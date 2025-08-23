@@ -32,8 +32,6 @@ jobs:
         working-directory: basics
 
       - name: Build
-        env:
-          BASE_URL: ${{ vars.PAGES_BASE_PATH }}
         run: npm run build
         working-directory: basics
 
