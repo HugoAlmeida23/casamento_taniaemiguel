@@ -1,0 +1,28 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import Countdown from '../components/Countdown.astro';
+import Ceremony from '../sections/Ceremony.astro';
+import LoveStory from '../sections/LoveStory.astro';
+import RSVP from '../sections/RSVP.astro';
+import GiftList from '../sections/GiftList.astro';
+import DressCode from '../sections/DressCode.astro';
+import Location from '../sections/Location.astro';
+import Gallery from '../sections/Gallery.astro';
+import Contact from '../sections/Contact.astro';
+---
+
+<Layout title="Tânia & Miguel">
+	<Hero />
+	<div class="px-4 max-w-7xl mx-auto space-y-8">
+		<Countdown />
+		<Ceremony />
+		<LoveStory />
+		<GiftList />
+		<DressCode />
+		<Location />
+		<Gallery />
+		<RSVP />
+		<Contact />
+	</div>
+</Layout>

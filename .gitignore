@@ -1,0 +1,12 @@
+# Root
+node_modules/
+*.log
+npm-debug.log*
+
+# Astro
+basics/dist/
+basics/.astro/
+
+# Env
+.env
+.env.*.local

@@ -1,0 +1,117 @@
+---
+// Photo gallery section
+---
+
+<section id="gallery" class="content-section py-20">
+	<div class="max-w-6xl mx-auto px-4">
+		<div class="text-center mb-16">
+			<div class="inline-flex items-center justify-center w-16 h-16 bg-rose-100 rounded-full mb-6">
+				<svg class="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+				</svg>
+			</div>
+			<h2 class="text-4xl md:text-5xl font-light text-gray-800 mb-4">
+				Galeria
+			</h2>
+			<div class="w-24 h-px bg-rose-400 mx-auto mb-8"></div>
+			<p class="text-lg text-gray-600 max-w-2xl mx-auto">
+				Algumas memórias especiais da nossa jornada juntos
+			</p>
+		</div>
+		
+		<!-- Gallery Grid -->
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+			<!-- Photo 1 -->
+			<div class="group relative aspect-w-4 aspect-h-5 rounded-lg overflow-hidden shadow-lg cursor-pointer gallery-item">
+				<img src="/images/1.jpg" alt="Foto 1" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+				<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+			</div>
+			
+			<!-- Photo 2 -->
+			<div class="group relative aspect-w-4 aspect-h-3 rounded-lg overflow-hidden shadow-lg cursor-pointer gallery-item">
+				<img src="/images/2.jpg" alt="Foto 2" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+				<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+			</div>
+			
+			<!-- Photo 3 -->
+			<div class="group relative aspect-w-4 aspect-h-5 rounded-lg overflow-hidden shadow-lg cursor-pointer gallery-item">
+				<img src="/images/3.jpg" alt="Foto 3" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+				<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+			</div>
+			
+			<!-- Photo 4 -->
+			<div class="group relative aspect-w-4 aspect-h-3 md:col-span-2 rounded-lg overflow-hidden shadow-lg cursor-pointer gallery-item">
+				<img src="/images/4.jpg" alt="Foto 4" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+				<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+			</div>
+			
+			<!-- Photo 5 -->
+			<div class="group relative aspect-w-4 aspect-h-5 rounded-lg overflow-hidden shadow-lg cursor-pointer gallery-item">
+				<img src="/images/5.jpg" alt="Foto 5" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
+				<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+			</div>
+			
+		</div>
+	</div>
+</section>
+
+<!-- Modal for full-size image viewing -->
+<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
+	<div class="relative max-w-4xl max-h-full">
+		<button 
+			id="closeModal" 
+			class="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+			aria-label="Fechar"
+		>
+			<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+			</svg>
+		</button>
+		<div id="modalImage" class="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
+			<svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+			</svg>
+		</div>
+	</div>
+</div>
+
+<script>
+	// Gallery interaction
+	document.addEventListener('DOMContentLoaded', function() {
+		const galleryItems = document.querySelectorAll('.gallery-item');
+		const modal = document.getElementById('imageModal');
+		const closeModal = document.getElementById('closeModal');
+		const modalImage = document.getElementById('modalImage');
+		
+		// Open modal when clicking on gallery item
+		galleryItems.forEach(item => {
+			item.addEventListener('click', function() {
+				if (modal) {
+					modal.classList.remove('hidden');
+				}
+			});
+		});
+		
+		// Close modal
+		function closeImageModal() {
+			if (modal) {
+				modal.classList.add('hidden');
+			}
+		}
+		
+		closeModal?.addEventListener('click', closeImageModal);
+		modal?.addEventListener('click', function(e) {
+			if (e.target === modal) {
+				closeImageModal();
+			}
+		});
+		
+		// Escape key to close modal
+		document.addEventListener('keydown', function(e) {
+			if (e.key === 'Escape') {
+				closeImageModal();
+			}
+		});
+	});
+</script>

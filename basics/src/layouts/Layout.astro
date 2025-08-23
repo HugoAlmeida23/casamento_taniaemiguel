@@ -1,0 +1,55 @@
+---
+import '../styles/global.css';
+
+export interface Props {
+	title?: string;
+}
+
+const { title = "Tânia & Miguel" } = Astro.props;
+const description = 'Junta-te a nós para celebrar o casamento da Tânia e do Miguel - 6 de setembro de 2025.';
+---
+<!doctype html>
+<html lang="pt">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="description" content={description} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<title>{title}</title>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	</head>
+	<body class="min-h-screen text-gray-900 font-inter antialiased overflow-x-hidden">
+		<!-- ALWAYS FIXED COUPLE BACKGROUND - NEVER MOVES -->
+		<div class="fixed inset-0 z-0">
+			<!-- Temporary gradient background until you add your couple's photo -->
+			<!-- <div class="absolute inset-0 bg-gradient-to-br from-rose-300 via-pink-200 to-rose-400 bg-fixed">
+			</div> -->
+			<!-- Your couple's photo background - ACTIVE -->
+			<div class="absolute inset-0 bg-cover bg-center bg-fixed bg-no-repeat" 
+				 style="background-image: url('/images/couple-background.jpg');">
+			</div>
+			<!-- Subtle overlay for better text readability -->
+			<div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-transparent"></div>
+		</div>
+		
+		<!-- FLOATING CONTENT SECTIONS - SCROLL OVER THE BACKGROUND -->
+		<div class="relative z-10 min-h-screen">
+			<slot />
+		</div>
+	</body>
+</html>
+
+<style>
+	html {
+		scroll-behavior: smooth;
+	}
+	
+	.font-inter {
+		font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+	}
+</style>
+

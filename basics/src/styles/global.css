@@ -1,0 +1,192 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Base tweaks */
+html, body {
+	scroll-behavior: smooth;
+}
+
+html {
+	overflow-x: hidden;
+}
+
+/* Parallax and smooth scrolling enhancements */
+body {
+	-webkit-overflow-scrolling: touch;
+}
+
+/* Content sections - COMPLETELY TRANSPARENT to show couple's background */
+.content-section {
+	background: transparent;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	border: none;
+	box-shadow: none;
+	margin: 3rem 1rem;
+	border-radius: 0;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-section:hover {
+	transform: translateY(-2px);
+}
+
+.hero-section {
+	background: transparent;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	border: none;
+	box-shadow: none;
+	margin: 0;
+	border-radius: 0;
+}
+
+/* Make ALL text white with shadows for readability over couple's background */
+.content-section h1,
+.content-section h2,
+.content-section h3,
+.content-section h4,
+.content-section h5,
+.content-section h6,
+.content-section p,
+.content-section span,
+.content-section label,
+.content-section div {
+	color: white !important;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Make all SVG icons white */
+.content-section svg {
+	color: white !important;
+}
+
+/* Style form elements to work with transparent background */
+.content-section input,
+.content-section textarea,
+.content-section select {
+	background: rgba(255, 255, 255, 0.9) !important;
+	border: 1px solid rgba(255, 255, 255, 0.5) !important;
+	color: #1f2937 !important;
+}
+
+/* Style buttons to have better contrast */
+.content-section button {
+	background: rgba(244, 63, 94, 0.9) !important;
+	border: 1px solid rgba(255, 255, 255, 0.3) !important;
+	color: white !important;
+	backdrop-filter: blur(10px);
+}
+
+.content-section button:hover {
+	background: rgba(244, 63, 94, 1) !important;
+}
+
+/* Special styling for elements that need background */
+.content-section .bg-white,
+.content-section .bg-gray-50,
+.content-section .bg-rose-100 {
+	background: rgba(255, 255, 255, 0.15) !important;
+	backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Smooth transitions for better user experience */
+* {
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 200ms;
+}
+
+/* Enhanced scrolling for a premium feel */
+html {
+	scroll-behavior: smooth;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(244, 63, 94, 0.3) transparent;
+}
+
+html::-webkit-scrollbar {
+	width: 6px;
+}
+
+html::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+html::-webkit-scrollbar-thumb {
+	background: rgba(244, 63, 94, 0.3);
+	border-radius: 3px;
+}
+
+html::-webkit-scrollbar-thumb:hover {
+	background: rgba(244, 63, 94, 0.5);
+}
+
+/* Elegant fade-in animation for content sections */
+.content-section {
+	animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* Custom aspect ratio utilities (fallback for older Tailwind versions) */
+.aspect-w-3 { position: relative; --tw-aspect-w: 3; }
+.aspect-w-4 { position: relative; --tw-aspect-w: 4; }
+.aspect-h-3 { --tw-aspect-h: 3; }
+.aspect-h-4 { --tw-aspect-h: 4; }
+.aspect-h-5 { --tw-aspect-h: 5; }
+
+.aspect-w-3 > *,
+.aspect-w-4 > * {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.aspect-w-3 {
+	padding-bottom: calc(var(--tw-aspect-h) / var(--tw-aspect-w) * 100%);
+}
+
+.aspect-w-4 {
+	padding-bottom: calc(var(--tw-aspect-h) / var(--tw-aspect-w) * 100%);
+}
+
+/* Custom animations */
+@keyframes float {
+	0%, 100% { transform: translateY(0px); }
+	50% { transform: translateY(-10px); }
+}
+
+.float {
+	animation: float 6s ease-in-out infinite;
+}
+
+/* Smooth transitions for interactive elements */
+* {
+	transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 150ms;
+}
+
+/* Focus states */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+	outline: 2px solid #f43f5e;
+	outline-offset: 2px;
+}

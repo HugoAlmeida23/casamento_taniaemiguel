@@ -1,0 +1,23 @@
+---
+const links = [
+  { href: '#historia', label: 'História' },
+  { href: '#localizacao', label: 'Localização' },
+  { href: '#dress-code', label: 'Dress code' },
+  { href: '#galeria', label: 'Galeria' },
+  { href: '#faq', label: 'FAQ' },
+  { href: '#contactos', label: 'Contactos' },
+  { href: '#rsvp', label: 'Confirmar presença' },
+];
+---
+
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/60 border-b border-gray-200">
+  <nav class="mx-auto max-w-6xl px-6 py-3 flex items-center justify-between" aria-label="Navegação principal">
+    <a href="#" class="text-lg font-semibold text-gray-900">Miguel & Tânia</a>
+    <ul class="hidden md:flex gap-6">
+      {links.map((l) => (
+        <li><a class="text-sm text-gray-700 hover:text-gray-900" href={l.href}>{l.label}</a></li>
+      ))}
+    </ul>
+    <a href="#rsvp" class="hidden md:inline-flex rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-rose-500">RSVP</a>
+  </nav>
+</header>

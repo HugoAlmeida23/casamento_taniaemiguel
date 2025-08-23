@@ -1,0 +1,84 @@
+---
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+const hasSupabase = Boolean(supabaseUrl && supabaseKey);
+---
+
+<section id="rsvp" class="bg-white">
+  <div class="mx-auto max-w-2xl px-6 py-20">
+    <h2 class="text-3xl font-semibold text-gray-900">Confirmar presença</h2>
+    {
+      hasSupabase ? (
+        <form id="rsvp-form" class="mt-6 grid gap-4" autocomplete="on">
+          <div>
+            <label class="block text-sm font-medium text-gray-700" for="nome">Nome</label>
+            <input id="nome" name="nome" required class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700" for="email">Email</label>
+            <input id="email" name="email" type="email" required class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700" for="telefone">Telefone</label>
+            <input id="telefone" name="telefone" type="tel" class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700" for="acompanha">Levas acompanhante?</label>
+            <select id="acompanha" name="acompanha" class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500">
+              <option value="nao">Não</option>
+              <option value="sim">Sim</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700" for="restricoes">Restrições alimentares</label>
+            <textarea id="restricoes" name="restricoes" rows="3" class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-rose-500 focus:outline-none focus:ring-1 focus:ring-rose-500" />
+          </div>
+          <div>
+            <button type="submit" class="inline-flex justify-center rounded-md bg-rose-600 px-6 py-3 text-sm font-semibold text-white shadow-sm hover:bg-rose-500">Enviar</button>
+          </div>
+          <p id="rsvp-message" class="text-sm"></p>
+        </form>
+      ) : (
+        <p class="mt-4 text-gray-600">Configura o Supabase para ativar o formulário (ver variáveis PUBLIC_SUPABASE_URL e PUBLIC_SUPABASE_ANON_KEY).</p>
+      )
+    }
+  </div>
+</section>
+
+<script>
+  const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+  const supabaseKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+  if (supabaseUrl && supabaseKey) {
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const form = document.getElementById('rsvp-form');
+    const message = document.getElementById('rsvp-message');
+
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      message.textContent = '';
+      const data = Object.fromEntries(new FormData(form));
+      try {
+        const { error } = await supabase.from('rsvps').insert({
+          nome: data.nome,
+          email: data.email,
+          telefone: data.telefone || null,
+          acompanha: data.acompanha === 'sim',
+          restricoes: data.restricoes || null,
+          created_at: new Date().toISOString(),
+        });
+        if (error) throw error;
+        form.reset();
+        message.className = 'text-sm text-green-700 mt-2';
+        message.textContent = 'Obrigado! Recebemos a tua confirmação.';
+      } catch (err) {
+        console.error(err);
+        message.className = 'text-sm text-rose-700 mt-2';
+        message.textContent = 'Ocorreu um erro. Tenta novamente mais tarde.';
+      }
+    });
+  }
+</script>

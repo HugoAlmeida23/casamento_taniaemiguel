@@ -1,0 +1,22 @@
+---
+const imagens = [
+  { src: '/images/1.jpg', alt: 'Foto do casal 1' },
+  { src: '/images/2.jpg', alt: 'Foto do casal 2' },
+  { src: '/images/3.jpg', alt: 'Foto do casal 3' },
+  { src: '/images/4.jpg', alt: 'Foto do casal 4' },
+  { src: '/images/5.jpg', alt: 'Foto do casal 5' },
+  { src: '/images/6.jpg', alt: 'Foto do casal 6' },
+];
+---
+
+<section class="bg-gray-50">
+  <div class="mx-auto max-w-6xl px-6 py-20">
+    <h2 class="text-3xl font-semibold text-gray-900">Galeria</h2>
+    <div class="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3">
+      {imagens.map((img) => (
+        <img src={img.src} alt={img.alt} class="aspect-square w-full rounded-lg object-cover" loading="lazy" />
+      ))}
+    </div>
+  </div>
+  <a id="faq"></a>
+</section>

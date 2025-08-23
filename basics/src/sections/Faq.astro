@@ -1,0 +1,23 @@
+---
+const faqs = [
+  { q: 'Posso levar acompanhante?', a: 'Indica no RSVP se levas acompanhante. Se tiveres dúvidas, fala connosco.' },
+  { q: 'Há estacionamento?', a: 'Sim, há estacionamento nas imediações de ambos os locais.' },
+  { q: 'Tenho restrições alimentares.', a: 'Indica tudo no formulário de RSVP. Vamos tratar de ti.' },
+  { q: 'Crianças são bem-vindas?', a: 'Claro! Avisa-nos no RSVP para prepararmos tudo.' },
+];
+---
+
+<section class="bg-white">
+  <div class="mx-auto max-w-6xl px-6 py-20">
+    <h2 class="text-3xl font-semibold text-gray-900">Perguntas frequentes</h2>
+    <dl class="mt-8 grid gap-6 md:grid-cols-2">
+      {faqs.map((f) => (
+        <div class="rounded-lg border border-gray-200 bg-white p-6">
+          <dt class="font-medium text-gray-900">{f.q}</dt>
+          <dd class="mt-2 text-gray-600">{f.a}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+  <a id="contactos"></a>
+</section>
