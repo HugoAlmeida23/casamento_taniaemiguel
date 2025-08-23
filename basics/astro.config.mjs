@@ -4,6 +4,7 @@ import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
-  base: process.env.BASE_URL ?? '/',
+  site: 'https://hugoalmeida23.github.io',
+  base: '/casamento_taniaemiguel',
   integrations: [tailwind()],
 });
