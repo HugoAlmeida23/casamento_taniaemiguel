@@ -2,8 +2,9 @@
 const faqs = [
   { q: 'Posso levar acompanhante?', a: 'Indica no formulário se levas acompanhante. Se tiveres dúvidas, fala connosco.' },
   { q: 'Há estacionamento?', a: 'Sim, estacionamento gratuito disponível no local.' },
-  { q: 'Tenho restrições alimentares.', a: 'diz tudo no formulario' },
-  { q: 'Posso tirar fotos na cerimónia?', a: 'óbvio lol ' },
+  { q: 'Tenho restrições alimentares, o que faço?', a: 'Indica tudo no formulário de confirmação e nós tratamos do resto.' },
+  { q: 'Posso tirar fotos na cerimónia?', a: 'Claro! Tirem à vontade, mas pedimos que não bloqueiem a passagem do fotógrafo profissional.' },
+  { q: 'Posso levar crianças?', a: 'Sim! Indica os nomes e idades no formulário para podermos preparar tudo.' },
 ];
 ---
 
@@ -13,9 +14,7 @@ const faqs = [
 			<p class="section-subtitle">Dúvidas</p>
 			<h2 class="section-title">Perguntas Frequentes</h2>
 			<div class="ornament">
-				<svg class="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 24 24">
-					<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-				</svg>
+				<span class="text-lg">🌿</span>
 			</div>
 		</div>
 
@@ -52,12 +51,12 @@ const faqs = [
 	}
 
 	.faq-item:hover {
-		border-color: rgba(244, 163, 166, 0.3);
+		border-color: rgba(143, 138, 94, 0.3);
 		box-shadow: 0 4px 20px rgba(0,0,0,0.04);
 	}
 
 	.faq-item.active {
-		border-color: rgba(244, 163, 166, 0.4);
+		border-color: rgba(143, 138, 94, 0.4);
 		box-shadow: 0 8px 30px rgba(0,0,0,0.06);
 	}
 
@@ -89,14 +88,14 @@ const faqs = [
 		align-items: center;
 		justify-content: center;
 		border-radius: 50%;
-		background: #faf9f7;
-		color: #999;
+		background: #f8f7f2;
+		color: #8f8a5e;
 		transition: background 0.3s ease, color 0.3s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 	}
 
 	.faq-item.active .faq-icon {
-		background: #fff1f2;
-		color: #f4a0a0;
+		background: #efeee5;
+		color: #74704a;
 		transform: rotate(45deg);
 	}
 
@@ -149,7 +148,6 @@ const faqs = [
 		trigger?.addEventListener('click', () => {
 			const isActive = item.classList.contains('active');
 
-			// Close all others
 			items.forEach(other => {
 				if (other !== item) {
 					other.classList.remove('active');
@@ -157,7 +155,6 @@ const faqs = [
 				}
 			});
 
-			// Toggle current
 			if (isActive) {
 				item.classList.remove('active');
 				trigger.setAttribute('aria-expanded', 'false');

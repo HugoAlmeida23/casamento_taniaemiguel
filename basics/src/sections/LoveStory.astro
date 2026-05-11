@@ -1,5 +1,5 @@
 ---
-// Love story section - elegant with image
+// A nossa história — with photos and brief text
 ---
 
 <section id="lovestory" class="wedding-section bg-white">
@@ -8,9 +8,7 @@
 			<p class="section-subtitle">A nossa jornada</p>
 			<h2 class="section-title">A Nossa História</h2>
 			<div class="ornament">
-				<svg class="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 24 24">
-					<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-				</svg>
+				<span class="text-lg">🌿</span>
 			</div>
 		</div>
 
@@ -42,9 +40,37 @@
 					celebrando não só o que fomos até aqui, mas principalmente tudo o que 
 					ainda vamos viver juntos.
 				</p>
-				<p class="text-rose-400 italic pt-4" style="font-family: 'Playfair Display', serif; font-size: 1.1rem;">
-					Com amor, Tânia & Miguel 💕
+				<p class="text-olive-600 italic pt-4" style="font-family: 'Playfair Display', serif; font-size: 1.1rem;">
+					Com amor, Tânia & Miguel 🌿
 				</p>
+			</div>
+		</div>
+
+		<!-- Additional photos row -->
+		<div class="grid grid-cols-3 gap-3 mt-10">
+			<div class="rounded-2xl overflow-hidden">
+				<img 
+					src={`${import.meta.env.BASE_URL}/images/1.jpg`}
+					alt="Foto do casal" 
+					class="w-full h-32 md:h-48 object-cover"
+					loading="lazy"
+				/>
+			</div>
+			<div class="rounded-2xl overflow-hidden">
+				<img 
+					src={`${import.meta.env.BASE_URL}/images/2.jpg`}
+					alt="Foto do casal" 
+					class="w-full h-32 md:h-48 object-cover"
+					loading="lazy"
+				/>
+			</div>
+			<div class="rounded-2xl overflow-hidden">
+				<img 
+					src={`${import.meta.env.BASE_URL}/images/3.jpg`}
+					alt="Foto do casal" 
+					class="w-full h-32 md:h-48 object-cover"
+					loading="lazy"
+				/>
 			</div>
 		</div>
 	</div>
