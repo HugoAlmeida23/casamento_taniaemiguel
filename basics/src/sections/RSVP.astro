@@ -1,153 +1,317 @@
 ---
-// RSVP section with form
+// RSVP section - dynamic form that adapts to solo, couple, family, groups
 ---
 
-<section id="rsvp" class="content-section py-20">
-	<div class="max-w-4xl mx-auto px-4">
-		<div class="text-center mb-16">
-			<div class="inline-flex items-center justify-center w-16 h-16 bg-rose-100 rounded-full mb-6">
-				<svg class="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+<section id="rsvp" class="wedding-section bg-[#faf9f7]">
+	<div class="max-w-2xl mx-auto">
+		<div class="section-header">
+			<p class="section-subtitle">Esperamos por vocês</p>
+			<h2 class="section-title">Confirmações</h2>
+			<div class="ornament">
+				<svg class="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 24 24">
+					<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
 				</svg>
 			</div>
-			<h2 class="text-4xl md:text-5xl font-light text-gray-800 mb-4">
-				Confirmação de Presença
-			</h2>
-			<div class="w-24 h-px bg-rose-400 mx-auto mb-8"></div>
-			<p class="text-lg text-gray-600 max-w-2xl mx-auto">
-				A vossa presença é o melhor presente que podemos receber. 
-				Por favor, confirmem a vossa participação até 15 de agosto de 2025.
-			</p>
 		</div>
-		
-		<div class="bg-white rounded-lg shadow-lg p-8 md:p-12">
-			<form id="rsvp-form" class="space-y-6">
-				<div class="grid md:grid-cols-2 gap-6">
-					<div>
-						<label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">
-							Primeiro Nome *
-						</label>
-						<input 
-							type="text" 
-							id="firstName" 
-							name="firstName" 
-							required 
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors"
-							placeholder="O teu primeiro nome"
-						>
-					</div>
-					<div>
-						<label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">
-							Último Nome *
-						</label>
-						<input 
-							type="text" 
-							id="lastName" 
-							name="lastName" 
-							required 
-							class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors"
-							placeholder="O teu último nome"
-						>
-					</div>
-				</div>
-				
+
+		<div class="wedding-card">
+			<form id="rsvp-form" class="space-y-5" autocomplete="on">
+				<!-- Nome -->
 				<div>
-					<label for="email" class="block text-sm font-medium text-gray-700 mb-2">
-						Email *
-					</label>
-					<input 
-						type="email" 
-						id="email" 
-						name="email" 
-						required 
-						class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors"
-						placeholder="o.teu@email.com"
-					>
+					<label for="nome" class="rsvp-label">O teu nome *</label>
+					<input type="text" id="nome" name="nome" required class="rsvp-input" placeholder="O teu nome completo" />
 				</div>
-				
+
+				<!-- Telefone -->
 				<div>
-					<label for="guests" class="block text-sm font-medium text-gray-700 mb-2">
-						Número de acompanhantes
-					</label>
-					<select 
-						id="guests" 
-						name="guests" 
-						class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors"
-					>
-						<option value="0">Apenas eu</option>
-						<option value="1">Eu + 1 acompanhante</option>
-						<option value="2">Eu + 2 acompanhantes</option>
-						<option value="3">Eu + 3 acompanhantes</option>
-						<option value="4">Eu + 4 acompanhantes</option>
-					</select>
+					<label for="telefone" class="rsvp-label">Telemóvel *</label>
+					<input type="tel" id="telefone" name="telefone" required class="rsvp-input" placeholder="+351 912 345 678" />
 				</div>
-				
+
+				<!-- Quantas pessoas -->
 				<div>
-					<label class="block text-sm font-medium text-gray-700 mb-4">
-						Consegues estar presente? *
-					</label>
-					<div class="space-y-3">
-						<label class="flex items-center">
-							<input 
-								type="radio" 
-								name="attendance" 
-								value="yes" 
-								required 
-								class="h-4 w-4 text-rose-500 focus:ring-rose-500 border-gray-300"
-							>
-							<span class="ml-3 text-gray-700">Sim, estarei presente! 🎉</span>
+					<label class="rsvp-label">Quantas pessoas vêm contigo? (incluindo-te)</label>
+					<div class="grid grid-cols-4 gap-2" id="guest-count-options">
+						<label class="rsvp-option-label">
+							<input type="radio" name="numGuests" value="1" checked class="sr-only peer" />
+							<div class="rsvp-count-option peer-checked:border-rose-400 peer-checked:bg-rose-50 peer-checked:text-rose-600">
+								<span class="text-lg font-medium">1</span>
+							</div>
 						</label>
-						<label class="flex items-center">
-							<input 
-								type="radio" 
-								name="attendance" 
-								value="no" 
-								required 
-								class="h-4 w-4 text-rose-500 focus:ring-rose-500 border-gray-300"
-							>
-							<span class="ml-3 text-gray-700">Infelizmente não posso comparecer 😔</span>
+						<label class="rsvp-option-label">
+							<input type="radio" name="numGuests" value="2" class="sr-only peer" />
+							<div class="rsvp-count-option peer-checked:border-rose-400 peer-checked:bg-rose-50 peer-checked:text-rose-600">
+								<span class="text-lg font-medium">2</span>
+							</div>
+						</label>
+						<label class="rsvp-option-label">
+							<input type="radio" name="numGuests" value="3" class="sr-only peer" />
+							<div class="rsvp-count-option peer-checked:border-rose-400 peer-checked:bg-rose-50 peer-checked:text-rose-600">
+								<span class="text-lg font-medium">3</span>
+							</div>
+						</label>
+						<label class="rsvp-option-label">
+							<input type="radio" name="numGuests" value="4+" class="sr-only peer" />
+							<div class="rsvp-count-option peer-checked:border-rose-400 peer-checked:bg-rose-50 peer-checked:text-rose-600">
+								<span class="text-lg font-medium">4+</span>
+							</div>
 						</label>
 					</div>
 				</div>
-				
-				<div>
-					<label for="dietary" class="block text-sm font-medium text-gray-700 mb-2">
-						Restrições alimentares ou observações
-					</label>
-					<textarea 
-						id="dietary" 
-						name="dietary" 
-						rows="4" 
-						class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent transition-colors resize-none"
-						placeholder="Deixa-nos saber se tens alguma restrição alimentar ou algo que queiras partilhar connosco..."
-					></textarea>
+
+				<!-- Dynamic guest names -->
+				<div id="guests-container" class="space-y-3 hidden">
+					<label class="rsvp-label">Nomes dos acompanhantes</label>
+					<div id="guests-list" class="space-y-2"></div>
 				</div>
-				
-				<div class="text-center pt-6">
+
+				<!-- Crianças -->
+				<div id="children-section" class="hidden">
+					<label class="rsvp-label">Alguma criança no grupo?</label>
+					<div class="grid grid-cols-2 gap-3">
+						<label class="rsvp-option-label">
+							<input type="radio" name="children" value="no" checked class="sr-only peer" />
+							<div class="rsvp-option-sm peer-checked:border-rose-400 peer-checked:bg-rose-50">
+								<span class="text-sm">Não</span>
+							</div>
+						</label>
+						<label class="rsvp-option-label">
+							<input type="radio" name="children" value="yes" class="sr-only peer" />
+							<div class="rsvp-option-sm peer-checked:border-rose-400 peer-checked:bg-rose-50">
+								<span class="text-sm">Sim</span>
+							</div>
+						</label>
+					</div>
+				</div>
+
+				<!-- Nomes crianças -->
+				<div id="children-names-section" class="hidden">
+					<label for="childrenNames" class="rsvp-label">Nomes e idades das crianças</label>
+					<input type="text" id="childrenNames" name="childrenNames" class="rsvp-input" placeholder="Ex: Maria (3 anos), João (7 anos)" />
+				</div>
+
+				<!-- Restrições -->
+				<div>
+					<label for="restricoes" class="rsvp-label">Alergias ou restrições alimentares</label>
+					<textarea id="restricoes" name="restricoes" rows="2" class="rsvp-input resize-none" placeholder="Vegetariano, alergias, etc. (opcional)"></textarea>
+				</div>
+
+				<!-- Mensagem -->
+				<div>
+					<label for="mensagem" class="rsvp-label">Mensagem para os noivos (opcional)</label>
+					<textarea id="mensagem" name="mensagem" rows="2" class="rsvp-input resize-none" placeholder="Uma palavrinha para nós..."></textarea>
+				</div>
+
+				<!-- Submit -->
+				<div class="pt-3">
 					<button 
 						type="submit" 
-						class="bg-rose-500 hover:bg-rose-600 text-white font-medium px-8 py-4 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
+						id="submit-btn"
+						class="w-full py-4 px-6 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium uppercase tracking-[0.15em] rounded-full transition-all duration-300 hover:shadow-lg"
 					>
-						Confirmar Presença
+						Enviar Confirmação
 					</button>
 				</div>
+
+				<!-- Message -->
+				<div id="rsvp-message" class="hidden rounded-xl p-4 text-center text-sm"></div>
 			</form>
 		</div>
 	</div>
 </section>
 
+<style>
+	.rsvp-label {
+		@apply block text-xs uppercase tracking-[0.15em] text-gray-400 font-medium mb-2;
+	}
+
+	.rsvp-input {
+		@apply w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 bg-white text-sm transition-all duration-200;
+	}
+
+	.rsvp-input:focus {
+		@apply outline-none border-rose-300 ring-3 ring-rose-100;
+	}
+
+	.rsvp-input::placeholder {
+		@apply text-gray-300;
+	}
+
+	.rsvp-option-label {
+		@apply cursor-pointer;
+	}
+
+	.rsvp-option {
+		@apply flex flex-col items-center justify-center p-4 border-2 border-gray-100 rounded-xl transition-all duration-200 text-center;
+	}
+
+	.rsvp-option-sm {
+		@apply flex items-center justify-center p-3 border-2 border-gray-100 rounded-xl transition-all duration-200 text-center;
+	}
+
+	.rsvp-count-option {
+		@apply flex items-center justify-center p-3 border-2 border-gray-100 rounded-xl transition-all duration-200 text-center text-gray-600;
+	}
+
+	#rsvp-message.success {
+		@apply bg-green-50 text-green-700 border border-green-200;
+	}
+
+	#rsvp-message.error {
+		@apply bg-red-50 text-red-700 border border-red-200;
+	}
+
+	/* Smooth reveal for dynamic sections */
+	#guests-container,
+	#children-section,
+	#children-names-section {
+		transition: opacity 0.3s ease, transform 0.3s ease;
+	}
+
+	#guests-container.hidden,
+	#children-section.hidden,
+	#children-names-section.hidden {
+		opacity: 0;
+		transform: translateY(-4px);
+		pointer-events: none;
+		position: absolute;
+		visibility: hidden;
+	}
+
+	#guests-container:not(.hidden),
+	#children-section:not(.hidden),
+	#children-names-section:not(.hidden) {
+		opacity: 1;
+		transform: translateY(0);
+		position: relative;
+		visibility: visible;
+	}
+</style>
+
 <script>
-	document.getElementById('rsvp-form')?.addEventListener('submit', function(e) {
+	const form = document.getElementById('rsvp-form') as HTMLFormElement;
+	const message = document.getElementById('rsvp-message') as HTMLDivElement;
+	const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
+	const guestsContainer = document.getElementById('guests-container') as HTMLDivElement;
+	const guestsList = document.getElementById('guests-list') as HTMLDivElement;
+	const childrenSection = document.getElementById('children-section') as HTMLDivElement;
+	const childrenNamesSection = document.getElementById('children-names-section') as HTMLDivElement;
+
+	// Handle guest count changes
+	const guestRadios = document.querySelectorAll('input[name="numGuests"]');
+	guestRadios.forEach(radio => {
+		radio.addEventListener('change', () => {
+			const value = (radio as HTMLInputElement).value;
+			updateGuestFields(value);
+		});
+	});
+
+	function updateGuestFields(value: string) {
+		const num = value === '4+' ? 4 : parseInt(value);
+
+		if (num <= 1) {
+			guestsContainer.classList.add('hidden');
+			childrenSection.classList.add('hidden');
+			childrenNamesSection.classList.add('hidden');
+		} else {
+			guestsContainer.classList.remove('hidden');
+			childrenSection.classList.remove('hidden');
+
+			// Generate guest name inputs (num - 1 because the main person already gave their name)
+			guestsList.innerHTML = '';
+			for (let i = 1; i < num; i++) {
+				const input = document.createElement('input');
+				input.type = 'text';
+				input.name = `guest_${i}`;
+				input.placeholder = `Nome do acompanhante ${i}`;
+				input.className = 'w-full px-4 py-3 border border-gray-200 rounded-xl text-gray-900 bg-white text-sm transition-all duration-200 focus:outline-none focus:border-rose-300 focus:ring-3 focus:ring-rose-100';
+				guestsList.appendChild(input);
+			}
+
+			// If 4+, add a note
+			if (value === '4+') {
+				const note = document.createElement('p');
+				note.className = 'text-xs text-gray-400 italic mt-1';
+				note.textContent = 'Se forem mais de 4, escreve todos os nomes separados por vírgula no último campo.';
+				guestsList.appendChild(note);
+			}
+		}
+	}
+
+	// Handle children toggle
+	const childrenRadios = document.querySelectorAll('input[name="children"]');
+	childrenRadios.forEach(radio => {
+		radio.addEventListener('change', () => {
+			const value = (radio as HTMLInputElement).value;
+			if (value === 'yes') {
+				childrenNamesSection.classList.remove('hidden');
+			} else {
+				childrenNamesSection.classList.add('hidden');
+			}
+		});
+	});
+
+	// Form submit
+	form?.addEventListener('submit', async (e) => {
 		e.preventDefault();
-		
-		// Show success message
-		const form = e.target as HTMLFormElement;
+
+		message.classList.add('hidden');
+		message.classList.remove('success', 'error');
+
+		submitBtn.disabled = true;
+		const originalText = submitBtn.textContent;
+		submitBtn.textContent = 'A enviar...';
+
 		const formData = new FormData(form);
 		
-		// Simple success feedback
-		alert('Obrigado pela confirmação! Recebemos a tua resposta e entraremos em contacto em breve.');
-		
-		// Reset form
-		form.reset();
+		// Collect guest names
+		const guests: string[] = [];
+		const numGuests = formData.get('numGuests') as string;
+		const num = numGuests === '4+' ? 4 : parseInt(numGuests);
+		for (let i = 1; i < num; i++) {
+			const name = formData.get(`guest_${i}`) as string;
+			if (name?.trim()) guests.push(name.trim());
+		}
+
+		const payload = {
+			nome: formData.get('nome'),
+			telefone: formData.get('telefone'),
+			attending: formData.get('attending') === 'yes',
+			numGuests: numGuests,
+			guests: guests,
+			children: formData.get('children') === 'yes',
+			childrenNames: formData.get('childrenNames') || null,
+			restricoes: formData.get('restricoes') || null,
+			mensagem: formData.get('mensagem') || null,
+		};
+
+		try {
+			const resp = await fetch('/api/rsvp', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(payload),
+			});
+
+			if (!resp.ok) throw new Error('API error');
+
+			form.reset();
+			// Reset dynamic sections
+			guestsContainer.classList.add('hidden');
+			childrenSection.classList.add('hidden');
+			childrenNamesSection.classList.add('hidden');
+			guestsList.innerHTML = '';
+
+			message.classList.remove('hidden');
+			message.classList.add('success');
+			message.textContent = '✨ Obrigado! Recebemos a vossa confirmação. Mal podemos esperar!';
+		} catch (err) {
+			console.error(err);
+			message.classList.remove('hidden');
+			message.classList.add('error');
+			message.textContent = 'Ocorreu um erro. Tentem novamente ou contactem-nos diretamente.';
+		} finally {
+			submitBtn.disabled = false;
+			submitBtn.textContent = originalText;
+		}
 	});
 </script>

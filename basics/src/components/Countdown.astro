@@ -1,65 +1,60 @@
 ---
-// Countdown timer to the wedding date - Compact style
+// Compact countdown timer (alternative style)
 ---
 
-<section class="content-section py-12">
+<section class="py-12 bg-rose-600 dark:bg-rose-900 transition-colors">
 	<div class="max-w-4xl mx-auto px-4 text-center">
-		<!-- Wedding Date Header -->
-		<div class="mb-8">
-			<div class="text-sm md:text-base text-white/80 font-medium tracking-wider uppercase mb-2 drop-shadow-md">
-				SET
-			</div>
-			<h2 class="text-5xl md:text-6xl font-bold text-white drop-shadow-lg">
-				6 <span class="text-3xl md:text-4xl font-normal">2025</span>
+		<div class="mb-6">
+			<p class="text-sm text-white/80 font-medium tracking-wider uppercase mb-1">Setembro</p>
+			<h2 class="text-4xl md:text-5xl font-bold text-white">
+				6 <span class="text-2xl md:text-3xl font-normal opacity-80">2025</span>
 			</h2>
 		</div>
-		
-		<!-- Compact Countdown -->
-		<div id="countdown" class="flex justify-center items-center space-x-4 md:space-x-6">
-			<div class="countdown-item">
-				<div class="countdown-number" id="days">0</div>
-				<div class="countdown-label">DIAS</div>
+
+		<div id="countdown-compact" class="flex justify-center items-center gap-3 md:gap-5">
+			<div class="countdown-compact-item">
+				<div class="countdown-compact-number" id="compact-days">0</div>
+				<div class="countdown-compact-label">Dias</div>
 			</div>
-			<div class="countdown-item">
-				<div class="countdown-number" id="hours">0</div>
-				<div class="countdown-label">HORAS</div>
+			<div class="countdown-compact-item">
+				<div class="countdown-compact-number" id="compact-hours">0</div>
+				<div class="countdown-compact-label">Horas</div>
 			</div>
-			<div class="countdown-item">
-				<div class="countdown-number" id="minutes">0</div>
-				<div class="countdown-label">MIN.</div>
+			<div class="countdown-compact-item">
+				<div class="countdown-compact-number" id="compact-minutes">0</div>
+				<div class="countdown-compact-label">Min</div>
 			</div>
-			<div class="countdown-item">
-				<div class="countdown-number" id="seconds">0</div>
-				<div class="countdown-label">SEG.</div>
+			<div class="countdown-compact-item">
+				<div class="countdown-compact-number" id="compact-seconds">0</div>
+				<div class="countdown-compact-label">Seg</div>
 			</div>
 		</div>
 	</div>
 </section>
 
 <style>
-	.countdown-item {
-		@apply text-center bg-black/20 backdrop-blur-sm rounded-lg px-3 py-2 md:px-4 md:py-3 border border-white/10;
+	.countdown-compact-item {
+		@apply text-center bg-white/15 backdrop-blur-sm rounded-xl px-4 py-3 md:px-5 md:py-4 border border-white/20;
 	}
-	
-	.countdown-number {
-		@apply text-3xl md:text-4xl font-bold text-white leading-none;
-		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
+	.countdown-compact-number {
+		@apply text-2xl md:text-3xl font-bold text-white leading-none;
 	}
-	
-	.countdown-label {
-		@apply text-xs md:text-sm font-medium text-white/80 mt-1 tracking-wide uppercase;
-		text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+
+	.countdown-compact-label {
+		@apply text-xs font-medium text-white/70 mt-1 uppercase tracking-wide;
 	}
 </style>
 
 <script>
-	function updateCountdown() {
-		const weddingDate = new Date('2025-09-06T15:30:00').getTime();
+	function updateCompactCountdown() {
+		const weddingDate = new Date('2027-06-20T15:30:00').getTime();
 		const now = new Date().getTime();
 		const distance = weddingDate - now;
 
 		if (distance < 0) {
-			document.getElementById('countdown')!.innerHTML = '<div class="text-4xl font-bold text-white bg-black/30 backdrop-blur-sm rounded-lg px-6 py-4">Hoje é o grande dia! 🎉</div>';
+			const el = document.getElementById('countdown-compact');
+			if (el) el.innerHTML = '<div class="text-2xl font-bold text-white py-4">🎉 Hoje é o grande dia!</div>';
 			return;
 		}
 
@@ -68,40 +63,17 @@
 		const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
 		const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-		document.getElementById('days')!.textContent = days.toString();
-		document.getElementById('hours')!.textContent = hours.toString().padStart(2, '0');
-		document.getElementById('minutes')!.textContent = minutes.toString().padStart(2, '0');
-		document.getElementById('seconds')!.textContent = seconds.toString().padStart(2, '0');
+		const daysEl = document.getElementById('compact-days');
+		const hoursEl = document.getElementById('compact-hours');
+		const minutesEl = document.getElementById('compact-minutes');
+		const secondsEl = document.getElementById('compact-seconds');
+
+		if (daysEl) daysEl.textContent = days.toString();
+		if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+		if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+		if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
 	}
 
-	// Update countdown immediately and then every second
-	updateCountdown();
-	setInterval(updateCountdown, 1000);
-</script>
-
-<script>
-	function updateCountdown() {
-		const weddingDate = new Date('2025-09-06T15:30:00').getTime();
-		const now = new Date().getTime();
-		const distance = weddingDate - now;
-
-		if (distance < 0) {
-			document.getElementById('countdown')!.innerHTML = '<div class="text-4xl font-bold text-white">Hoje é o grande dia!</div>';
-			return;
-		}
-
-		const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-		const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-		const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-		const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-		document.getElementById('days')!.textContent = days.toString();
-		document.getElementById('hours')!.textContent = hours.toString().padStart(2, '0');
-		document.getElementById('minutes')!.textContent = minutes.toString().padStart(2, '0');
-		document.getElementById('seconds')!.textContent = seconds.toString().padStart(2, '0');
-	}
-
-	// Update countdown immediately and then every second
-	updateCountdown();
-	setInterval(updateCountdown, 1000);
+	updateCompactCountdown();
+	setInterval(updateCompactCountdown, 1000);
 </script>

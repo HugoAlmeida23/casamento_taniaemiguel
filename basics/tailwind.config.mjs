@@ -4,7 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'inter': ['Inter', 'system-ui', 'sans-serif'],
+        'playfair': ['Playfair Display', 'Georgia', 'serif'],
+        'montserrat': ['Montserrat', 'system-ui', 'sans-serif'],
       },
       colors: {
         rose: {
@@ -20,10 +21,8 @@ export default {
           900: '#881337',
         },
       },
-      aspectRatio: {
-        '4/3': '4 / 3',
-        '4/5': '4 / 5',
-        '3/4': '3 / 4',
+      ringWidth: {
+        '3': '3px',
       },
     },
   },

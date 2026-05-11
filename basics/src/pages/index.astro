@@ -1,28 +1,34 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Hero from '../components/Hero.astro';
-import Countdown from '../components/Countdown.astro';
+import IntroScreen from '../components/IntroScreen.astro';
+import QuizGate from '../components/QuizGate.astro';
+import HeroModern from '../components/HeroModern.astro';
+import CountdownModern from '../components/CountdownModern.astro';
 import Ceremony from '../sections/Ceremony.astro';
+import Timeline from '../sections/Timeline.astro';
 import LoveStory from '../sections/LoveStory.astro';
-import RSVP from '../sections/RSVP.astro';
-import GiftList from '../sections/GiftList.astro';
-import DressCode from '../sections/DressCode.astro';
-import Location from '../sections/Location.astro';
 import Gallery from '../sections/Gallery.astro';
+import DressCode from '../sections/DressCode.astro';
+import GiftList from '../sections/GiftList.astro';
+import Location from '../sections/Location.astro';
+import Faq from '../sections/Faq.astro';
+import RSVP from '../sections/RSVP.astro';
 import Contact from '../sections/Contact.astro';
 ---
 
-<Layout title="Tânia & Miguel">
-	<Hero />
-	<div class="px-4 max-w-7xl mx-auto space-y-8">
-		<Countdown />
-		<Ceremony />
-		<LoveStory />
-		<GiftList />
-		<DressCode />
-		<Location />
-		<Gallery />
-		<RSVP />
-		<Contact />
-	</div>
+<Layout title="Tânia & Miguel — 20 de Junho de 2027">
+	<IntroScreen />
+	<QuizGate />
+	<HeroModern />
+	<CountdownModern />
+	<Ceremony />
+	<Timeline />
+	<LoveStory />
+	<Gallery />
+	<DressCode />
+	<GiftList />
+	<Location />
+	<Faq />
+	<RSVP />
+	<Contact />
 </Layout>

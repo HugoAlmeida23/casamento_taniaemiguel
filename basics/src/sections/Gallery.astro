@@ -1,117 +1,112 @@
 ---
-// Photo gallery section
+// Photo gallery with lightbox
+const images = [
+	{ src: '1.jpg', alt: 'Foto do casal 1' },
+	{ src: '2.jpg', alt: 'Foto do casal 2' },
+	{ src: '3.jpg', alt: 'Foto do casal 3' },
+	{ src: '4.jpg', alt: 'Foto do casal 4' },
+	{ src: '5.jpg', alt: 'Foto do casal 5' },
+	{ src: '6.jpg', alt: 'Foto do casal 6' },
+];
 ---
 
-<section id="gallery" class="content-section py-20">
-	<div class="max-w-6xl mx-auto px-4">
-		<div class="text-center mb-16">
-			<div class="inline-flex items-center justify-center w-16 h-16 bg-rose-100 rounded-full mb-6">
-				<svg class="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+<section id="gallery" class="wedding-section bg-[#faf9f7]">
+	<div class="max-w-5xl mx-auto">
+		<div class="section-header">
+			<p class="section-subtitle">Memórias</p>
+			<h2 class="section-title">Galeria</h2>
+			<div class="ornament">
+				<svg class="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 24 24">
+					<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
 				</svg>
 			</div>
-			<h2 class="text-4xl md:text-5xl font-light text-gray-800 mb-4">
-				Galeria
-			</h2>
-			<div class="w-24 h-px bg-rose-400 mx-auto mb-8"></div>
-			<p class="text-lg text-gray-600 max-w-2xl mx-auto">
-				Algumas memórias especiais da nossa jornada juntos
-			</p>
 		</div>
-		
-		<!-- Gallery Grid -->
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-			<!-- Photo 1 -->
-			<div class="group relative aspect-w-4 aspect-h-5 rounded-lg overflow-hidden shadow-lg cursor-pointer gallery-item">
-				<img src={`${import.meta.env.BASE_URL}/images/1.jpg`} alt="Foto 1" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
-				<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
-			</div>
-			
-			<!-- Photo 2 -->
-			<div class="group relative aspect-w-4 aspect-h-3 rounded-lg overflow-hidden shadow-lg cursor-pointer gallery-item">
-				<img src={`${import.meta.env.BASE_URL}/images/2.jpg`} alt="Foto 2" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
-				<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
-			</div>
-			
-			<!-- Photo 3 -->
-			<div class="group relative aspect-w-4 aspect-h-5 rounded-lg overflow-hidden shadow-lg cursor-pointer gallery-item">
-				<img src={`${import.meta.env.BASE_URL}/images/3.jpg`} alt="Foto 3" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
-				<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
-			</div>
-			
-			<!-- Photo 4 -->
-			<div class="group relative aspect-w-4 aspect-h-3 md:col-span-2 rounded-lg overflow-hidden shadow-lg cursor-pointer gallery-item">
-				<img src={`${import.meta.env.BASE_URL}/images/4.jpg`} alt="Foto 4" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
-				<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
-			</div>
-			
-			<!-- Photo 5 -->
-			<div class="group relative aspect-w-4 aspect-h-5 rounded-lg overflow-hidden shadow-lg cursor-pointer gallery-item">
-				<img src={`${import.meta.env.BASE_URL}/images/5.jpg`} alt="Foto 5" class="w-full h-full object-cover transition-transform group-hover:scale-105" />
-				<div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
-			</div>
-			
+
+		<!-- Masonry-style grid -->
+		<div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+			{images.map((img, i) => (
+				<div 
+					class={`gallery-item group relative rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-lg transition-shadow duration-300 ${i === 0 || i === 5 ? 'row-span-2' : ''}`}
+				>
+					<div class={`${i === 0 || i === 5 ? 'h-full min-h-[300px] md:min-h-[400px]' : 'aspect-square'}`}>
+						<img 
+							src={`${import.meta.env.BASE_URL}/images/${img.src}`}
+							alt={img.alt}
+							class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+							loading="lazy"
+						/>
+					</div>
+					<div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+				</div>
+			))}
 		</div>
 	</div>
 </section>
 
-<!-- Modal for full-size image viewing -->
-<div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
-	<div class="relative max-w-4xl max-h-full">
-		<button 
-			id="closeModal" 
-			class="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
-			aria-label="Fechar"
-		>
-			<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-			</svg>
-		</button>
-		<div id="modalImage" class="w-full h-full bg-gray-200 rounded-lg flex items-center justify-center">
-			<svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-			</svg>
-		</div>
-	</div>
+<!-- Lightbox -->
+<div id="lightbox" class="fixed inset-0 bg-black/95 hidden z-[100] flex items-center justify-center" role="dialog" aria-modal="true" aria-label="Visualizar foto">
+	<button id="lightbox-close" class="absolute top-6 right-6 text-white/70 hover:text-white transition-colors" aria-label="Fechar">
+		<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
+		</svg>
+	</button>
+	<button id="lightbox-prev" class="absolute left-4 md:left-8 text-white/70 hover:text-white transition-colors" aria-label="Anterior">
+		<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"></path>
+		</svg>
+	</button>
+	<button id="lightbox-next" class="absolute right-4 md:right-8 text-white/70 hover:text-white transition-colors" aria-label="Próxima">
+		<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"></path>
+		</svg>
+	</button>
+	<img id="lightbox-img" src="" alt="" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg" />
 </div>
 
 <script>
-	// Gallery interaction
-	document.addEventListener('DOMContentLoaded', function() {
-		const galleryItems = document.querySelectorAll('.gallery-item');
-		const modal = document.getElementById('imageModal');
-		const closeModal = document.getElementById('closeModal');
-		const modalImage = document.getElementById('modalImage');
-		
-		// Open modal when clicking on gallery item
-		galleryItems.forEach(item => {
-			item.addEventListener('click', function() {
-				if (modal) {
-					modal.classList.remove('hidden');
-				}
-			});
+	document.addEventListener('DOMContentLoaded', () => {
+		const items = document.querySelectorAll('.gallery-item');
+		const lightbox = document.getElementById('lightbox');
+		const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+		const closeBtn = document.getElementById('lightbox-close');
+		const prevBtn = document.getElementById('lightbox-prev');
+		const nextBtn = document.getElementById('lightbox-next');
+
+		const images: string[] = [];
+		items.forEach(item => {
+			const img = item.querySelector('img');
+			if (img) images.push(img.src);
 		});
-		
-		// Close modal
-		function closeImageModal() {
-			if (modal) {
-				modal.classList.add('hidden');
-			}
+
+		let currentIndex = 0;
+
+		function openLightbox(index: number) {
+			currentIndex = index;
+			if (lightboxImg) lightboxImg.src = images[currentIndex];
+			lightbox?.classList.remove('hidden');
+			document.body.style.overflow = 'hidden';
 		}
-		
-		closeModal?.addEventListener('click', closeImageModal);
-		modal?.addEventListener('click', function(e) {
-			if (e.target === modal) {
-				closeImageModal();
-			}
-		});
-		
-		// Escape key to close modal
-		document.addEventListener('keydown', function(e) {
-			if (e.key === 'Escape') {
-				closeImageModal();
-			}
+
+		function closeLightbox() {
+			lightbox?.classList.add('hidden');
+			document.body.style.overflow = '';
+		}
+
+		function navigate(dir: number) {
+			currentIndex = (currentIndex + dir + images.length) % images.length;
+			if (lightboxImg) lightboxImg.src = images[currentIndex];
+		}
+
+		items.forEach((item, i) => item.addEventListener('click', () => openLightbox(i)));
+		closeBtn?.addEventListener('click', closeLightbox);
+		prevBtn?.addEventListener('click', () => navigate(-1));
+		nextBtn?.addEventListener('click', () => navigate(1));
+		lightbox?.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+		document.addEventListener('keydown', (e) => {
+			if (lightbox?.classList.contains('hidden')) return;
+			if (e.key === 'Escape') closeLightbox();
+			if (e.key === 'ArrowLeft') navigate(-1);
+			if (e.key === 'ArrowRight') navigate(1);
 		});
 	});
 </script>

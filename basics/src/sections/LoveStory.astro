@@ -1,59 +1,50 @@
 ---
-// Love story section
+// Love story section - elegant with image
 ---
 
-<section class="content-section py-20">
-	<div class="max-w-6xl mx-auto px-4">
-		<div class="text-center mb-16">
-			<div class="inline-flex items-center justify-center w-16 h-16 bg-rose-100 rounded-full mb-6">
-				<svg class="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+<section id="lovestory" class="wedding-section bg-white">
+	<div class="max-w-5xl mx-auto">
+		<div class="section-header">
+			<p class="section-subtitle">A nossa jornada</p>
+			<h2 class="section-title">A Nossa História</h2>
+			<div class="ornament">
+				<svg class="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 24 24">
+					<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
 				</svg>
 			</div>
-			<h2 class="text-4xl md:text-5xl font-light text-gray-800 mb-4">
-				Our love story
-			</h2>
-			<div class="w-24 h-px bg-rose-400 mx-auto"></div>
 		</div>
-		
-		<div class="grid md:grid-cols-2 gap-12 items-center">
-			<div class="relative order-2 md:order-1">
-				<div class="aspect-w-4 aspect-h-5 rounded-lg overflow-hidden shadow-xl">
-					<img 
-						src={`${import.meta.env.BASE_URL}/images/historia.jpg`}
-						alt="Nossa história de amor" 
-						class="object-cover w-full h-full"
-					/>
-				</div>
+
+		<div class="grid md:grid-cols-2 gap-10 items-center">
+			<!-- Image -->
+			<div class="rounded-3xl overflow-hidden shadow-lg">
+				<img 
+					src={`${import.meta.env.BASE_URL}/images/historia.jpg`}
+					alt="Nossa história de amor" 
+					class="w-full h-80 md:h-[450px] object-cover"
+					loading="lazy"
+				/>
 			</div>
-			
-			<div class="text-center md:text-left order-1 md:order-2">
-				<h3 class="text-2xl font-medium text-gray-800 mb-6">
-					A nossa história de amor
-				</h3>
-				<div class="space-y-6 text-lg text-gray-600 leading-relaxed">
-					<p>
-						Era uma vez dois corações que se encontraram no momento perfeito. 
-						A nossa história começou de forma simples, mas com a certeza de que 
-						havia algo especial entre nós.
-					</p>
-					<p>
-						Desde o primeiro olhar, soubemos que éramos feitos um para o outro. 
-						Crescemos juntos, partilhámos sonhos, enfrentámos desafios e construímos 
-						uma base sólida de amor, respeito e cumplicidade.
-					</p>
-					<p>
-						Hoje, queremos oficializar este amor perante as pessoas que mais amamos, 
-						celebrando não só o que fomos até aqui, mas principalmente tudo o que 
-						ainda vamos viver juntos.
-					</p>
-				</div>
-				<div class="mt-8">
-					<div class="inline-flex items-center text-rose-500 font-medium">
-						<span class="mr-2">Com amor,</span>
-						<span>Tânia & Miguel</span>
-					</div>
-				</div>
+
+			<!-- Text -->
+			<div class="space-y-5 text-gray-600 leading-relaxed">
+				<p>
+					Era uma vez dois corações que se encontraram no momento perfeito. 
+					A nossa história começou de forma simples, mas com a certeza de que 
+					havia algo especial entre nós.
+				</p>
+				<p>
+					Desde o primeiro olhar, soubemos que éramos feitos um para o outro. 
+					Crescemos juntos, partilhámos sonhos, enfrentámos desafios e construímos 
+					uma base sólida de amor, respeito e cumplicidade.
+				</p>
+				<p>
+					Hoje, queremos oficializar este amor perante as pessoas que mais amamos, 
+					celebrando não só o que fomos até aqui, mas principalmente tudo o que 
+					ainda vamos viver juntos.
+				</p>
+				<p class="text-rose-400 italic pt-4" style="font-family: 'Playfair Display', serif; font-size: 1.1rem;">
+					Com amor, Tânia & Miguel 💕
+				</p>
 			</div>
 		</div>
 	</div>

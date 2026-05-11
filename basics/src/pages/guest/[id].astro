@@ -1,0 +1,35 @@
+---
+export const prerender = false;
+
+const { params } = Astro;
+const id = params.id;
+---
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Informação do Convidado</title>
+  </head>
+  <body class="p-8">
+    <h1 class="text-2xl font-bold mb-4">Detalhes</h1>
+    <div id="content">A carregar...</div>
+
+    <script>
+      (async () => {
+        try {
+          const res = await fetch(`/api/guest/${encodeURIComponent(id)}`);
+          if (!res.ok) throw new Error('not found');
+          const j = await res.json();
+          document.getElementById('content').innerHTML = `
+            <p><strong>Nome:</strong> ${j.nome}</p>
+            <p><strong>Email:</strong> ${j.email}</p>
+            <p><strong>Mesa:</strong> ${j.mesa_id || 'Ainda sem atribuição'}</p>
+            <p><strong>Restrições:</strong> ${j.restricoes || 'Nenhuma'}</p>
+          `;
+        } catch (err) {
+          document.getElementById('content').innerText = 'Convidado não encontrado.';
+        }
+      })();
+    </script>
+  </body>
+</html>

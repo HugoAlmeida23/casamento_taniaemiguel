@@ -1,23 +1,170 @@
 ---
 const faqs = [
-  { q: 'Posso levar acompanhante?', a: 'Indica no RSVP se levas acompanhante. Se tiveres dúvidas, fala connosco.' },
-  { q: 'Há estacionamento?', a: 'Sim, há estacionamento nas imediações de ambos os locais.' },
-  { q: 'Tenho restrições alimentares.', a: 'Indica tudo no formulário de RSVP. Vamos tratar de ti.' },
-  { q: 'Crianças são bem-vindas?', a: 'Claro! Avisa-nos no RSVP para prepararmos tudo.' },
+  { q: 'Posso levar acompanhante?', a: 'Indica no formulário se levas acompanhante. Se tiveres dúvidas, fala connosco.' },
+  { q: 'Há estacionamento?', a: 'Sim, estacionamento gratuito disponível no local.' },
+  { q: 'Tenho restrições alimentares.', a: 'diz tudo no formulario' },
+  { q: 'Posso tirar fotos na cerimónia?', a: 'óbvio lol ' },
 ];
 ---
 
-<section class="bg-white">
-  <div class="mx-auto max-w-6xl px-6 py-20">
-    <h2 class="text-3xl font-semibold text-gray-900">Perguntas frequentes</h2>
-    <dl class="mt-8 grid gap-6 md:grid-cols-2">
-      {faqs.map((f) => (
-        <div class="rounded-lg border border-gray-200 bg-white p-6">
-          <dt class="font-medium text-gray-900">{f.q}</dt>
-          <dd class="mt-2 text-gray-600">{f.a}</dd>
-        </div>
-      ))}
-    </dl>
-  </div>
-  <a id="contactos"></a>
+<section id="faq" class="wedding-section bg-white">
+	<div class="max-w-3xl mx-auto">
+		<div class="section-header">
+			<p class="section-subtitle">Dúvidas</p>
+			<h2 class="section-title">Perguntas Frequentes</h2>
+			<div class="ornament">
+				<svg class="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 24 24">
+					<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+				</svg>
+			</div>
+		</div>
+
+		<div class="faq-list space-y-3">
+			{faqs.map((f, i) => (
+				<div class="faq-item" data-index={i}>
+					<button class="faq-trigger" aria-expanded="false">
+						<span class="faq-question">{f.q}</span>
+						<span class="faq-icon">
+							<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+								<line x1="10" y1="4" x2="10" y2="16" class="faq-icon-v" />
+								<line x1="4" y1="10" x2="16" y2="10" />
+							</svg>
+						</span>
+					</button>
+					<div class="faq-answer">
+						<div class="faq-answer-inner">
+							<p>{f.a}</p>
+						</div>
+					</div>
+				</div>
+			))}
+		</div>
+	</div>
 </section>
+
+<style>
+	.faq-item {
+		background: white;
+		border: 1px solid rgba(0,0,0,0.06);
+		border-radius: 16px;
+		overflow: hidden;
+		transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+	}
+
+	.faq-item:hover {
+		border-color: rgba(244, 163, 166, 0.3);
+		box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+	}
+
+	.faq-item.active {
+		border-color: rgba(244, 163, 166, 0.4);
+		box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+	}
+
+	.faq-trigger {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.25rem 1.5rem;
+		cursor: pointer;
+		background: none;
+		border: none;
+		text-align: left;
+		gap: 1rem;
+	}
+
+	.faq-question {
+		font-size: 0.95rem;
+		font-weight: 500;
+		color: #1a1a1a;
+		line-height: 1.4;
+	}
+
+	.faq-icon {
+		flex-shrink: 0;
+		width: 28px;
+		height: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		background: #faf9f7;
+		color: #999;
+		transition: background 0.3s ease, color 0.3s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.faq-item.active .faq-icon {
+		background: #fff1f2;
+		color: #f4a0a0;
+		transform: rotate(45deg);
+	}
+
+	.faq-icon-v {
+		transition: transform 0.3s ease, opacity 0.3s ease;
+		transform-origin: center;
+	}
+
+	.faq-item.active .faq-icon-v {
+		opacity: 0;
+		transform: scaleY(0);
+	}
+
+	.faq-answer {
+		display: grid;
+		grid-template-rows: 0fr;
+		transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+	}
+
+	.faq-item.active .faq-answer {
+		grid-template-rows: 1fr;
+	}
+
+	.faq-answer-inner {
+		overflow: hidden;
+	}
+
+	.faq-answer-inner p {
+		padding: 0 1.5rem 1.25rem;
+		font-size: 0.875rem;
+		line-height: 1.7;
+		color: #666;
+		opacity: 0;
+		transform: translateY(-8px);
+		transition: opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s;
+	}
+
+	.faq-item.active .faq-answer-inner p {
+		opacity: 1;
+		transform: translateY(0);
+	}
+</style>
+
+<script>
+	const items = document.querySelectorAll('.faq-item');
+
+	items.forEach(item => {
+		const trigger = item.querySelector('.faq-trigger');
+
+		trigger?.addEventListener('click', () => {
+			const isActive = item.classList.contains('active');
+
+			// Close all others
+			items.forEach(other => {
+				if (other !== item) {
+					other.classList.remove('active');
+					other.querySelector('.faq-trigger')?.setAttribute('aria-expanded', 'false');
+				}
+			});
+
+			// Toggle current
+			if (isActive) {
+				item.classList.remove('active');
+				trigger.setAttribute('aria-expanded', 'false');
+			} else {
+				item.classList.add('active');
+				trigger.setAttribute('aria-expanded', 'true');
+			}
+		});
+	});
+</script>

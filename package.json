@@ -12,6 +12,12 @@
   "type": "commonjs",
   "dependencies": {
     "@astrojs/db": "^0.17.1",
-    "astro": "^5.13.3"
+    "astro": "^5.13.3",
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "qrcode": "^1.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "uuid": "^9.0.0"
   }
 }

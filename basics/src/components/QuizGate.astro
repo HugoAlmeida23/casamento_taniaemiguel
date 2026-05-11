@@ -1,0 +1,179 @@
+---
+// Quiz gate - 1 question with 4 options, only 1 correct to proceed
+---
+
+<div id="quiz-gate" class="fixed inset-0 z-[150] flex items-center justify-center bg-[#faf9f7] opacity-0 pointer-events-none transition-opacity duration-600">
+	<div class="max-w-md w-full mx-6 text-center">
+		<!-- Decorative top -->
+		<div class="mb-8">
+			<svg class="w-8 h-8 mx-auto text-rose-400 mb-4" fill="currentColor" viewBox="0 0 24 24">
+				<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+			</svg>
+			<p class="text-xs uppercase tracking-[0.3em] text-gray-400 mb-3">Antes de entrar...</p>
+			<h2 class="text-2xl sm:text-3xl font-light text-gray-900" style="font-family: 'Playfair Display', serif;">
+				Prova que nos conheces!
+			</h2>
+			<div class="w-12 h-px bg-rose-300 mx-auto mt-4"></div>
+		</div>
+
+		<!-- Question -->
+		<div class="mb-8">
+			<p class="text-base sm:text-lg text-gray-700 font-medium leading-relaxed">
+				Onde é que a Tânia e o Miguel se vão casar?
+			</p>
+		</div>
+
+		<!-- Options -->
+		<div class="grid grid-cols-1 gap-3" id="quiz-options">
+			<button class="quiz-option" data-correct="false">
+				<span>Palácio de Cristal, Porto</span>
+			</button>
+			<button class="quiz-option" data-correct="true">
+				<span>Quinta da Lage - Santo Tirso</span>
+			</button>
+			<button class="quiz-option" data-correct="false">
+				<span>Hotel Yeatman, Gaia</span>
+			</button>
+			<button class="quiz-option" data-correct="false">
+				<span>Convento dos Capuchos, Sintra</span>
+			</button>
+		</div>
+
+		<!-- Feedback message -->
+		<div id="quiz-feedback" class="mt-6 text-sm font-medium opacity-0 transition-opacity duration-300">
+			<p id="quiz-feedback-text"></p>
+		</div>
+	</div>
+</div>
+
+<style>
+	#quiz-gate.visible {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	#quiz-gate.dismissed {
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.8s ease;
+	}
+
+	.quiz-option {
+		@apply w-full px-5 py-4 border border-gray-200 rounded-xl text-sm text-gray-700 font-medium text-left transition-all duration-300 hover:border-rose-300 hover:bg-rose-50/50;
+		pointer-events: none;
+	}
+
+	#quiz-gate.visible .quiz-option {
+		pointer-events: auto;
+	}
+
+	.quiz-option:active {
+		transform: scale(0.98);
+	}
+
+	.quiz-option.correct {
+		@apply border-green-400 bg-green-50 text-green-700;
+		animation: correctPulse 0.5s ease;
+	}
+
+	.quiz-option.wrong {
+		@apply border-red-300 bg-red-50 text-red-600;
+		animation: shake 0.5s ease;
+	}
+
+	.quiz-option:disabled {
+		@apply cursor-not-allowed opacity-60;
+	}
+
+	@keyframes shake {
+		0%, 100% { transform: translateX(0); }
+		20% { transform: translateX(-6px); }
+		40% { transform: translateX(6px); }
+		60% { transform: translateX(-4px); }
+		80% { transform: translateX(4px); }
+	}
+
+	@keyframes correctPulse {
+		0% { transform: scale(1); }
+		50% { transform: scale(1.02); }
+		100% { transform: scale(1); }
+	}
+</style>
+
+<script>
+	const quizGate = document.getElementById('quiz-gate');
+	const options = document.querySelectorAll('.quiz-option');
+	const feedback = document.getElementById('quiz-feedback');
+	const feedbackText = document.getElementById('quiz-feedback-text');
+
+	let answered = false;
+	let interactive = false;
+
+	// Show quiz gate (called from intro screen after doors open)
+	window.showQuizGate = function() {
+		quizGate?.classList.add('visible');
+		// Delay before options become clickable — prevents the envelope tap
+		// from accidentally triggering an option
+		setTimeout(() => {
+			interactive = true;
+		}, 800);
+	};
+
+	options.forEach(btn => {
+		btn.addEventListener('click', () => {
+			if (answered || !interactive) return;
+
+			const isCorrect = btn.getAttribute('data-correct') === 'true';
+
+			if (isCorrect) {
+				answered = true;
+				btn.classList.add('correct');
+				
+				// Disable all buttons
+				options.forEach(b => (b as HTMLButtonElement).disabled = true);
+
+				// Show success feedback
+				if (feedback) feedback.style.opacity = '1';
+				if (feedbackText) {
+					feedbackText.textContent = '✨ Correto! Bem-vindo/a ao nosso casamento!';
+					feedbackText.className = 'text-green-600';
+				}
+
+				// Dismiss and show main page
+				setTimeout(() => {
+					quizGate?.classList.add('dismissed');
+					// Unlock scroll
+					document.body.style.overflow = '';
+					document.documentElement.style.overflow = '';
+					// Remove scroll blockers using the global reference
+					if ((window as any).__preventScroll) {
+						document.removeEventListener('wheel', (window as any).__preventScroll);
+						document.removeEventListener('touchmove', (window as any).__preventScroll);
+					}
+					// Reset scroll position to top
+					window.scrollTo(0, 0);
+				}, 1500);
+
+				setTimeout(() => {
+					quizGate?.remove();
+				}, 2500);
+
+			} else {
+				btn.classList.add('wrong');
+				
+				// Show error feedback
+				if (feedback) feedback.style.opacity = '1';
+				if (feedbackText) {
+					feedbackText.textContent = '😅 Não é essa! Tenta outra vez.';
+					feedbackText.className = 'text-red-500';
+				}
+
+				// Reset after shake animation
+				setTimeout(() => {
+					btn.classList.remove('wrong');
+					if (feedback) feedback.style.opacity = '0';
+				}, 1500);
+			}
+		});
+	});
+</script>

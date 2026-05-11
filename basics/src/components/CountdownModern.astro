@@ -1,0 +1,76 @@
+---
+// Elegant countdown with large serif numbers
+---
+
+<section class="wedding-section bg-white">
+	<div class="max-w-4xl mx-auto text-center">
+		<div class="section-header">
+			<p class="section-subtitle">Contagem regressiva</p>
+			<h2 class="section-title">Falta pouco</h2>
+			<div class="ornament">
+				<svg class="w-4 h-4 text-rose-400" fill="currentColor" viewBox="0 0 24 24">
+					<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+				</svg>
+			</div>
+		</div>
+
+		<div id="countdown" class="flex justify-center items-start gap-6 md:gap-10">
+			<div class="text-center">
+				<div class="countdown-value" id="days">0</div>
+				<div class="countdown-unit">Dias</div>
+			</div>
+			<div class="text-center">
+				<div class="countdown-value" id="hours">0</div>
+				<div class="countdown-unit">Horas</div>
+			</div>
+			<div class="text-center">
+				<div class="countdown-value" id="minutes">0</div>
+				<div class="countdown-unit">Minutos</div>
+			</div>
+			<div class="text-center">
+				<div class="countdown-value" id="seconds">0</div>
+				<div class="countdown-unit">Segundos</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	function updateCountdown() {
+		const weddingDate = new Date('2027-06-20T15:30:00').getTime();
+		const now = new Date().getTime();
+		const distance = weddingDate - now;
+
+		if (distance < 0) {
+			const el = document.getElementById('countdown');
+			if (el) {
+				el.innerHTML = `
+					<div class="text-center">
+						<p class="text-3xl md:text-5xl font-light text-gray-900" style="font-family: 'Playfair Display', serif;">
+							Hoje é o grande dia! 🎉
+						</p>
+					</div>
+				`;
+			}
+			return;
+		}
+
+		const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+		const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+		const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+		const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+		const daysEl = document.getElementById('days');
+		const hoursEl = document.getElementById('hours');
+		const minutesEl = document.getElementById('minutes');
+		const secondsEl = document.getElementById('seconds');
+
+		if (daysEl) daysEl.textContent = days.toString();
+		if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+		if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+		if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
+	}
+
+	updateCountdown();
+	setInterval(updateCountdown, 1000);
+</script>
