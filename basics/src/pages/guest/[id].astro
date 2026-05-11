@@ -1,5 +1,9 @@
 ---
-export const prerender = false;
+export function getStaticPaths() {
+  // Guest pages are resolved client-side; no static paths needed at build time.
+  // If you later want pre-rendered guest pages, populate this from your data source.
+  return [];
+}
 
 const { params } = Astro;
 const id = params.id;
@@ -14,7 +18,7 @@ const id = params.id;
     <h1 class="text-2xl font-bold mb-4">Detalhes</h1>
     <div id="content">A carregar...</div>
 
-    <script>
+    <script define:vars={{ id }}>
       (async () => {
         try {
           const res = await fetch(`/api/guest/${encodeURIComponent(id)}`);
