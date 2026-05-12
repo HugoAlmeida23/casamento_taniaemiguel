@@ -1,5 +1,5 @@
 ---
-// RSVP section — olive/beige palette
+// RSVP section — companions added via "+ Adulto" / "+ Criança" buttons
 ---
 
 <section id="rsvp" class="wedding-section bg-[#faf7f0]">
@@ -26,72 +26,43 @@
 					<input type="tel" id="telefone" name="telefone" required class="rsvp-input" placeholder="+351 912 345 678" />
 				</div>
 
-				<!-- Quantas pessoas -->
+				<!-- Restrições do próprio -->
 				<div>
-					<label class="rsvp-label">Quantas pessoas vêm contigo? (incluindo-te)</label>
-					<div class="grid grid-cols-4 gap-2" id="guest-count-options">
-						<label class="rsvp-option-label">
-							<input type="radio" name="numGuests" value="1" checked class="sr-only peer" />
-							<div class="rsvp-count-option peer-checked:border-olive-500 peer-checked:bg-olive-50 peer-checked:text-olive-700">
-								<span class="text-lg font-medium">1</span>
-							</div>
-						</label>
-						<label class="rsvp-option-label">
-							<input type="radio" name="numGuests" value="2" class="sr-only peer" />
-							<div class="rsvp-count-option peer-checked:border-olive-500 peer-checked:bg-olive-50 peer-checked:text-olive-700">
-								<span class="text-lg font-medium">2</span>
-							</div>
-						</label>
-						<label class="rsvp-option-label">
-							<input type="radio" name="numGuests" value="3" class="sr-only peer" />
-							<div class="rsvp-count-option peer-checked:border-olive-500 peer-checked:bg-olive-50 peer-checked:text-olive-700">
-								<span class="text-lg font-medium">3</span>
-							</div>
-						</label>
-						<label class="rsvp-option-label">
-							<input type="radio" name="numGuests" value="4+" class="sr-only peer" />
-							<div class="rsvp-count-option peer-checked:border-olive-500 peer-checked:bg-olive-50 peer-checked:text-olive-700">
-								<span class="text-lg font-medium">4+</span>
-							</div>
-						</label>
-					</div>
+					<label for="restricoes" class="rsvp-label">As tuas alergias ou restrições alimentares</label>
+					<input type="text" id="restricoes" name="restricoes" class="rsvp-input" placeholder="Vegetariano, alergias, etc. (opcional)" />
 				</div>
 
-				<!-- Dynamic guest names -->
-				<div id="guests-container" class="space-y-3 hidden">
-					<label class="rsvp-label">Nomes dos acompanhantes</label>
-					<div id="guests-list" class="space-y-2"></div>
-				</div>
-
-				<!-- Crianças -->
-				<div id="children-section" class="hidden">
-					<label class="rsvp-label">Alguma criança no grupo?</label>
-					<div class="grid grid-cols-2 gap-3">
-						<label class="rsvp-option-label">
-							<input type="radio" name="children" value="no" checked class="sr-only peer" />
-							<div class="rsvp-option-sm peer-checked:border-olive-500 peer-checked:bg-olive-50">
-								<span class="text-sm">Não</span>
-							</div>
-						</label>
-						<label class="rsvp-option-label">
-							<input type="radio" name="children" value="yes" class="sr-only peer" />
-							<div class="rsvp-option-sm peer-checked:border-olive-500 peer-checked:bg-olive-50">
-								<span class="text-sm">Sim</span>
-							</div>
-						</label>
-					</div>
-				</div>
-
-				<!-- Nomes crianças -->
-				<div id="children-names-section" class="hidden">
-					<label for="childrenNames" class="rsvp-label">Nomes e idades das crianças</label>
-					<input type="text" id="childrenNames" name="childrenNames" class="rsvp-input" placeholder="Ex: Maria (3 anos), João (7 anos)" />
-				</div>
-
-				<!-- Restrições -->
+				<!-- Acompanhantes section -->
 				<div>
-					<label for="restricoes" class="rsvp-label">Alergias ou restrições alimentares</label>
-					<textarea id="restricoes" name="restricoes" rows="2" class="rsvp-input resize-none" placeholder="Vegetariano, alergias, etc. (opcional)"></textarea>
+					<label class="rsvp-label">Acompanhantes</label>
+					<p class="text-xs text-gray-400 mb-3">Adiciona as pessoas que vêm contigo e indica alergias caso tenham.</p>
+					
+					<!-- List of companions -->
+					<div id="companions-list" class="space-y-3 mb-4"></div>
+
+					<!-- Add buttons -->
+					<div class="flex gap-3">
+						<button 
+							type="button" 
+							id="add-adult-btn"
+							class="add-companion-btn"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+							</svg>
+							Adulto
+						</button>
+						<button 
+							type="button" 
+							id="add-child-btn"
+							class="add-companion-btn"
+						>
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+							</svg>
+							Criança
+						</button>
+					</div>
 				</div>
 
 				<!-- Mensagem -->
@@ -135,20 +106,38 @@
 		@apply text-gray-300;
 	}
 
-	.rsvp-option-label {
-		@apply cursor-pointer;
+	.add-companion-btn {
+		@apply inline-flex items-center gap-2 px-4 py-2.5 border-2 border-dashed border-beige-300 rounded-xl text-sm font-medium text-olive-600 transition-all duration-200;
 	}
 
-	.rsvp-option {
-		@apply flex flex-col items-center justify-center p-4 border-2 border-beige-200 rounded-xl transition-all duration-200 text-center;
+	.add-companion-btn:hover {
+		@apply border-olive-400 bg-olive-50;
 	}
 
-	.rsvp-option-sm {
-		@apply flex items-center justify-center p-3 border-2 border-beige-200 rounded-xl transition-all duration-200 text-center;
+	.companion-card {
+		@apply relative p-4 border border-beige-200 rounded-xl bg-white/60 space-y-2;
+		animation: slideIn 0.3s ease;
 	}
 
-	.rsvp-count-option {
-		@apply flex items-center justify-center p-3 border-2 border-beige-200 rounded-xl transition-all duration-200 text-center text-gray-600;
+	@keyframes slideIn {
+		from { opacity: 0; transform: translateY(-8px); }
+		to { opacity: 1; transform: translateY(0); }
+	}
+
+	.companion-remove {
+		@apply absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors;
+	}
+
+	.companion-badge {
+		@apply inline-block text-[0.6rem] uppercase tracking-wider font-semibold px-2 py-0.5 rounded-full;
+	}
+
+	.companion-badge.adult {
+		@apply bg-olive-100 text-olive-700;
+	}
+
+	.companion-badge.child {
+		@apply bg-beige-200 text-beige-800;
 	}
 
 	#rsvp-message.success {
@@ -158,92 +147,67 @@
 	#rsvp-message.error {
 		@apply bg-red-50 text-red-700 border border-red-200;
 	}
-
-	#guests-container,
-	#children-section,
-	#children-names-section {
-		transition: opacity 0.3s ease, transform 0.3s ease;
-	}
-
-	#guests-container.hidden,
-	#children-section.hidden,
-	#children-names-section.hidden {
-		opacity: 0;
-		transform: translateY(-4px);
-		pointer-events: none;
-		position: absolute;
-		visibility: hidden;
-	}
-
-	#guests-container:not(.hidden),
-	#children-section:not(.hidden),
-	#children-names-section:not(.hidden) {
-		opacity: 1;
-		transform: translateY(0);
-		position: relative;
-		visibility: visible;
-	}
 </style>
 
 <script>
 	const form = document.getElementById('rsvp-form') as HTMLFormElement;
 	const message = document.getElementById('rsvp-message') as HTMLDivElement;
 	const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
-	const guestsContainer = document.getElementById('guests-container') as HTMLDivElement;
-	const guestsList = document.getElementById('guests-list') as HTMLDivElement;
-	const childrenSection = document.getElementById('children-section') as HTMLDivElement;
-	const childrenNamesSection = document.getElementById('children-names-section') as HTMLDivElement;
+	const companionsList = document.getElementById('companions-list') as HTMLDivElement;
+	const addAdultBtn = document.getElementById('add-adult-btn') as HTMLButtonElement;
+	const addChildBtn = document.getElementById('add-child-btn') as HTMLButtonElement;
 
-	const guestRadios = document.querySelectorAll('input[name="numGuests"]');
-	guestRadios.forEach(radio => {
-		radio.addEventListener('change', () => {
-			const value = (radio as HTMLInputElement).value;
-			updateGuestFields(value);
+	let companionCount = 0;
+
+	function addCompanion(type: 'adult' | 'child') {
+		companionCount++;
+		const id = companionCount;
+
+		const card = document.createElement('div');
+		card.className = 'companion-card';
+		card.dataset.companionId = id.toString();
+		card.dataset.type = type;
+
+		const badgeClass = type === 'adult' ? 'adult' : 'child';
+		const badgeText = type === 'adult' ? 'Adulto' : 'Criança';
+
+		card.innerHTML = `
+			<button type="button" class="companion-remove" aria-label="Remover" data-remove="${id}">
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+				</svg>
+			</button>
+			<span class="companion-badge ${badgeClass}">${badgeText}</span>
+			<input 
+				type="text" 
+				name="companion_name_${id}" 
+				placeholder="${type === 'child' ? 'Nome e idade (ex: Maria, 3 anos)' : 'Nome'}" 
+				class="w-full px-4 py-3 border border-beige-300 rounded-xl text-gray-900 bg-white text-sm transition-all duration-200 focus:outline-none focus:border-olive-400 focus:ring-3 focus:ring-olive-100"
+			/>
+			<input 
+				type="text" 
+				name="companion_allergy_${id}" 
+				placeholder="Alergias / restrições alimentares (opcional)" 
+				class="w-full px-4 py-3 border border-beige-300 rounded-xl text-gray-900 bg-white text-sm transition-all duration-200 focus:outline-none focus:border-olive-400 focus:ring-3 focus:ring-olive-100"
+			/>
+		`;
+
+		companionsList.appendChild(card);
+
+		// Attach remove handler
+		const removeBtn = card.querySelector(`[data-remove="${id}"]`);
+		removeBtn?.addEventListener('click', () => {
+			card.style.opacity = '0';
+			card.style.transform = 'translateY(-8px)';
+			card.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+			setTimeout(() => card.remove(), 200);
 		});
-	});
-
-	function updateGuestFields(value: string) {
-		const num = value === '4+' ? 4 : parseInt(value);
-
-		if (num <= 1) {
-			guestsContainer.classList.add('hidden');
-			childrenSection.classList.add('hidden');
-			childrenNamesSection.classList.add('hidden');
-		} else {
-			guestsContainer.classList.remove('hidden');
-			childrenSection.classList.remove('hidden');
-
-			guestsList.innerHTML = '';
-			for (let i = 1; i < num; i++) {
-				const input = document.createElement('input');
-				input.type = 'text';
-				input.name = `guest_${i}`;
-				input.placeholder = `Nome do acompanhante ${i}`;
-				input.className = 'w-full px-4 py-3 border border-beige-300 rounded-xl text-gray-900 bg-white text-sm transition-all duration-200 focus:outline-none focus:border-olive-400 focus:ring-3 focus:ring-olive-100';
-				guestsList.appendChild(input);
-			}
-
-			if (value === '4+') {
-				const note = document.createElement('p');
-				note.className = 'text-xs text-gray-400 italic mt-1';
-				note.textContent = 'Se forem mais de 4, escreve todos os nomes separados por vírgula no último campo.';
-				guestsList.appendChild(note);
-			}
-		}
 	}
 
-	const childrenRadios = document.querySelectorAll('input[name="children"]');
-	childrenRadios.forEach(radio => {
-		radio.addEventListener('change', () => {
-			const value = (radio as HTMLInputElement).value;
-			if (value === 'yes') {
-				childrenNamesSection.classList.remove('hidden');
-			} else {
-				childrenNamesSection.classList.add('hidden');
-			}
-		});
-	});
+	addAdultBtn?.addEventListener('click', () => addCompanion('adult'));
+	addChildBtn?.addEventListener('click', () => addCompanion('child'));
 
+	// Form submit
 	form?.addEventListener('submit', async (e) => {
 		e.preventDefault();
 
@@ -255,24 +219,31 @@
 		submitBtn.textContent = 'A enviar...';
 
 		const formData = new FormData(form);
-		
-		const guests: string[] = [];
-		const numGuests = formData.get('numGuests') as string;
-		const num = numGuests === '4+' ? 4 : parseInt(numGuests);
-		for (let i = 1; i < num; i++) {
-			const name = formData.get(`guest_${i}`) as string;
-			if (name?.trim()) guests.push(name.trim());
-		}
+
+		// Collect companions
+		const companions: {name: string, type: string, allergy: string}[] = [];
+		const cards = companionsList.querySelectorAll('.companion-card');
+		cards.forEach(card => {
+			const cardEl = card as HTMLElement;
+			const id = cardEl.dataset.companionId;
+			const type = cardEl.dataset.type || 'adult';
+			const name = formData.get(`companion_name_${id}`) as string;
+			const allergy = formData.get(`companion_allergy_${id}`) as string;
+			if (name?.trim()) {
+				companions.push({ 
+					name: name.trim(), 
+					type, 
+					allergy: allergy?.trim() || '' 
+				});
+			}
+		});
 
 		const payload = {
 			nome: formData.get('nome'),
 			telefone: formData.get('telefone'),
 			attending: true,
-			numGuests: numGuests,
-			guests: guests,
-			children: formData.get('children') === 'yes',
-			childrenNames: formData.get('childrenNames') || null,
 			restricoes: formData.get('restricoes') || null,
+			companions: companions,
 			mensagem: formData.get('mensagem') || null,
 		};
 
@@ -286,10 +257,8 @@
 			if (!resp.ok) throw new Error('API error');
 
 			form.reset();
-			guestsContainer.classList.add('hidden');
-			childrenSection.classList.add('hidden');
-			childrenNamesSection.classList.add('hidden');
-			guestsList.innerHTML = '';
+			companionsList.innerHTML = '';
+			companionCount = 0;
 
 			message.classList.remove('hidden');
 			message.classList.add('success');

@@ -1,0 +1,1753 @@
+---
+// Admin page — login + view confirmations + export CSV
+// Currently uses static data; will connect to Supabase later
+---
+
+<html lang="pt">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Admin — Confirmações</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@300;400;500&display=swap" rel="stylesheet" />
+	<style>
+		* { margin: 0; padding: 0; box-sizing: border-box; }
+		body { font-family: 'Montserrat', sans-serif; background: #f5f3ed; color: #333; min-height: 100vh; }
+
+		/* ============ LOGIN ============ */
+		.login-container {
+			min-height: 100vh;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 1.5rem;
+			background: linear-gradient(160deg, #f5f3ed 0%, #ede9df 100%);
+		}
+		.login-card {
+			background: white;
+			border-radius: 1.5rem;
+			padding: 2.5rem;
+			width: 100%;
+			max-width: 380px;
+			box-shadow: 0 8px 40px rgba(0,0,0,0.06);
+			border: 1px solid #efeee5;
+		}
+		.login-card h1 {
+			font-size: 1.5rem;
+			font-weight: 300;
+			text-align: center;
+			margin-bottom: 0.5rem;
+			color: #1a1a1a;
+		}
+		.login-card .login-subtitle {
+			text-align: center;
+			font-size: 0.75rem;
+			color: #8f8a5e;
+			text-transform: uppercase;
+			letter-spacing: 0.15em;
+			margin-bottom: 2rem;
+		}
+		.login-card label {
+			display: block;
+			font-size: 0.7rem;
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			color: #8f8a5e;
+			margin-bottom: 0.4rem;
+			font-weight: 500;
+		}
+		.login-card input {
+			width: 100%;
+			padding: 0.75rem 1rem;
+			border: 1px solid #dddbc9;
+			border-radius: 0.75rem;
+			font-size: 0.9rem;
+			margin-bottom: 1rem;
+			outline: none;
+			transition: border-color 0.2s;
+			font-family: inherit;
+		}
+		.login-card input:focus { border-color: #8f8a5e; }
+		.login-btn {
+			width: 100%;
+			padding: 0.85rem;
+			background: #5c6e44;
+			color: white;
+			border: none;
+			border-radius: 2rem;
+			font-size: 0.8rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.15em;
+			cursor: pointer;
+			transition: background 0.2s;
+			font-family: inherit;
+		}
+		.login-btn:hover { background: #4a5a38; }
+		.login-error {
+			text-align: center;
+			color: #dc2626;
+			font-size: 0.8rem;
+			margin-top: 1rem;
+			display: none;
+		}
+
+		/* ============ DASHBOARD ============ */
+		.dashboard { display: none; padding: 1.5rem; margin: 0 auto; }
+		.dashboard.visible { display: block; }
+
+		@media (min-width: 768px) { .dashboard { padding: 2rem 3rem; } }
+		@media (min-width: 1400px) { .dashboard { padding: 2rem 4rem; } }
+
+		.dash-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 1.5rem;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+		.dash-header-left {
+			display: flex;
+			align-items: center;
+			gap: 1.5rem;
+			flex-wrap: wrap;
+		}
+		.dash-header h1 {
+			font-family: 'Playfair Display', serif;
+			font-size: 1.6rem;
+			font-weight: 400;
+			color: #1a1a1a;
+		}
+		.dash-tabs {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+		}
+		.tab-btn {
+			padding: 0.55rem 1.1rem;
+			border-radius: 2rem;
+			font-size: 0.72rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s;
+			font-family: inherit;
+			border: 1px solid #dddbc9;
+			background: white;
+			color: #5c6e44;
+		}
+		.tab-btn:hover {
+			border-color: #8f8a5e;
+			background: #f8f7f2;
+		}
+		.tab-btn.active {
+			background: #5c6e44;
+			color: white;
+			border-color: #5c6e44;
+			font-weight: 600;
+		}
+		.tab-btn.active:hover {
+			background: #4a5a38;
+			border-color: #4a5a38;
+		}
+		.dash-actions {
+			display: flex;
+			gap: 0.75rem;
+			align-items: center;
+		}
+		.btn-secondary {
+			padding: 0.55rem 1.1rem;
+			background: white;
+			border: 1px solid #dddbc9;
+			border-radius: 2rem;
+			font-size: 0.72rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s;
+			color: #5c6e44;
+			font-family: inherit;
+		}
+		.btn-secondary:hover { border-color: #8f8a5e; background: #f8f7f2; }
+		.btn-primary {
+			padding: 0.55rem 1.1rem;
+			background: #5c6e44;
+			color: white;
+			border: none;
+			border-radius: 2rem;
+			font-size: 0.72rem;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background 0.2s;
+			font-family: inherit;
+		}
+		.btn-primary:hover { background: #4a5a38; }
+
+		/* ============ TAB VIEWS ============ */
+		.tab-view {
+			display: none;
+		}
+		.tab-view.active {
+			display: block;
+		}
+
+		/* ============ STATS ============ */
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 0.75rem;
+			margin-bottom: 1.5rem;
+		}
+		@media (max-width: 640px) {
+			.stats-grid { grid-template-columns: repeat(2, 1fr); }
+		}
+		.stat-card {
+			background: white;
+			border-radius: 0.75rem;
+			padding: 1rem;
+			border: 1px solid #efeee5;
+			text-align: center;
+		}
+		.stat-card .stat-value {
+			font-family: 'Playfair Display', serif;
+			font-size: 1.8rem;
+			font-weight: 400;
+			color: #5c6e44;
+			line-height: 1;
+		}
+		.stat-card .stat-label {
+			font-size: 0.6rem;
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			color: #8f8a5e;
+			margin-top: 0.3rem;
+			font-weight: 500;
+		}
+
+		/* ============ SEARCH ============ */
+		.search-bar {
+			margin-bottom: 1rem;
+		}
+		.search-bar input {
+			width: 100%;
+			max-width: 360px;
+			padding: 0.6rem 1rem 0.6rem 2.4rem;
+			border: 1px solid #dddbc9;
+			border-radius: 2rem;
+			font-size: 0.8rem;
+			outline: none;
+			transition: border-color 0.2s, box-shadow 0.2s;
+			background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%238f8a5e' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 0.8rem center;
+			font-family: inherit;
+		}
+		.search-bar input:focus {
+			border-color: #8f8a5e;
+			box-shadow: 0 0 0 3px rgba(143,138,94,0.08);
+		}
+
+		/* ============ TABLE ============ */
+		.table-wrapper {
+			background: white;
+			border-radius: 1rem;
+			border: 1px solid #efeee5;
+			overflow: hidden;
+		}
+		.table-scroll {
+			overflow-x: auto;
+		}
+		table {
+			width: 100%;
+			border-collapse: separate;
+			border-spacing: 0;
+			font-size: 0.8rem;
+		}
+		thead {
+			background: #faf8f3;
+			position: sticky;
+			top: 0;
+			z-index: 2;
+		}
+		th {
+			padding: 0.75rem 1rem;
+			text-align: left;
+			font-size: 0.6rem;
+			text-transform: uppercase;
+			letter-spacing: 0.1em;
+			color: #8f8a5e;
+			font-weight: 600;
+			white-space: nowrap;
+			border-bottom: 1px solid #efeee5;
+		}
+		td {
+			padding: 0.85rem 1rem;
+			vertical-align: top;
+			line-height: 1.5;
+			border-top: 2px solid #ccc8b8;
+		}
+		tbody tr {
+			transition: background 0.1s;
+		}
+		tbody tr:hover td {
+			background: #edeadf;
+		}
+		tbody tr:nth-child(even) td {
+			background: #f4f2eb;
+		}
+		tbody tr:nth-child(even):hover td {
+			background: #edeadf;
+		}
+
+		/* Cells */
+		.cell-name {
+			font-weight: 600;
+			color: #1a1a1a;
+			white-space: nowrap;
+		}
+		.cell-phone {
+			color: #555;
+			font-size: 0.78rem;
+			white-space: nowrap;
+		}
+		.cell-restriction {
+			display: inline-block;
+			padding: 0.15rem 0.5rem;
+			background: #fef7ed;
+			color: #92400e;
+			border-radius: 0.5rem;
+			font-size: 0.68rem;
+			font-weight: 500;
+			border: 1px solid #fde8cd;
+		}
+		.cell-none {
+			color: #d0ccc0;
+			font-size: 0.78rem;
+		}
+		.cell-date {
+			white-space: nowrap;
+			color: #888;
+			font-size: 0.75rem;
+		}
+		.cell-message {
+			color: #555;
+			font-size: 0.78rem;
+			max-width: 240px;
+			line-height: 1.4;
+			font-style: italic;
+		}
+
+		/* Companions */
+		.companions-grid {
+			display: flex;
+			flex-direction: column;
+			gap: 0.35rem;
+		}
+		.comp-row {
+			display: flex;
+			align-items: center;
+			gap: 0.4rem;
+			flex-wrap: wrap;
+		}
+		.comp-badge {
+			display: inline-block;
+			padding: 0.1rem 0.4rem;
+			border-radius: 0.4rem;
+			font-size: 0.58rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.03em;
+			white-space: nowrap;
+		}
+		.comp-badge-adult {
+			background: #efeee5;
+			color: #5c6e44;
+		}
+		.comp-badge-child {
+			background: #fef3c7;
+			color: #92400e;
+		}
+		.comp-name {
+			font-size: 0.78rem;
+			color: #333;
+			font-weight: 500;
+		}
+		.comp-allergy {
+			font-size: 0.7rem;
+			color: #b87a2e;
+			font-style: italic;
+		}
+		.comp-none {
+			color: #d0ccc0;
+			font-size: 0.78rem;
+		}
+
+		/* Row number */
+		.row-num {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 22px;
+			height: 22px;
+			border-radius: 50%;
+			background: #f5f3ed;
+			color: #8f8a5e;
+			font-size: 0.6rem;
+			font-weight: 600;
+		}
+
+		/* Footer */
+		.table-footer {
+			padding: 0.6rem 1rem;
+			background: #faf8f3;
+			border-top: 1px solid #efeee5;
+			font-size: 0.68rem;
+			color: #8f8a5e;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		/* ============ MESAS SECTION ============ */
+		.mesas-error {
+			background: #fef2f2;
+			border: 1px solid #fecaca;
+			color: #dc2626;
+			padding: 0.75rem 1rem;
+			border-radius: 0.75rem;
+			font-size: 0.8rem;
+			margin-bottom: 1rem;
+		}
+		.mesas-section-title {
+			font-family: 'Playfair Display', serif;
+			font-size: 1.2rem;
+			font-weight: 400;
+			color: #1a1a1a;
+			margin-bottom: 1rem;
+		}
+		.mesas-create-form {
+			background: white;
+			border-radius: 1rem;
+			border: 1px solid #efeee5;
+			padding: 1.25rem;
+			margin-bottom: 1.5rem;
+		}
+		.inline-form {
+			display: flex;
+			gap: 0.75rem;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+		.inline-input {
+			padding: 0.6rem 1rem;
+			border: 1px solid #dddbc9;
+			border-radius: 0.75rem;
+			font-size: 0.8rem;
+			outline: none;
+			transition: border-color 0.2s;
+			font-family: inherit;
+			min-width: 160px;
+		}
+		.inline-input:focus {
+			border-color: #8f8a5e;
+		}
+		.inline-input-small {
+			min-width: 100px;
+			max-width: 120px;
+		}
+		.mesas-list-wrapper {
+			background: white;
+			border-radius: 1rem;
+			border: 1px solid #efeee5;
+			overflow: hidden;
+		}
+		.mesas-actions {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+		}
+		.btn-icon {
+			padding: 0.4rem 0.7rem;
+			border-radius: 0.5rem;
+			font-size: 0.7rem;
+			font-weight: 500;
+			cursor: pointer;
+			transition: all 0.2s;
+			font-family: inherit;
+			border: 1px solid #dddbc9;
+			background: white;
+			color: #5c6e44;
+		}
+		.btn-icon:hover {
+			border-color: #8f8a5e;
+			background: #f8f7f2;
+		}
+		.btn-icon-danger {
+			color: #dc2626;
+			border-color: #fecaca;
+		}
+		.btn-icon-danger:hover {
+			background: #fef2f2;
+			border-color: #dc2626;
+		}
+		.btn-icon-save {
+			background: #5c6e44;
+			color: white;
+			border-color: #5c6e44;
+		}
+		.btn-icon-save:hover {
+			background: #4a5a38;
+		}
+		.btn-icon-cancel {
+			color: #888;
+			border-color: #ddd;
+		}
+		.edit-input {
+			padding: 0.35rem 0.6rem;
+			border: 1px solid #8f8a5e;
+			border-radius: 0.5rem;
+			font-size: 0.78rem;
+			outline: none;
+			font-family: inherit;
+			width: 100%;
+		}
+		.occupancy-badge {
+			display: inline-block;
+			padding: 0.15rem 0.5rem;
+			border-radius: 0.5rem;
+			font-size: 0.7rem;
+			font-weight: 500;
+		}
+		.occupancy-ok {
+			background: #f0fdf4;
+			color: #166534;
+			border: 1px solid #bbf7d0;
+		}
+		.occupancy-full {
+			background: #fef7ed;
+			color: #92400e;
+			border: 1px solid #fde8cd;
+		}
+		.occupancy-empty {
+			background: #f5f3ed;
+			color: #8f8a5e;
+			border: 1px solid #efeee5;
+		}
+		/* ============ SEATING GRID ============ */
+		.seating-grid-wrapper {
+			margin-top: 1.5rem;
+		}
+		.seating-grid-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 1rem;
+			flex-wrap: wrap;
+			gap: 0.5rem;
+		}
+		.seating-grid-header h3 {
+			font-family: 'Playfair Display', serif;
+			font-size: 1.1rem;
+			font-weight: 400;
+			color: #1a1a1a;
+			margin: 0;
+		}
+		.seating-grid-unassigned {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.4rem;
+			padding: 0.4rem 0.9rem;
+			background: #fef3c7;
+			border: 1px solid #fde68a;
+			border-radius: 2rem;
+			font-size: 0.75rem;
+			font-weight: 600;
+			color: #92400e;
+		}
+		.seating-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+			gap: 1rem;
+		}
+		@media (max-width: 640px) {
+			.seating-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+		.seating-card {
+			background: white;
+			border-radius: 1rem;
+			padding: 1.1rem;
+			border: 2px solid #efeee5;
+			transition: border-color 0.2s, box-shadow 0.2s;
+		}
+		.seating-card:hover {
+			box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+		}
+		.seating-card-empty {
+			border-color: #d5d3c8;
+			background: #faf8f3;
+		}
+		.seating-card-partial {
+			border-color: #8f9e6e;
+			background: #f6f9f2;
+		}
+		.seating-card-full {
+			border-color: #c9a227;
+			background: #fefcf3;
+		}
+		.seating-card-top {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 0.6rem;
+		}
+		.seating-card-name {
+			font-weight: 600;
+			font-size: 0.85rem;
+			color: #1a1a1a;
+		}
+		.seating-card-badge {
+			display: inline-block;
+			padding: 0.15rem 0.5rem;
+			border-radius: 0.5rem;
+			font-size: 0.65rem;
+			font-weight: 600;
+		}
+		.seating-card-badge-empty {
+			background: #f5f3ed;
+			color: #8f8a5e;
+			border: 1px solid #efeee5;
+		}
+		.seating-card-badge-partial {
+			background: #f0fdf4;
+			color: #166534;
+			border: 1px solid #bbf7d0;
+		}
+		.seating-card-badge-full {
+			background: #fef7ed;
+			color: #92400e;
+			border: 1px solid #fde8cd;
+		}
+		.seating-card-guests {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
+		.seating-card-guests li {
+			font-size: 0.75rem;
+			color: #555;
+			padding: 0.2rem 0;
+			border-bottom: 1px solid #f5f3ed;
+		}
+		.seating-card-guests li:last-child {
+			border-bottom: none;
+		}
+		.seating-card-empty-msg {
+			font-size: 0.72rem;
+			color: #bbb;
+			font-style: italic;
+		}
+
+		/* ============ GUEST ASSIGNMENT SECTION ============ */
+		.guest-assignment-wrapper {
+			background: white;
+			border-radius: 1rem;
+			border: 1px solid #efeee5;
+			overflow: hidden;
+			margin-top: 1.5rem;
+		}
+		.guest-assignment-header {
+			padding: 1.25rem;
+			border-bottom: 1px solid #efeee5;
+		}
+		.guest-assignment-header h3 {
+			font-family: 'Playfair Display', serif;
+			font-size: 1.1rem;
+			font-weight: 400;
+			color: #1a1a1a;
+			margin: 0;
+		}
+		.guest-assignment-search {
+			padding: 1rem 1.25rem;
+			border-bottom: 1px solid #efeee5;
+		}
+		.guest-assignment-search input {
+			width: 100%;
+			max-width: 320px;
+			padding: 0.55rem 1rem 0.55rem 2.2rem;
+			border: 1px solid #dddbc9;
+			border-radius: 2rem;
+			font-size: 0.78rem;
+			outline: none;
+			transition: border-color 0.2s, box-shadow 0.2s;
+			background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%238f8a5e' stroke-width='2' viewBox='0 0 24 24'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 0.75rem center;
+			font-family: inherit;
+		}
+		.guest-assignment-search input:focus {
+			border-color: #8f8a5e;
+			box-shadow: 0 0 0 3px rgba(143,138,94,0.08);
+		}
+		.guest-assign-select {
+			padding: 0.4rem 0.6rem;
+			border: 1px solid #dddbc9;
+			border-radius: 0.5rem;
+			font-size: 0.75rem;
+			outline: none;
+			font-family: inherit;
+			background: white;
+			cursor: pointer;
+			transition: border-color 0.2s;
+			min-width: 140px;
+		}
+		.guest-assign-select:focus {
+			border-color: #8f8a5e;
+		}
+		.capacity-warning {
+			display: inline-block;
+			padding: 0.1rem 0.4rem;
+			border-radius: 0.4rem;
+			font-size: 0.6rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.03em;
+			background: #fef3c7;
+			color: #92400e;
+			border: 1px solid #fde68a;
+			margin-left: 0.4rem;
+		}
+		.guest-row-warning td {
+			background: #fffbeb !important;
+		}
+		.guest-row-warning:hover td {
+			background: #fef3c7 !important;
+		}
+
+		/* Confirm dialog */
+		.confirm-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0,0,0,0.4);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 1000;
+		}
+		.confirm-dialog {
+			background: white;
+			border-radius: 1rem;
+			padding: 2rem;
+			max-width: 380px;
+			width: 90%;
+			box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+		}
+		.confirm-dialog h3 {
+			font-family: 'Playfair Display', serif;
+			font-size: 1.1rem;
+			font-weight: 400;
+			margin-bottom: 0.75rem;
+			color: #1a1a1a;
+		}
+		.confirm-dialog p {
+			font-size: 0.82rem;
+			color: #555;
+			margin-bottom: 1.5rem;
+			line-height: 1.5;
+		}
+		.confirm-actions {
+			display: flex;
+			gap: 0.75rem;
+			justify-content: flex-end;
+		}
+	</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="login-container">
+	<div class="login-card">
+		<h1>T&M</h1>
+		<p class="login-subtitle">Painel de Administração</p>
+		<form id="login-form">
+			<label for="login-user">Utilizador</label>
+			<input type="text" id="login-user" placeholder="admin" autocomplete="username" />
+			<label for="login-pass">Password</label>
+			<input type="password" id="login-pass" placeholder="••••••" autocomplete="current-password" />
+			<button type="submit" class="login-btn">Entrar</button>
+		</form>
+		<p id="login-error" class="login-error">Credenciais inválidas</p>
+	</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="dashboard">
+	<div class="dash-header">
+		<div class="dash-header-left">
+			<h1>Painel</h1>
+			<div class="dash-tabs">
+				<button id="tab-confirmacoes" class="tab-btn active" data-tab="confirmacoes-view">Confirmações</button>
+				<button id="tab-mesas" class="tab-btn" data-tab="mesas-view">Mesas</button>
+			</div>
+		</div>
+		<div class="dash-actions">
+			<button id="export-csv-btn" class="btn-primary">Exportar CSV</button>
+			<button id="logout-btn" class="btn-secondary">Sair</button>
+		</div>
+	</div>
+
+	<!-- Confirmações Tab View -->
+	<div id="confirmacoes-view" class="tab-view active">
+		<!-- Stats -->
+		<div class="stats-grid">
+			<div class="stat-card">
+				<div class="stat-value" id="stat-total">0</div>
+				<div class="stat-label">Confirmações</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-value" id="stat-adults">0</div>
+				<div class="stat-label">Adultos</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-value" id="stat-children">0</div>
+				<div class="stat-label">Crianças</div>
+			</div>
+			<div class="stat-card">
+				<div class="stat-value" id="stat-total-people">0</div>
+				<div class="stat-label">Total Pessoas</div>
+			</div>
+		</div>
+
+		<!-- Search -->
+		<div class="search-bar">
+			<input type="text" id="search-input" placeholder="Pesquisar por nome, telemóvel ou restrição..." />
+		</div>
+
+		<!-- Table -->
+		<div class="table-wrapper">
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Nome</th>
+							<th>Telemóvel</th>
+							<th>Restrições</th>
+							<th>Acompanhantes</th>
+							<th>Mensagem</th>
+							<th>Data</th>
+						</tr>
+					</thead>
+					<tbody id="confirmations-table"></tbody>
+				</table>
+			</div>
+			<div class="table-footer">
+				<span id="table-count">0 resultados</span>
+				<span id="table-people-count">0 pessoas no total</span>
+			</div>
+		</div>
+	</div>
+
+	<!-- Mesas Tab View -->
+	<div id="mesas-view" class="tab-view">
+		<!-- Error message area -->
+		<div id="mesas-error" class="mesas-error" style="display:none;"></div>
+
+		<!-- Create table form -->
+		<div class="mesas-create-form">
+			<h2 class="mesas-section-title">Gerir Mesas</h2>
+			<form id="create-table-form" class="inline-form">
+				<input type="text" id="new-table-name" placeholder="Nome da mesa" required class="inline-input" />
+				<input type="number" id="new-table-capacity" placeholder="Capacidade" min="1" required class="inline-input inline-input-small" />
+				<button type="submit" class="btn-primary">Criar Mesa</button>
+			</form>
+		</div>
+
+		<!-- Table list -->
+		<div class="mesas-list-wrapper">
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>Nome</th>
+							<th>Capacidade</th>
+							<th>Ocupação</th>
+							<th>Ações</th>
+						</tr>
+					</thead>
+					<tbody id="mesas-table-body"></tbody>
+				</table>
+			</div>
+			<div class="table-footer">
+				<span id="mesas-count">0 mesas</span>
+			</div>
+		</div>
+
+		<!-- Seating Overview Grid -->
+		<div class="seating-grid-wrapper">
+			<div class="seating-grid-header">
+				<h3>Visão Geral das Mesas</h3>
+				<span id="seating-grid-unassigned" class="seating-grid-unassigned" style="display:none;">
+					<span id="seating-grid-unassigned-count">0</span> sem mesa
+				</span>
+			</div>
+			<div id="seating-grid" class="seating-grid"></div>
+		</div>
+
+		<!-- Guest Assignment Section -->
+		<div class="guest-assignment-wrapper">
+			<div class="guest-assignment-header">
+				<h3>Atribuir Convidados a Mesas</h3>
+			</div>
+			<div class="guest-assignment-search">
+				<input type="text" id="guest-assign-search" placeholder="Filtrar convidados por nome..." />
+			</div>
+			<div class="table-scroll">
+				<table>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Convidado</th>
+							<th>Mesa Atribuída</th>
+							<th>Estado</th>
+						</tr>
+					</thead>
+					<tbody id="guest-assign-body"></tbody>
+				</table>
+			</div>
+			<div class="table-footer">
+				<span id="guest-assign-count">0 convidados</span>
+				<span id="guest-assign-unassigned">0 sem mesa</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	// ============================================
+	// STATIC DATA (replace with Supabase later)
+	// ============================================
+	const STATIC_CONFIRMATIONS = [
+		{
+			id: 1,
+			nome: 'Ana Silva',
+			telefone: '+351 912 345 678',
+			restricoes: 'Vegetariana',
+			companions: [
+				{ name: 'Pedro Silva', type: 'adult', allergy: '' },
+				{ name: 'Maria Silva, 5 anos', type: 'child', allergy: 'Intolerância à lactose' },
+			],
+			mensagem: 'Mal podemos esperar! Parabéns aos noivos!',
+			created_at: '2025-03-15T10:30:00',
+		},
+		{
+			id: 2,
+			nome: 'João Costa',
+			telefone: '+351 916 789 012',
+			restricoes: '',
+			companions: [
+				{ name: 'Rita Costa', type: 'adult', allergy: 'Alergia a marisco' },
+			],
+			mensagem: '',
+			created_at: '2025-03-18T14:22:00',
+		},
+		{
+			id: 3,
+			nome: 'Mariana Ferreira',
+			telefone: '+351 910 111 222',
+			restricoes: 'Sem glúten',
+			companions: [],
+			mensagem: 'Vou sozinha mas com muita vontade de celebrar convosco!',
+			created_at: '2025-03-20T09:15:00',
+		},
+		{
+			id: 4,
+			nome: 'Carlos Mendes',
+			telefone: '+351 913 444 555',
+			restricoes: '',
+			companions: [
+				{ name: 'Sofia Mendes', type: 'adult', allergy: '' },
+				{ name: 'Tomás Mendes, 8 anos', type: 'child', allergy: '' },
+				{ name: 'Beatriz Mendes, 3 anos', type: 'child', allergy: 'Alergia a frutos secos' },
+			],
+			mensagem: 'Vamos todos! Grande abraço.',
+			created_at: '2025-03-22T16:45:00',
+		},
+		{
+			id: 5,
+			nome: 'Inês Rodrigues',
+			telefone: '+351 914 666 777',
+			restricoes: 'Vegan',
+			companions: [
+				{ name: 'Miguel Alves', type: 'adult', allergy: 'Vegan' },
+			],
+			mensagem: '',
+			created_at: '2025-04-01T11:00:00',
+		},
+	];
+
+	// ============================================
+	// AUTH
+	// ============================================
+	const ADMIN_USER = 'admin';
+	const ADMIN_PASS = 'taniaemiguel2027';
+
+	const loginScreen = document.getElementById('login-screen') as HTMLDivElement;
+	const dashboard = document.getElementById('dashboard') as HTMLDivElement;
+	const loginForm = document.getElementById('login-form') as HTMLFormElement;
+	const loginError = document.getElementById('login-error') as HTMLParagraphElement;
+	const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
+	const exportBtn = document.getElementById('export-csv-btn') as HTMLButtonElement;
+	const searchInput = document.getElementById('search-input') as HTMLInputElement;
+
+	if (sessionStorage.getItem('admin_logged_in') === 'true') {
+		showDashboard();
+	}
+
+	loginForm?.addEventListener('submit', (e) => {
+		e.preventDefault();
+		const user = (document.getElementById('login-user') as HTMLInputElement).value;
+		const pass = (document.getElementById('login-pass') as HTMLInputElement).value;
+
+		if (user === ADMIN_USER && pass === ADMIN_PASS) {
+			sessionStorage.setItem('admin_logged_in', 'true');
+			loginError.style.display = 'none';
+			showDashboard();
+		} else {
+			loginError.style.display = 'block';
+		}
+	});
+
+	logoutBtn?.addEventListener('click', () => {
+		sessionStorage.removeItem('admin_logged_in');
+		dashboard.classList.remove('visible');
+		loginScreen.style.display = 'flex';
+	});
+
+	function showDashboard() {
+		loginScreen.style.display = 'none';
+		dashboard.classList.add('visible');
+		renderStats(STATIC_CONFIRMATIONS);
+		renderTable(STATIC_CONFIRMATIONS);
+	}
+
+	// ============================================
+	// TAB NAVIGATION
+	// ============================================
+	const tabButtons = document.querySelectorAll('.tab-btn') as NodeListOf<HTMLButtonElement>;
+	const tabViews = document.querySelectorAll('.tab-view') as NodeListOf<HTMLDivElement>;
+
+	tabButtons.forEach(btn => {
+		btn.addEventListener('click', () => {
+			const targetId = btn.getAttribute('data-tab');
+			if (!targetId) return;
+
+			// Update active tab button
+			tabButtons.forEach(b => b.classList.remove('active'));
+			btn.classList.add('active');
+
+			// Show/hide tab views
+			tabViews.forEach(view => {
+				if (view.id === targetId) {
+					view.classList.add('active');
+				} else {
+					view.classList.remove('active');
+				}
+			});
+		});
+	});
+
+	// ============================================
+	// SEARCH
+	// ============================================
+	searchInput?.addEventListener('input', () => {
+		const query = searchInput.value.toLowerCase().trim();
+		if (!query) {
+			renderTable(STATIC_CONFIRMATIONS);
+			return;
+		}
+		const filtered = STATIC_CONFIRMATIONS.filter(row => {
+			const searchable = [
+				row.nome,
+				row.telefone,
+				row.restricoes,
+				row.mensagem,
+				...row.companions.map(c => c.name),
+				...row.companions.map(c => c.allergy),
+			].join(' ').toLowerCase();
+			return searchable.includes(query);
+		});
+		renderTable(filtered);
+	});
+
+	// ============================================
+	// RENDER STATS
+	// ============================================
+	function renderStats(data: typeof STATIC_CONFIRMATIONS) {
+		const totalConfirmations = data.length;
+		let totalAdults = data.length;
+		let totalChildren = 0;
+
+		data.forEach(row => {
+			row.companions.forEach(c => {
+				if (c.type === 'child') totalChildren++;
+				else totalAdults++;
+			});
+		});
+
+		(document.getElementById('stat-total') as HTMLElement).textContent = totalConfirmations.toString();
+		(document.getElementById('stat-adults') as HTMLElement).textContent = totalAdults.toString();
+		(document.getElementById('stat-children') as HTMLElement).textContent = totalChildren.toString();
+		(document.getElementById('stat-total-people') as HTMLElement).textContent = (totalAdults + totalChildren).toString();
+	}
+
+	// ============================================
+	// RENDER TABLE
+	// ============================================
+	function renderTable(data: typeof STATIC_CONFIRMATIONS) {
+		const tbody = document.getElementById('confirmations-table') as HTMLTableSectionElement;
+		tbody.innerHTML = '';
+
+		if (data.length === 0) {
+			tbody.innerHTML = `
+				<tr>
+					<td colspan="7" style="text-align:center; padding:3rem; color:#999;">
+						Nenhuma confirmação encontrada
+					</td>
+				</tr>
+			`;
+			(document.getElementById('table-count') as HTMLElement).textContent = '0 resultados';
+			(document.getElementById('table-people-count') as HTMLElement).textContent = '0 pessoas';
+			return;
+		}
+
+		let totalPeople = 0;
+
+		data.forEach((row, index) => {
+			const tr = document.createElement('tr');
+			const rowPeople = 1 + row.companions.length;
+			totalPeople += rowPeople;
+
+			// Companions
+			let companionsHtml = '';
+			if (row.companions.length === 0) {
+				companionsHtml = '<span class="comp-none">Nenhum</span>';
+			} else {
+				const items = row.companions.map(c => {
+					const badgeClass = c.type === 'child' ? 'comp-badge-child' : 'comp-badge-adult';
+					const badgeLabel = c.type === 'child' ? 'Criança' : 'Adulto';
+					const allergyHtml = c.allergy ? `<span class="comp-allergy">(${c.allergy})</span>` : '';
+					return `
+						<div class="comp-row">
+							<span class="comp-badge ${badgeClass}">${badgeLabel}</span>
+							<span class="comp-name">${c.name}</span>
+							${allergyHtml}
+						</div>
+					`;
+				}).join('');
+				companionsHtml = `<div class="companions-grid">${items}</div>`;
+			}
+
+			// Restriction
+			const restrictionHtml = row.restricoes 
+				? `<span class="cell-restriction">${row.restricoes}</span>` 
+				: '<span class="cell-none">—</span>';
+
+			// Message
+			const messageHtml = row.mensagem 
+				? `<span class="cell-message">${row.mensagem}</span>` 
+				: '<span class="cell-none">—</span>';
+
+			// Date
+			const date = new Date(row.created_at);
+			const dateStr = date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+			tr.innerHTML = `
+				<td><span class="row-num">${index + 1}</span></td>
+				<td><span class="cell-name">${row.nome}</span></td>
+				<td><span class="cell-phone">${row.telefone}</span></td>
+				<td>${restrictionHtml}</td>
+				<td>${companionsHtml}</td>
+				<td>${messageHtml}</td>
+				<td><span class="cell-date">${dateStr}</span></td>
+			`;
+
+			tbody.appendChild(tr);
+		});
+
+		(document.getElementById('table-count') as HTMLElement).textContent = `${data.length} confirmação${data.length !== 1 ? 'ões' : ''}`;
+		(document.getElementById('table-people-count') as HTMLElement).textContent = `${totalPeople} pessoas no total`;
+	}
+
+	// ============================================
+	// EXPORT CSV
+	// ============================================
+	exportBtn?.addEventListener('click', () => {
+		exportToCSV(STATIC_CONFIRMATIONS);
+	});
+
+	function exportToCSV(data: typeof STATIC_CONFIRMATIONS) {
+		const rows: string[][] = [];
+
+		rows.push(['#', 'Nome', 'Telemovel', 'Restricoes', 'Acompanhante', 'Tipo', 'Alergia Acompanhante', 'Mensagem', 'Data']);
+
+		data.forEach((row, index) => {
+			const date = new Date(row.created_at).toLocaleDateString('pt-PT');
+
+			if (row.companions.length === 0) {
+				rows.push([
+					(index + 1).toString(),
+					row.nome,
+					row.telefone,
+					row.restricoes || '',
+					'',
+					'',
+					'',
+					row.mensagem || '',
+					date,
+				]);
+			} else {
+				row.companions.forEach((c, i) => {
+					rows.push([
+						i === 0 ? (index + 1).toString() : '',
+						i === 0 ? row.nome : '',
+						i === 0 ? row.telefone : '',
+						i === 0 ? (row.restricoes || '') : '',
+						c.name,
+						c.type === 'child' ? 'Crianca' : 'Adulto',
+						c.allergy || '',
+						i === 0 ? (row.mensagem || '') : '',
+						i === 0 ? date : '',
+					]);
+				});
+			}
+		});
+
+		const csvContent = rows.map(row => 
+			row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')
+		).join('\n');
+
+		const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = `confirmacoes_casamento_${new Date().toISOString().slice(0,10)}.csv`;
+		link.click();
+		URL.revokeObjectURL(url);
+	}
+
+	// ============================================
+	// MESAS (TABLE MANAGEMENT) - CRUD
+	// ============================================
+	interface TableData {
+		id: string;
+		name: string;
+		capacity: number;
+	}
+
+	interface GuestData {
+		id: string;
+		nome: string;
+		mesa_id: string | null;
+	}
+
+	let mesasTables: TableData[] = [];
+	let mesasGuests: GuestData[] = [];
+	let editingTableId: string | null = null;
+
+	const createTableForm = document.getElementById('create-table-form') as HTMLFormElement;
+	const newTableName = document.getElementById('new-table-name') as HTMLInputElement;
+	const newTableCapacity = document.getElementById('new-table-capacity') as HTMLInputElement;
+	const mesasError = document.getElementById('mesas-error') as HTMLDivElement;
+	const mesasTableBody = document.getElementById('mesas-table-body') as HTMLTableSectionElement;
+	const mesasCount = document.getElementById('mesas-count') as HTMLSpanElement;
+
+	// Show error message
+	function showMesasError(message: string) {
+		mesasError.textContent = message;
+		mesasError.style.display = 'block';
+		setTimeout(() => {
+			mesasError.style.display = 'none';
+		}, 5000);
+	}
+
+	// Hide error message
+	function hideMesasError() {
+		mesasError.style.display = 'none';
+	}
+
+	// Fetch tables and guests, then render
+	async function loadMesasData() {
+		try {
+			const [tablesRes, guestsRes] = await Promise.all([
+				fetch('/api/tables'),
+				fetch('/api/guests')
+			]);
+
+			if (!tablesRes.ok) throw new Error('Erro ao carregar mesas');
+			if (!guestsRes.ok) throw new Error('Erro ao carregar convidados');
+
+			mesasTables = await tablesRes.json();
+			mesasGuests = await guestsRes.json();
+			renderMesasTable();
+			renderGuestAssignment();
+			renderSeatingGrid();
+		} catch (err: any) {
+			showMesasError(err.message || 'Erro ao carregar dados');
+		}
+	}
+
+	// Calculate occupancy for a table
+	function getOccupancy(tableId: string): number {
+		return mesasGuests.filter(g => g.mesa_id === tableId).length;
+	}
+
+	// Render the table list
+	function renderMesasTable() {
+		mesasTableBody.innerHTML = '';
+
+		if (mesasTables.length === 0) {
+			mesasTableBody.innerHTML = `
+				<tr>
+					<td colspan="4" style="text-align:center; padding:2rem; color:#999;">
+						Nenhuma mesa criada. Use o formulário acima para criar a primeira mesa.
+					</td>
+				</tr>
+			`;
+			mesasCount.textContent = '0 mesas';
+			return;
+		}
+
+		mesasTables.forEach(table => {
+			const tr = document.createElement('tr');
+			const occupancy = getOccupancy(table.id);
+			const isEditing = editingTableId === table.id;
+
+			if (isEditing) {
+				tr.innerHTML = `
+					<td>
+						<input type="text" class="edit-input" id="edit-name-${table.id}" value="${escapeHtml(table.name)}" />
+					</td>
+					<td>
+						<input type="number" class="edit-input" id="edit-capacity-${table.id}" value="${table.capacity}" min="1" style="width:80px;" />
+					</td>
+					<td>
+						<span class="occupancy-badge ${occupancy === 0 ? 'occupancy-empty' : occupancy >= table.capacity ? 'occupancy-full' : 'occupancy-ok'}">${occupancy}/${table.capacity}</span>
+					</td>
+					<td>
+						<div class="mesas-actions">
+							<button class="btn-icon btn-icon-save" data-action="save" data-id="${table.id}">Guardar</button>
+							<button class="btn-icon btn-icon-cancel" data-action="cancel-edit">Cancelar</button>
+						</div>
+					</td>
+				`;
+			} else {
+				tr.innerHTML = `
+					<td><span class="cell-name">${escapeHtml(table.name)}</span></td>
+					<td>${table.capacity}</td>
+					<td>
+						<span class="occupancy-badge ${occupancy === 0 ? 'occupancy-empty' : occupancy >= table.capacity ? 'occupancy-full' : 'occupancy-ok'}">${occupancy}/${table.capacity}</span>
+					</td>
+					<td>
+						<div class="mesas-actions">
+							<button class="btn-icon" data-action="edit" data-id="${table.id}">Editar</button>
+							<button class="btn-icon btn-icon-danger" data-action="delete" data-id="${table.id}" data-name="${escapeHtml(table.name)}" data-occupancy="${occupancy}">Eliminar</button>
+						</div>
+					</td>
+				`;
+			}
+
+			mesasTableBody.appendChild(tr);
+		});
+
+		mesasCount.textContent = `${mesasTables.length} mesa${mesasTables.length !== 1 ? 's' : ''}`;
+	}
+
+	// Render the seating overview grid
+	function renderSeatingGrid() {
+		const gridContainer = document.getElementById('seating-grid') as HTMLDivElement;
+		const unassignedBadge = document.getElementById('seating-grid-unassigned') as HTMLSpanElement;
+		const unassignedCountEl = document.getElementById('seating-grid-unassigned-count') as HTMLSpanElement;
+
+		if (!gridContainer) return;
+
+		const unassignedCount = mesasGuests.filter(g => !g.mesa_id).length;
+
+		// Show/hide unassigned badge
+		if (unassignedCount > 0) {
+			unassignedBadge.style.display = 'inline-flex';
+			unassignedCountEl.textContent = unassignedCount.toString();
+		} else {
+			unassignedBadge.style.display = 'none';
+		}
+
+		if (mesasTables.length === 0) {
+			gridContainer.innerHTML = `<p style="color:#999; font-size:0.82rem; padding:1rem 0;">Nenhuma mesa criada ainda.</p>`;
+			return;
+		}
+
+		let html = '';
+		mesasTables.forEach(table => {
+			const occupancy = getOccupancy(table.id);
+			const assignedGuests = mesasGuests.filter(g => g.mesa_id === table.id);
+
+			// Determine fill level
+			let fillLevel: 'empty' | 'partial' | 'full';
+			if (occupancy === 0) {
+				fillLevel = 'empty';
+			} else if (occupancy >= table.capacity) {
+				fillLevel = 'full';
+			} else {
+				fillLevel = 'partial';
+			}
+
+			const cardClass = `seating-card seating-card-${fillLevel}`;
+			const badgeClass = `seating-card-badge seating-card-badge-${fillLevel}`;
+
+			// Guest list HTML
+			let guestsHtml = '';
+			if (assignedGuests.length === 0) {
+				guestsHtml = `<p class="seating-card-empty-msg">Sem convidados</p>`;
+			} else {
+				guestsHtml = '<ul class="seating-card-guests">';
+				assignedGuests.forEach(guest => {
+					guestsHtml += `<li>${escapeHtml(guest.nome)}</li>`;
+				});
+				guestsHtml += '</ul>';
+			}
+
+			html += `
+				<div class="${cardClass}">
+					<div class="seating-card-top">
+						<span class="seating-card-name">${escapeHtml(table.name)}</span>
+						<span class="${badgeClass}">${occupancy}/${table.capacity}</span>
+					</div>
+					${guestsHtml}
+				</div>
+			`;
+		});
+
+		gridContainer.innerHTML = html;
+	}
+
+	// Escape HTML to prevent XSS
+	function escapeHtml(text: string): string {
+		const div = document.createElement('div');
+		div.textContent = text;
+		return div.innerHTML;
+	}
+
+	// Create table
+	createTableForm?.addEventListener('submit', async (e) => {
+		e.preventDefault();
+		hideMesasError();
+
+		const name = newTableName.value.trim();
+		const capacity = parseInt(newTableCapacity.value, 10);
+
+		if (!name) {
+			showMesasError('O nome da mesa é obrigatório');
+			return;
+		}
+		if (!capacity || capacity < 1) {
+			showMesasError('A capacidade deve ser pelo menos 1');
+			return;
+		}
+
+		try {
+			const res = await fetch('/api/tables', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ name, capacity })
+			});
+
+			if (!res.ok) {
+				const data = await res.json();
+				throw new Error(data.error || 'Erro ao criar mesa');
+			}
+
+			const newTable: TableData = await res.json();
+			mesasTables.push(newTable);
+			renderMesasTable();
+			renderSeatingGrid();
+
+			// Reset form
+			newTableName.value = '';
+			newTableCapacity.value = '';
+		} catch (err: any) {
+			showMesasError(err.message || 'Erro ao criar mesa');
+		}
+	});
+
+	// Handle table actions (edit, delete, save, cancel)
+	mesasTableBody?.addEventListener('click', async (e) => {
+		const target = e.target as HTMLElement;
+		const button = target.closest('button') as HTMLButtonElement | null;
+		if (!button) return;
+
+		const action = button.getAttribute('data-action');
+		const id = button.getAttribute('data-id');
+
+		if (action === 'edit' && id) {
+			editingTableId = id;
+			renderMesasTable();
+		}
+
+		if (action === 'cancel-edit') {
+			editingTableId = null;
+			renderMesasTable();
+		}
+
+		if (action === 'save' && id) {
+			const nameInput = document.getElementById(`edit-name-${id}`) as HTMLInputElement;
+			const capacityInput = document.getElementById(`edit-capacity-${id}`) as HTMLInputElement;
+
+			const newName = nameInput.value.trim();
+			const newCapacity = parseInt(capacityInput.value, 10);
+
+			if (!newName) {
+				showMesasError('O nome da mesa é obrigatório');
+				return;
+			}
+			if (!newCapacity || newCapacity < 1) {
+				showMesasError('A capacidade deve ser pelo menos 1');
+				return;
+			}
+
+			try {
+				const res = await fetch(`/api/tables/${id}`, {
+					method: 'PATCH',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ name: newName, capacity: newCapacity })
+				});
+
+				if (!res.ok) {
+					const data = await res.json();
+					throw new Error(data.error || 'Erro ao atualizar mesa');
+				}
+
+				// Update local data
+				const tableIndex = mesasTables.findIndex(t => t.id === id);
+				if (tableIndex !== -1) {
+					mesasTables[tableIndex].name = newName;
+					mesasTables[tableIndex].capacity = newCapacity;
+				}
+
+				editingTableId = null;
+				renderMesasTable();
+				renderSeatingGrid();
+			} catch (err: any) {
+				showMesasError(err.message || 'Erro ao atualizar mesa');
+			}
+		}
+
+		if (action === 'delete' && id) {
+			const tableName = button.getAttribute('data-name') || 'esta mesa';
+			const occupancy = parseInt(button.getAttribute('data-occupancy') || '0', 10);
+			showDeleteConfirmation(id, tableName, occupancy);
+		}
+	});
+
+	// Show delete confirmation dialog
+	function showDeleteConfirmation(tableId: string, tableName: string, occupancy: number) {
+		const overlay = document.createElement('div');
+		overlay.className = 'confirm-overlay';
+
+		const occupancyWarning = occupancy > 0
+			? `<p>Esta mesa tem <strong>${occupancy}</strong> convidado${occupancy !== 1 ? 's' : ''} atribuído${occupancy !== 1 ? 's' : ''}. Ao eliminar, os convidados ficarão sem mesa.</p>`
+			: '';
+
+		overlay.innerHTML = `
+			<div class="confirm-dialog">
+				<h3>Eliminar Mesa</h3>
+				<p>Tem a certeza que deseja eliminar a mesa "<strong>${escapeHtml(tableName)}</strong>"?</p>
+				${occupancyWarning}
+				<div class="confirm-actions">
+					<button class="btn-secondary" id="confirm-cancel">Cancelar</button>
+					<button class="btn-primary" id="confirm-delete" style="background:#dc2626;">Eliminar</button>
+				</div>
+			</div>
+		`;
+
+		document.body.appendChild(overlay);
+
+		const cancelBtn = document.getElementById('confirm-cancel') as HTMLButtonElement;
+		const deleteBtn = document.getElementById('confirm-delete') as HTMLButtonElement;
+
+		cancelBtn.addEventListener('click', () => {
+			overlay.remove();
+		});
+
+		overlay.addEventListener('click', (e) => {
+			if (e.target === overlay) overlay.remove();
+		});
+
+		deleteBtn.addEventListener('click', async () => {
+			try {
+				const res = await fetch(`/api/tables/${tableId}`, {
+					method: 'DELETE'
+				});
+
+				if (!res.ok) {
+					const data = await res.json();
+					throw new Error(data.error || 'Erro ao eliminar mesa');
+				}
+
+				// Remove from local data
+				mesasTables = mesasTables.filter(t => t.id !== tableId);
+				// Update guests that were assigned to this table
+				mesasGuests = mesasGuests.map(g => g.mesa_id === tableId ? { ...g, mesa_id: null } : g);
+				renderMesasTable();
+				renderSeatingGrid();
+				overlay.remove();
+			} catch (err: any) {
+				showMesasError(err.message || 'Erro ao eliminar mesa');
+				overlay.remove();
+			}
+		});
+	}
+
+	// Load mesas data when the Mesas tab is activated
+	const mesasTabBtn = document.getElementById('tab-mesas') as HTMLButtonElement;
+	let mesasLoaded = false;
+
+	mesasTabBtn?.addEventListener('click', () => {
+		if (!mesasLoaded) {
+			mesasLoaded = true;
+			loadMesasData();
+		}
+	});
+
+	// ============================================
+	// GUEST ASSIGNMENT
+	// ============================================
+	const guestAssignBody = document.getElementById('guest-assign-body') as HTMLTableSectionElement;
+	const guestAssignCount = document.getElementById('guest-assign-count') as HTMLSpanElement;
+	const guestAssignUnassigned = document.getElementById('guest-assign-unassigned') as HTMLSpanElement;
+	const guestAssignSearch = document.getElementById('guest-assign-search') as HTMLInputElement;
+
+	let guestAssignFilter = '';
+
+	// Filter guests by name
+	guestAssignSearch?.addEventListener('input', () => {
+		guestAssignFilter = guestAssignSearch.value.toLowerCase().trim();
+		renderGuestAssignment();
+	});
+
+	// Render guest assignment table
+	function renderGuestAssignment() {
+		if (!guestAssignBody) return;
+		guestAssignBody.innerHTML = '';
+
+		let filteredGuests = mesasGuests;
+		if (guestAssignFilter) {
+			filteredGuests = mesasGuests.filter(g => g.nome.toLowerCase().includes(guestAssignFilter));
+		}
+
+		const unassignedCount = mesasGuests.filter(g => !g.mesa_id).length;
+
+		if (filteredGuests.length === 0) {
+			guestAssignBody.innerHTML = `
+				<tr>
+					<td colspan="4" style="text-align:center; padding:2rem; color:#999;">
+						${guestAssignFilter ? 'Nenhum convidado encontrado' : 'Nenhum convidado registado'}
+					</td>
+				</tr>
+			`;
+			guestAssignCount.textContent = `${mesasGuests.length} convidado${mesasGuests.length !== 1 ? 's' : ''}`;
+			guestAssignUnassigned.textContent = `${unassignedCount} sem mesa`;
+			return;
+		}
+
+		filteredGuests.forEach((guest, index) => {
+			const tr = document.createElement('tr');
+			const currentTable = mesasTables.find(t => t.id === guest.mesa_id);
+			const isAtCapacity = currentTable ? getOccupancy(currentTable.id) >= currentTable.capacity : false;
+
+			if (isAtCapacity && guest.mesa_id) {
+				tr.className = 'guest-row-warning';
+			}
+
+			// Build dropdown options
+			let optionsHtml = '<option value="">Sem mesa</option>';
+			mesasTables.forEach(table => {
+				const occ = getOccupancy(table.id);
+				const atCapacity = occ >= table.capacity;
+				const selected = guest.mesa_id === table.id ? 'selected' : '';
+				const capacityLabel = atCapacity ? ' ⚠️' : '';
+				optionsHtml += `<option value="${table.id}" ${selected}>${escapeHtml(table.name)} (${occ}/${table.capacity})${capacityLabel}</option>`;
+			});
+
+			// Status badge
+			let statusHtml = '';
+			if (!guest.mesa_id) {
+				statusHtml = '<span class="occupancy-badge occupancy-empty">Sem mesa</span>';
+			} else if (isAtCapacity) {
+				statusHtml = `<span class="capacity-warning">Lotada</span>`;
+			} else {
+				statusHtml = '<span class="occupancy-badge occupancy-ok">Atribuído</span>';
+			}
+
+			tr.innerHTML = `
+				<td><span class="row-num">${index + 1}</span></td>
+				<td><span class="cell-name">${escapeHtml(guest.nome)}</span></td>
+				<td>
+					<select class="guest-assign-select" data-guest-id="${guest.id}">
+						${optionsHtml}
+					</select>
+				</td>
+				<td>${statusHtml}</td>
+			`;
+
+			guestAssignBody.appendChild(tr);
+		});
+
+		guestAssignCount.textContent = `${mesasGuests.length} convidado${mesasGuests.length !== 1 ? 's' : ''}`;
+		guestAssignUnassigned.textContent = `${unassignedCount} sem mesa`;
+	}
+
+	// Handle guest assignment changes
+	guestAssignBody?.addEventListener('change', async (e) => {
+		const target = e.target as HTMLSelectElement;
+		if (!target.classList.contains('guest-assign-select')) return;
+
+		const guestId = target.getAttribute('data-guest-id');
+		if (!guestId) return;
+
+		const newTableId = target.value || null;
+
+		try {
+			const res = await fetch(`/api/guests/${guestId}/assign`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ table_id: newTableId })
+			});
+
+			if (!res.ok) {
+				const data = await res.json();
+				throw new Error(data.error || 'Erro ao atribuir mesa');
+			}
+
+			// Update local data
+			const guestIndex = mesasGuests.findIndex(g => g.id === guestId);
+			if (guestIndex !== -1) {
+				mesasGuests[guestIndex].mesa_id = newTableId;
+			}
+
+			// Re-render both tables to update occupancy counts
+			renderMesasTable();
+			renderGuestAssignment();
+			renderSeatingGrid();
+		} catch (err: any) {
+			showMesasError(err.message || 'Erro ao atribuir mesa');
+			// Revert the select to previous value
+			const guest = mesasGuests.find(g => g.id === guestId);
+			if (guest) {
+				target.value = guest.mesa_id || '';
+			}
+		}
+	});
+</script>
+
+</body>
+</html>
