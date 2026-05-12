@@ -3,294 +3,195 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Encontre a sua Mesa — Tânia & Miguel">
-  <main class="min-h-screen bg-beige-50">
-    <!-- Search Section -->
-    <section id="search-section" class="wedding-section flex flex-col items-center justify-center min-h-[60vh]">
-      <div class="text-center max-w-lg mx-auto w-full">
-        <!-- Page Header -->
-        <p class="section-subtitle">Casamento Tânia & Miguel</p>
-        <h1 class="font-playfair text-4xl md:text-5xl lg:text-6xl font-light text-gray-900 mb-2">
-          Encontre a sua Mesa
-        </h1>
-        <div class="ornament">
-          <span class="text-gold-400 text-lg">✦</span>
+  <main id="mesa-main">
+    <!-- SEARCH SCREEN — full screen centered -->
+    <section id="search-section">
+      <div class="search-inner">
+        <p class="search-subtitle">Casamento Tânia & Miguel</p>
+        <h1 class="search-title">Encontre a sua Mesa</h1>
+        <div class="search-ornament">
+          <span>✦</span>
         </div>
-        <p class="font-montserrat text-olive-600 text-sm md:text-base mt-4 mb-10">
-          Insira o seu nome para descobrir onde se vai sentar
-        </p>
+        <p class="search-desc">Insira o seu nome para descobrir onde se vai sentar</p>
 
-        <!-- Search Form -->
-        <form id="search-form" class="relative w-full max-w-md mx-auto" role="search" aria-label="Pesquisar convidado">
-          <div class="relative">
+        <form id="search-form" role="search" aria-label="Pesquisar convidado">
+          <div class="search-input-wrap">
             <input
               id="guest-search-input"
               type="text"
               placeholder="Nome do convidado..."
               autocomplete="off"
               aria-label="Nome do convidado"
-              aria-describedby="search-hint"
-              class="w-full px-6 py-4 rounded-full border-2 border-beige-300 bg-white font-montserrat text-base text-gray-800 placeholder-olive-400 focus:outline-none focus:border-gold-400 focus:ring-3 focus:ring-gold-100 transition-all duration-300 shadow-sm"
             />
-            <button
-              type="submit"
-              aria-label="Pesquisar"
-              class="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center rounded-full bg-olive-500 hover:bg-olive-600 text-white transition-colors duration-200"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <button type="submit" aria-label="Pesquisar">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
           </div>
-          <p id="search-hint" class="sr-only">Escreva o seu nome e pressione Enter ou clique no botão de pesquisa</p>
         </form>
 
-        <!-- Live region for screen reader announcements -->
-        <div id="search-announcements" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+        <!-- Loading -->
+        <div id="search-loading" class="search-msg hidden">
+          <div class="loading-spinner"></div>
+          <span>A procurar...</span>
+        </div>
 
-        <!-- Loading State -->
-        <div id="search-loading" class="hidden mt-6">
-          <div class="flex items-center justify-center gap-2 text-olive-500 font-montserrat text-sm">
-            <svg class="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
-            <span>A procurar...</span>
+        <!-- Results -->
+        <div id="search-results" class="hidden">
+          <div class="results-box">
+            <p class="results-label">Selecione o seu nome</p>
+            <ul id="results-list" role="listbox" aria-label="Resultados"></ul>
           </div>
         </div>
 
-        <!-- Results Dropdown -->
-        <div id="search-results" class="hidden mt-4 w-full max-w-md mx-auto">
-          <div class="bg-white rounded-2xl border border-beige-200 shadow-lg overflow-hidden">
-            <p class="px-5 py-3 text-xs uppercase tracking-wider text-olive-500 font-montserrat font-medium border-b border-beige-100">
-              Selecione o seu nome
-            </p>
-            <ul id="results-list" role="listbox" aria-label="Resultados da pesquisa" class="max-h-60 overflow-y-auto">
-            </ul>
-          </div>
+        <!-- No results -->
+        <div id="no-results" class="search-msg hidden">
+          <div class="msg-icon">✗</div>
+          <p>Não encontrámos esse nome.<br><span class="msg-hint">Verifique a ortografia ou tente o nome completo.</span></p>
         </div>
 
-        <!-- No Results Message -->
-        <div id="no-results" class="hidden mt-6">
-          <div class="bg-white rounded-2xl border border-beige-200 p-6 max-w-md mx-auto">
-            <div class="text-gold-500 text-3xl mb-3">✗</div>
-            <p class="font-montserrat text-gray-700 text-sm leading-relaxed">
-              Não encontrámos esse nome.<br>
-              <span class="text-olive-500">Verifique a ortografia ou tente o nome completo.</span>
-            </p>
-          </div>
-        </div>
-
-        <!-- Error Message -->
-        <div id="search-error" class="hidden mt-6">
-          <div class="bg-white rounded-2xl border border-red-200 p-6 max-w-md mx-auto">
-            <p class="font-montserrat text-red-600 text-sm">
-              Não foi possível carregar os dados. Tente novamente.
-            </p>
-            <button id="retry-btn" class="mt-3 px-5 py-3 min-h-[44px] rounded-full bg-olive-500 text-white font-montserrat text-sm hover:bg-olive-600 transition-colors">
-              Tentar novamente
-            </button>
-          </div>
+        <!-- Error -->
+        <div id="search-error" class="search-msg hidden">
+          <p class="msg-error">Não foi possível carregar os dados.</p>
+          <button id="retry-btn">Tentar novamente</button>
         </div>
       </div>
+
+      <!-- Live region -->
+      <div id="search-announcements" class="sr-only" aria-live="polite" aria-atomic="true"></div>
     </section>
 
-    <!-- Seating Map Section -->
-    <section id="seating-map-section" class="hidden wedding-section" aria-label="Mapa de mesas do casamento">
+    <!-- MAP SECTION — shows below search after guest is found -->
+    <section id="map-section" class="hidden">
       <div id="map-announcements" class="sr-only" aria-live="polite" aria-atomic="true"></div>
-      <div class="max-w-6xl mx-auto">
-        <div class="section-header">
-          <h2 class="font-playfair text-2xl md:text-3xl font-light text-gray-900 mb-2">Mapa de Mesas</h2>
-          <div class="ornament">
-            <span class="text-gold-400 text-sm">✦</span>
-          </div>
-        </div>
 
-        <!-- SVG Floor Plan Container -->
-        <div id="floor-plan-viewport" class="floor-plan-viewport">
-          <div id="floor-plan-container" class="floor-plan-container">
-            <svg id="floor-plan-svg" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Planta do salão com mesas do casamento">
-              <!-- Background -->
-              <rect width="1000" height="700" fill="#faf8f3" rx="12"/>
+      <!-- Section header -->
+      <div class="map-header">
+        <h2 class="map-title">Mapa de Mesas</h2>
+        <div class="map-ornament"><span>✦</span></div>
+      </div>
 
-              <!-- Dance Floor -->
-              <g id="dance-floor">
-                <rect x="380" y="260" width="240" height="180" rx="8" fill="#f0ebe0" stroke="#c5c2a5" stroke-width="1.5" stroke-dasharray="6 4"/>
-                <text x="500" y="345" text-anchor="middle" font-family="Playfair Display, serif" font-size="16" fill="#8f8a5e" font-style="italic">Pista de</text>
-                <text x="500" y="367" text-anchor="middle" font-family="Playfair Display, serif" font-size="16" fill="#8f8a5e" font-style="italic">Dança</text>
-              </g>
-
-              <!-- Decorative elements -->
-              <circle cx="500" cy="355" r="20" fill="none" stroke="#e0dcc8" stroke-width="0.5" stroke-dasharray="3 3"/>
-              <circle cx="500" cy="355" r="35" fill="none" stroke="#e0dcc8" stroke-width="0.5" stroke-dasharray="3 3"/>
-
-              <!-- Tables will be rendered here dynamically -->
-              <g id="tables-group"></g>
-            </svg>
-          </div>
-
-          <!-- Detail Overlay (inside viewport for absolute positioning) -->
-          <div id="table-detail-overlay" class="table-detail-overlay hidden">
-            <div class="table-detail-content">
-              <h3 id="detail-table-name" class="table-detail-heading"></h3>
-              <div id="detail-guest-list" class="table-detail-guests"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Map Controls -->
-        <div id="map-controls" class="hidden mt-6 text-center">
-          <button id="back-to-overview-btn" class="inline-flex items-center gap-2 px-5 py-3 min-h-[44px] rounded-full border border-olive-300 text-olive-600 font-montserrat text-sm hover:bg-olive-50 transition-colors focus-visible:outline-2 focus-visible:outline-olive-500 focus-visible:outline-offset-2" aria-label="Voltar à vista geral das mesas">
-            ← Ver todas as mesas
-          </button>
-        </div>
-
-        <!-- Link to ementa section -->
-        <div id="ementa-link" class="mt-8 text-center">
-          <a href="#ementa-section" id="scroll-to-ementa" class="inline-flex items-center gap-2 font-montserrat text-sm text-olive-500 hover:text-gold-600 transition-colors group" aria-label="Ver ementa do casamento">
-            <span>Ver Ementa</span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 transform group-hover:translate-y-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-            </svg>
-          </a>
+      <!-- SVG Floor Plan Viewport -->
+      <div id="floor-plan-viewport">
+        <div id="floor-plan-container">
+          <svg id="floor-plan-svg" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Planta do salão com mesas">
+            <rect width="1000" height="700" fill="#faf8f3" rx="12"/>
+            <!-- Dance Floor -->
+            <rect x="380" y="260" width="240" height="180" rx="8" fill="#f0ebe0" stroke="#c5c2a5" stroke-width="1.5" stroke-dasharray="6 4"/>
+            <text x="500" y="345" text-anchor="middle" font-family="Playfair Display, serif" font-size="16" fill="#8f8a5e" font-style="italic">Pista de</text>
+            <text x="500" y="367" text-anchor="middle" font-family="Playfair Display, serif" font-size="16" fill="#8f8a5e" font-style="italic">Dança</text>
+            <circle cx="500" cy="355" r="20" fill="none" stroke="#e0dcc8" stroke-width="0.5" stroke-dasharray="3 3"/>
+            <circle cx="500" cy="355" r="35" fill="none" stroke="#e0dcc8" stroke-width="0.5" stroke-dasharray="3 3"/>
+            <g id="tables-group"></g>
+          </svg>
         </div>
       </div>
+
+      <!-- Ver Ementa link below map -->
+      <div id="ementa-link">
+        <a href="#ementa-section" id="scroll-to-ementa">
+          <span>Ver Ementa</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </a>
+      </div>
     </section>
+
+    <!-- BOTTOM SHEET (mobile) / SIDEBAR OVERLAY (desktop) -->
+    <div id="detail-sheet" class="detail-sheet hidden" aria-hidden="true">
+      <div class="sheet-drag-handle"><span></span></div>
+      <button id="back-to-overview-btn" class="sheet-back-btn" aria-label="Voltar à vista geral das mesas">
+        ← Ver todas as mesas
+      </button>
+      <div class="sheet-content">
+        <h3 id="detail-table-name" class="sheet-table-name"></h3>
+        <div id="detail-guest-list" class="sheet-guest-list"></div>
+      </div>
+    </div>
 
     <!-- Ementa Section -->
-    <section id="ementa-section" class="hidden wedding-section bg-white py-16 md:py-24" aria-labelledby="ementa-heading">
-      <div class="max-w-4xl mx-auto px-6">
-        <div class="text-center mb-12 md:mb-16">
-          <p class="font-montserrat text-olive-500 text-xs uppercase tracking-[0.2em] mb-3">Menu do Casamento</p>
-          <h2 id="ementa-heading" class="font-playfair text-3xl md:text-4xl lg:text-5xl font-light text-gray-900 mb-3">Ementa</h2>
-          <div class="flex items-center justify-center gap-3 mb-4">
-            <span class="block w-12 h-px bg-gold-300"></span>
-            <span class="text-gold-400 text-sm">✦</span>
-            <span class="block w-12 h-px bg-gold-300"></span>
+    <section id="ementa-section" class="hidden" aria-labelledby="ementa-heading">
+      <div class="ementa-wrapper">
+        <div class="ementa-header">
+          <p class="ementa-label">Menu do Casamento</p>
+          <h2 id="ementa-heading" class="ementa-title">Ementa</h2>
+          <div class="ementa-ornament">
+            <span class="ementa-line"></span>
+            <span class="ementa-star">✦</span>
+            <span class="ementa-line"></span>
           </div>
-          <p class="font-montserrat text-olive-600 text-sm max-w-md mx-auto">
-            Uma seleção cuidada de sabores para celebrar este dia especial
-          </p>
+          <p class="ementa-subtitle">Uma seleção cuidada de sabores para celebrar este dia especial</p>
         </div>
 
-        <div class="ementa-courses space-y-10 md:space-y-14">
+        <div class="ementa-courses">
           <!-- Entradas -->
           <div class="ementa-course">
-            <div class="text-center mb-6">
-              <h3 class="font-playfair text-xl md:text-2xl text-gray-900 mb-1">Entradas</h3>
-              <span class="block w-8 h-px bg-gold-300 mx-auto"></span>
+            <div class="course-header">
+              <h3>Entradas</h3>
+              <span class="course-line"></span>
             </div>
-            <ul class="ementa-items space-y-3">
-              <li class="ementa-item">
-                <span class="ementa-item-name">Tábua de Queijos e Enchidos da Região</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Seleção artesanal com mel e frutos secos</span>
-              </li>
-              <li class="ementa-item">
-                <span class="ementa-item-name">Alheira Frita com Grelos Salteados</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Receita tradicional portuguesa</span>
-              </li>
-              <li class="ementa-item">
-                <span class="ementa-item-name">Gambas ao Alho com Coentros</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Servidas com pão torrado caseiro</span>
-              </li>
-              <li class="ementa-item">
-                <span class="ementa-item-name">Salada de Polvo Grelhado</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Com batata, cebola roxa e azeite virgem</span>
-              </li>
+            <ul>
+              <li><span class="item-name">Tábua de Queijos e Enchidos da Região</span><span class="item-dot"></span><span class="item-desc">Seleção artesanal com mel e frutos secos</span></li>
+              <li><span class="item-name">Alheira Frita com Grelos Salteados</span><span class="item-dot"></span><span class="item-desc">Receita tradicional portuguesa</span></li>
+              <li><span class="item-name">Gambas ao Alho com Coentros</span><span class="item-dot"></span><span class="item-desc">Servidas com pão torrado caseiro</span></li>
+              <li><span class="item-name">Salada de Polvo Grelhado</span><span class="item-dot"></span><span class="item-desc">Com batata, cebola roxa e azeite virgem</span></li>
             </ul>
           </div>
 
           <!-- Prato Principal -->
           <div class="ementa-course">
-            <div class="text-center mb-6">
-              <h3 class="font-playfair text-xl md:text-2xl text-gray-900 mb-1">Prato Principal</h3>
-              <span class="block w-8 h-px bg-gold-300 mx-auto"></span>
+            <div class="course-header">
+              <h3>Prato Principal</h3>
+              <span class="course-line"></span>
             </div>
-            <ul class="ementa-items space-y-3">
-              <li class="ementa-item">
-                <span class="ementa-item-name">Lombo de Vitela Assado com Ervas</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Acompanhado de puré de batata trufado</span>
-              </li>
-              <li class="ementa-item">
-                <span class="ementa-item-name">Bacalhau com Broa e Espinafres</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Gratinado no forno com azeite da casa</span>
-              </li>
+            <ul>
+              <li><span class="item-name">Lombo de Vitela Assado com Ervas</span><span class="item-dot"></span><span class="item-desc">Acompanhado de puré de batata trufado</span></li>
+              <li><span class="item-name">Bacalhau com Broa e Espinafres</span><span class="item-dot"></span><span class="item-desc">Gratinado no forno com azeite da casa</span></li>
             </ul>
           </div>
 
           <!-- Sobremesa -->
           <div class="ementa-course">
-            <div class="text-center mb-6">
-              <h3 class="font-playfair text-xl md:text-2xl text-gray-900 mb-1">Sobremesa</h3>
-              <span class="block w-8 h-px bg-gold-300 mx-auto"></span>
+            <div class="course-header">
+              <h3>Sobremesa</h3>
+              <span class="course-line"></span>
             </div>
-            <ul class="ementa-items space-y-3">
-              <li class="ementa-item">
-                <span class="ementa-item-name">Bolo de Noiva</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Camadas de baunilha com creme de framboesa</span>
-              </li>
-              <li class="ementa-item">
-                <span class="ementa-item-name">Leite-Creme Queimado</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Receita conventual com canela</span>
-              </li>
-              <li class="ementa-item">
-                <span class="ementa-item-name">Mesa de Doces Regionais</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Pastéis de nata, travesseiros e queijadas</span>
-              </li>
+            <ul>
+              <li><span class="item-name">Bolo de Noiva</span><span class="item-dot"></span><span class="item-desc">Camadas de baunilha com creme de framboesa</span></li>
+              <li><span class="item-name">Leite-Creme Queimado</span><span class="item-dot"></span><span class="item-desc">Receita conventual com canela</span></li>
+              <li><span class="item-name">Mesa de Doces Regionais</span><span class="item-dot"></span><span class="item-desc">Pastéis de nata, travesseiros e queijadas</span></li>
             </ul>
           </div>
 
           <!-- Bebidas -->
           <div class="ementa-course">
-            <div class="text-center mb-6">
-              <h3 class="font-playfair text-xl md:text-2xl text-gray-900 mb-1">Bebidas</h3>
-              <span class="block w-8 h-px bg-gold-300 mx-auto"></span>
+            <div class="course-header">
+              <h3>Bebidas</h3>
+              <span class="course-line"></span>
             </div>
-            <ul class="ementa-items space-y-3">
-              <li class="ementa-item">
-                <span class="ementa-item-name">Espumante de Boas-Vindas</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Bruto natural da região</span>
-              </li>
-              <li class="ementa-item">
-                <span class="ementa-item-name">Vinho Branco e Tinto da Quinta</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Seleção do enólogo para a ocasião</span>
-              </li>
-              <li class="ementa-item">
-                <span class="ementa-item-name">Águas, Sumos Naturais e Café</span>
-                <span class="ementa-item-dot"></span>
-                <span class="ementa-item-desc">Disponíveis durante toda a refeição</span>
-              </li>
+            <ul>
+              <li><span class="item-name">Espumante de Boas-Vindas</span><span class="item-dot"></span><span class="item-desc">Bruto natural da região</span></li>
+              <li><span class="item-name">Vinho Branco e Tinto da Quinta</span><span class="item-dot"></span><span class="item-desc">Seleção do enólogo para a ocasião</span></li>
+              <li><span class="item-name">Águas, Sumos Naturais e Café</span><span class="item-dot"></span><span class="item-desc">Disponíveis durante toda a refeição</span></li>
             </ul>
           </div>
         </div>
 
-        <div class="text-center mt-12 md:mt-16">
-          <div class="flex items-center justify-center gap-3">
-            <span class="block w-8 h-px bg-beige-300"></span>
-            <span class="text-gold-400 text-xs">✦ ✦ ✦</span>
-            <span class="block w-8 h-px bg-beige-300"></span>
-          </div>
-          <p class="font-montserrat text-olive-500 text-xs mt-4 italic">
-            Menu sujeito a pequenas alterações sazonais
-          </p>
+        <div class="ementa-footer">
+          <span class="ementa-line"></span>
+          <span class="ementa-stars">✦ ✦ ✦</span>
+          <span class="ementa-line"></span>
         </div>
+        <p class="ementa-note">Menu sujeito a pequenas alterações sazonais</p>
       </div>
     </section>
   </main>
 </Layout>
 
 <script>
-  // --- Types ---
+  // === Types ===
   interface Guest {
     id: string;
     nome: string;
@@ -310,7 +211,7 @@ import Layout from '../layouts/Layout.astro';
     radius: number;
   }
 
-  // --- State ---
+  // === State ===
   let allGuests: Guest[] = [];
   let allTables: Table[] = [];
   let guestsFetched = false;
@@ -320,70 +221,52 @@ import Layout from '../layouts/Layout.astro';
   let currentView: 'overview' | 'detail' = 'overview';
   let activeTableId: string | null = null;
 
-  // --- Table layout positions (scattered around dance floor) ---
-  // Positions are well within the 1000x700 viewBox to avoid clipping
+  // === Table positions — centered and spread across the 1000x700 viewBox ===
   const TABLE_POSITIONS: TablePosition[] = [
-    // Top row (3 tables)
-    { x: 200, y: 130, radius: 38 },
-    { x: 500, y: 120, radius: 38 },
-    { x: 800, y: 130, radius: 38 },
-    // Left side (2 tables)
-    { x: 160, y: 330, radius: 38 },
-    { x: 170, y: 530, radius: 38 },
-    // Right side (2 tables)
-    { x: 840, y: 330, radius: 38 },
-    { x: 830, y: 530, radius: 38 },
-    // Bottom row (2 tables)
-    { x: 300, y: 600, radius: 36 },
-    { x: 700, y: 600, radius: 36 },
-    // Inner ring near dance floor (5 tables)
-    { x: 320, y: 210, radius: 34 },
-    { x: 680, y: 210, radius: 34 },
-    { x: 280, y: 450, radius: 34 },
-    { x: 720, y: 450, radius: 34 },
-    { x: 500, y: 580, radius: 34 },
+    // Row 1 (top)
+    { x: 200, y: 150, radius: 42 },
+    { x: 500, y: 130, radius: 42 },
+    { x: 800, y: 150, radius: 42 },
+    // Row 2 (middle-left and middle-right of dance floor)
+    { x: 150, y: 350, radius: 42 },
+    { x: 850, y: 350, radius: 42 },
+    // Row 3 (bottom)
+    { x: 200, y: 560, radius: 42 },
+    { x: 500, y: 580, radius: 42 },
+    { x: 800, y: 560, radius: 42 },
+    // Extras (closer to dance floor)
+    { x: 330, y: 250, radius: 38 },
+    { x: 670, y: 250, radius: 38 },
+    { x: 330, y: 470, radius: 38 },
+    { x: 670, y: 470, radius: 38 },
+    { x: 150, y: 560, radius: 36 },
+    { x: 850, y: 560, radius: 36 },
   ];
 
-  // --- DOM Elements ---
+  // === DOM refs ===
+  const searchSection = document.getElementById('search-section')!;
   const searchForm = document.getElementById('search-form') as HTMLFormElement;
   const searchInput = document.getElementById('guest-search-input') as HTMLInputElement;
-  const searchLoading = document.getElementById('search-loading') as HTMLElement;
-  const searchResults = document.getElementById('search-results') as HTMLElement;
+  const searchLoading = document.getElementById('search-loading')!;
+  const searchResults = document.getElementById('search-results')!;
   const resultsList = document.getElementById('results-list') as HTMLUListElement;
-  const noResults = document.getElementById('no-results') as HTMLElement;
-  const searchError = document.getElementById('search-error') as HTMLElement;
-  const retryBtn = document.getElementById('retry-btn') as HTMLButtonElement;
-  const seatingMapSection = document.getElementById('seating-map-section') as HTMLElement;
-  const ementaSection = document.getElementById('ementa-section') as HTMLElement;
-  const scrollToEmentaLink = document.getElementById('scroll-to-ementa') as HTMLAnchorElement;
-  const searchAnnouncements = document.getElementById('search-announcements') as HTMLElement;
-  const mapAnnouncements = document.getElementById('map-announcements') as HTMLElement;
-  const floorPlanContainer = document.getElementById('floor-plan-container') as HTMLElement;
-  const floorPlanSvg = document.getElementById('floor-plan-svg') as unknown as SVGSVGElement;
+  const noResults = document.getElementById('no-results')!;
+  const searchError = document.getElementById('search-error')!;
+  const retryBtn = document.getElementById('retry-btn')!;
+  const mapSection = document.getElementById('map-section')!;
+  const ementaSection = document.getElementById('ementa-section')!;
+  const scrollToEmentaLink = document.getElementById('scroll-to-ementa')!;
+  const searchAnnouncements = document.getElementById('search-announcements')!;
+  const mapAnnouncements = document.getElementById('map-announcements')!;
+  const floorPlanContainer = document.getElementById('floor-plan-container')!;
   const tablesGroup = document.getElementById('tables-group') as unknown as SVGGElement;
-  const detailOverlay = document.getElementById('table-detail-overlay') as HTMLElement;
-  const detailTableName = document.getElementById('detail-table-name') as HTMLElement;
-  const detailGuestList = document.getElementById('detail-guest-list') as HTMLElement;
-  const mapControls = document.getElementById('map-controls') as HTMLElement;
-  const backToOverviewBtn = document.getElementById('back-to-overview-btn') as HTMLButtonElement;
+  const detailSheet = document.getElementById('detail-sheet')!;
+  const detailTableName = document.getElementById('detail-table-name')!;
+  const detailGuestList = document.getElementById('detail-guest-list')!;
+  const backToOverviewBtn = document.getElementById('back-to-overview-btn')!;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // --- Utility functions ---
-  function searchGuestsByName(guests: Guest[], query: string): Guest[] {
-    if (query.trim() === '') return [];
-    const lowerQuery = query.trim().toLowerCase();
-    return guests.filter((guest) => guest.nome.toLowerCase().includes(lowerQuery));
-  }
-
-  function announceToSearch(message: string) {
-    searchAnnouncements.textContent = message;
-  }
-
-  function announceToMap(message: string) {
-    mapAnnouncements.textContent = message;
-  }
-
-  // --- UI Helpers ---
+  // === Helpers ===
   function hideAllMessages() {
     searchLoading.classList.add('hidden');
     searchResults.classList.add('hidden');
@@ -391,610 +274,626 @@ import Layout from '../layouts/Layout.astro';
     searchError.classList.add('hidden');
   }
 
-  function showLoading() {
-    hideAllMessages();
-    searchLoading.classList.remove('hidden');
+  function announce(el: HTMLElement, msg: string) {
+    el.textContent = msg;
   }
 
-  function showResults(guests: Guest[]) {
-    hideAllMessages();
-    searchResults.classList.remove('hidden');
-    resultsList.innerHTML = '';
-    announceToSearch(`${guests.length} resultados encontrados. Use as setas para navegar.`);
-
-    guests.forEach((guest) => {
-      const li = document.createElement('li');
-      li.role = 'option';
-      li.tabIndex = 0;
-      li.className = 'px-5 py-3 font-montserrat text-sm text-gray-800 hover:bg-beige-50 cursor-pointer transition-colors border-b border-beige-50 last:border-b-0 flex items-center justify-between';
-      li.setAttribute('data-guest-id', guest.id);
-      li.innerHTML = `
-        <span>${guest.nome}</span>
-        <span class="text-olive-400 text-xs">${guest.mesa_id ? '●' : ''}</span>
-      `;
-      li.addEventListener('click', () => selectGuest(guest));
-      li.addEventListener('keydown', (e: KeyboardEvent) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          selectGuest(guest);
-        }
-      });
-      resultsList.appendChild(li);
-    });
-  }
-
-  function showNoResults() {
-    hideAllMessages();
-    noResults.classList.remove('hidden');
-    announceToSearch('Nenhum resultado encontrado. Verifique a ortografia.');
-  }
-
-  function showError() {
-    hideAllMessages();
-    searchError.classList.remove('hidden');
-    announceToSearch('Erro ao carregar dados. Tente novamente.');
-  }
-
-  // --- API calls ---
+  // === API ===
   async function fetchGuests(): Promise<Guest[]> {
-    if (guestsFetched && allGuests.length > 0) return allGuests;
-    const response = await fetch('/api/guests');
-    if (!response.ok) throw new Error(`API error: ${response.status}`);
-    const data = await response.json();
-    allGuests = data;
+    if (guestsFetched) return allGuests;
+    const res = await fetch('/api/guests');
+    if (!res.ok) throw new Error('API error');
+    allGuests = await res.json();
     guestsFetched = true;
     return allGuests;
   }
 
   async function fetchTables(): Promise<Table[]> {
-    if (tablesFetched && allTables.length > 0) return allTables;
-    const response = await fetch('/api/tables');
-    if (!response.ok) throw new Error(`API error: ${response.status}`);
-    const data = await response.json();
-    allTables = data;
+    if (tablesFetched) return allTables;
+    const res = await fetch('/api/tables');
+    if (!res.ok) throw new Error('API error');
+    allTables = await res.json();
     tablesFetched = true;
     return allTables;
   }
 
-  // --- SVG Floor Plan Rendering ---
-
-  function createSvgElement(tag: string, attrs: Record<string, string>): SVGElement {
+  // === SVG Rendering ===
+  function svgEl(tag: string, attrs: Record<string, string>): SVGElement {
     const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-    for (const [key, value] of Object.entries(attrs)) {
-      el.setAttribute(key, value);
-    }
+    for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
     return el;
   }
 
-  /**
-   * Renders a single table as an SVG group with seats arranged around it.
-   */
-  function renderTable(table: Table, position: TablePosition, tableGuests: Guest[], index: number): SVGGElement {
-    const { x, y, radius } = position;
-    const group = createSvgElement('g', {
+  function renderTable(table: Table, pos: TablePosition, guests: Guest[]): SVGGElement {
+    const { x, y, radius } = pos;
+    const g = svgEl('g', {
       'data-table-id': table.id,
       'class': 'floor-table',
       'role': 'button',
       'tabindex': '0',
-      'aria-label': `${table.name}, ${tableGuests.length} de ${table.capacity} lugares ocupados`,
+      'aria-label': `${table.name}, ${guests.length} de ${table.capacity} lugares`,
     }) as SVGGElement;
 
-    // Table surface (large circle)
-    const tableCircle = createSvgElement('circle', {
-      cx: String(x),
-      cy: String(y),
-      r: String(radius),
-      fill: '#f5f0e3',
-      stroke: '#c5c2a5',
-      'stroke-width': '1.5',
-      class: 'table-surface',
-    });
-    group.appendChild(tableCircle);
+    // Table circle
+    g.appendChild(svgEl('circle', {
+      cx: String(x), cy: String(y), r: String(radius),
+      fill: '#f5f0e3', stroke: '#c5c2a5', 'stroke-width': '1.5',
+    }));
 
-    // Inner decorative ring
-    const innerRing = createSvgElement('circle', {
-      cx: String(x),
-      cy: String(y),
-      r: String(radius - 10),
-      fill: 'none',
-      stroke: '#e8e4d4',
-      'stroke-width': '0.5',
-      'stroke-dasharray': '2 2',
-    });
-    group.appendChild(innerRing);
+    // Inner ring
+    g.appendChild(svgEl('circle', {
+      cx: String(x), cy: String(y), r: String(radius - 10),
+      fill: 'none', stroke: '#e8e4d4', 'stroke-width': '0.5', 'stroke-dasharray': '2 2',
+    }));
 
-    // Seat circles arranged around the table
-    const seatRadius = 7;
-    const seatDistance = radius + 14;
-    const totalSeats = table.capacity;
+    // Seats
+    const seatDist = radius + 14;
+    const total = table.capacity;
+    for (let i = 0; i < total; i++) {
+      const angle = (i / total) * Math.PI * 2 - Math.PI / 2;
+      const sx = x + Math.cos(angle) * seatDist;
+      const sy = y + Math.sin(angle) * seatDist;
+      const occupied = i < guests.length;
+      const isMe = occupied && selectedGuest && guests[i].id === selectedGuest.id;
 
-    for (let i = 0; i < totalSeats; i++) {
-      const angle = (i / totalSeats) * Math.PI * 2 - Math.PI / 2;
-      const seatX = x + Math.cos(angle) * seatDistance;
-      const seatY = y + Math.sin(angle) * seatDistance;
-
-      const isOccupied = i < tableGuests.length;
-      const isCurrentGuest = isOccupied && selectedGuest && tableGuests[i].id === selectedGuest.id;
-
-      // Determine colors inline for SVG compatibility
-      let seatFill: string;
-      let seatStroke: string;
-      let seatStrokeWidth: string;
-      let seatStrokeDasharray: string = 'none';
-
-      if (isCurrentGuest) {
-        seatFill = '#e6b040';
-        seatStroke = '#d4983a';
-        seatStrokeWidth = '1.5';
-      } else if (isOccupied) {
-        seatFill = '#c5c2a5';
-        seatStroke = '#a9a57e';
-        seatStrokeWidth = '1';
-      } else {
-        seatFill = '#fdfcf9';
-        seatStroke = '#c5c2a5';
-        seatStrokeWidth = '1';
-        seatStrokeDasharray = '3 2';
-      }
-
-      const seatAttrs: Record<string, string> = {
-        cx: String(seatX),
-        cy: String(seatY),
-        r: String(seatRadius),
-        fill: seatFill,
-        stroke: seatStroke,
-        'stroke-width': seatStrokeWidth,
+      const attrs: Record<string, string> = {
+        cx: String(sx), cy: String(sy), r: '7',
       };
-      if (seatStrokeDasharray !== 'none') {
-        seatAttrs['stroke-dasharray'] = seatStrokeDasharray;
+
+      if (isMe) {
+        attrs.fill = '#e6b040';
+        attrs.stroke = '#d4983a';
+        attrs['stroke-width'] = '1.5';
+      } else if (occupied) {
+        attrs.fill = '#c5c2a5';
+        attrs.stroke = '#a9a57e';
+        attrs['stroke-width'] = '1';
+      } else {
+        attrs.fill = '#fdfcf9';
+        attrs.stroke = '#c5c2a5';
+        attrs['stroke-width'] = '1';
+        attrs['stroke-dasharray'] = '3 2';
       }
 
-      const seat = createSvgElement('circle', seatAttrs);
-
-      if (isCurrentGuest) {
-        seat.setAttribute('data-guest-seat', 'true');
-      }
-
-      group.appendChild(seat);
+      g.appendChild(svgEl('circle', attrs));
     }
 
-    // Table name text
-    const tableName = createSvgElement('text', {
-      x: String(x),
-      y: String(y + 1),
-      'text-anchor': 'middle',
-      'dominant-baseline': 'middle',
-      'font-family': 'Montserrat, sans-serif',
-      'font-size': '9',
-      'font-weight': '600',
-      fill: '#74704a',
-      'pointer-events': 'none',
+    // Table name
+    const txt = svgEl('text', {
+      x: String(x), y: String(y + 1),
+      'text-anchor': 'middle', 'dominant-baseline': 'middle',
+      'font-family': 'Montserrat, sans-serif', 'font-size': '9',
+      'font-weight': '600', fill: '#74704a', 'pointer-events': 'none',
     });
-    tableName.textContent = table.name;
-    group.appendChild(tableName);
+    txt.textContent = table.name;
+    g.appendChild(txt);
 
-    return group;
+    return g;
   }
 
-  /**
-   * Renders the full floor plan SVG with all tables.
-   */
   function renderFloorPlan(tables: Table[]) {
     tablesGroup.innerHTML = '';
-
     if (tables.length === 0) {
-      const emptyText = createSvgElement('text', {
-        x: '500',
-        y: '350',
-        'text-anchor': 'middle',
-        'font-family': 'Montserrat, sans-serif',
-        'font-size': '14',
-        fill: '#8f8a5e',
-      });
-      emptyText.textContent = 'O mapa de mesas será disponibilizado em breve.';
-      tablesGroup.appendChild(emptyText);
+      const t = svgEl('text', { x: '500', y: '350', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif', 'font-size': '14', fill: '#8f8a5e' });
+      t.textContent = 'O mapa de mesas será disponibilizado em breve.';
+      tablesGroup.appendChild(t);
       return;
     }
 
-    // Group guests by table
-    const guestsByTable = new Map<string, Guest[]>();
-    tables.forEach(t => guestsByTable.set(t.id, []));
-    allGuests.forEach(g => {
-      if (g.mesa_id && guestsByTable.has(g.mesa_id)) {
-        guestsByTable.get(g.mesa_id)!.push(g);
-      }
-    });
+    const byTable = new Map<string, Guest[]>();
+    tables.forEach(t => byTable.set(t.id, []));
+    allGuests.forEach(g => { if (g.mesa_id && byTable.has(g.mesa_id)) byTable.get(g.mesa_id)!.push(g); });
 
-    tables.forEach((table, index) => {
-      const position = TABLE_POSITIONS[index % TABLE_POSITIONS.length];
-      const tableGuests = guestsByTable.get(table.id) || [];
-      const tableGroup = renderTable(table, position, tableGuests, index);
-      tablesGroup.appendChild(tableGroup);
+    tables.forEach((table, i) => {
+      const pos = TABLE_POSITIONS[i % TABLE_POSITIONS.length];
+      tablesGroup.appendChild(renderTable(table, pos, byTable.get(table.id) || []));
     });
   }
 
-  // --- Zoom Logic ---
-
-  function getTablePosition(tableId: string): TablePosition | null {
-    const tableIndex = allTables.findIndex(t => t.id === tableId);
-    if (tableIndex === -1) return null;
-    return TABLE_POSITIONS[tableIndex % TABLE_POSITIONS.length];
-  }
-
+  // === Zoom ===
   function zoomToTable(tableId: string) {
-    const position = getTablePosition(tableId);
-    if (!position) return;
+    const idx = allTables.findIndex(t => t.id === tableId);
+    if (idx === -1) return;
+    const pos = TABLE_POSITIONS[idx % TABLE_POSITIONS.length];
 
     currentView = 'detail';
     activeTableId = tableId;
 
-    // Calculate zoom transform to center on the table
-    // SVG viewBox is 1000x700, we want to zoom to ~3x and center on the table
     const scale = 2.5;
-    const viewportWidth = floorPlanContainer.clientWidth;
-    const viewportHeight = floorPlanContainer.clientHeight;
+    const vw = floorPlanContainer.clientWidth;
+    const vh = floorPlanContainer.clientHeight;
+    const svgScale = Math.min(vw / 1000, vh / 700);
+    const tx = vw / 2 - pos.x * svgScale * scale;
+    const ty = vh / 2 - pos.y * svgScale * scale;
 
-    // The SVG scales to fit the container, so we need to calculate based on the container
-    const svgScaleX = viewportWidth / 1000;
-    const svgScaleY = viewportHeight / 700;
-    const svgScale = Math.min(svgScaleX, svgScaleY);
-
-    // Table position in pixel space
-    const tablePxX = position.x * svgScale;
-    const tablePxY = position.y * svgScale;
-
-    // Center of viewport
-    const centerX = viewportWidth / 2;
-    const centerY = viewportHeight / 2;
-
-    // Translation needed to center the table, then scale
-    const translateX = centerX - tablePxX * scale;
-    const translateY = centerY - tablePxY * scale;
-
-    if (!prefersReducedMotion) {
-      floorPlanContainer.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-    } else {
-      floorPlanContainer.style.transition = 'none';
-    }
-
-    floorPlanContainer.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+    floorPlanContainer.style.transition = prefersReducedMotion ? 'none' : 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+    floorPlanContainer.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
     floorPlanContainer.style.transformOrigin = '0 0';
 
-    // Highlight the active table
-    const allTableGroups = tablesGroup.querySelectorAll('.floor-table');
-    allTableGroups.forEach(g => g.classList.remove('table-active'));
-    const targetGroup = tablesGroup.querySelector(`[data-table-id="${tableId}"]`);
-    if (targetGroup) {
-      targetGroup.classList.add('table-active');
-    }
-
-    // Show controls
-    mapControls.classList.remove('hidden');
+    // Highlight active table
+    tablesGroup.querySelectorAll('.floor-table').forEach(g => g.classList.remove('table-active'));
+    tablesGroup.querySelector(`[data-table-id="${tableId}"]`)?.classList.add('table-active');
   }
 
   function zoomToOverview() {
     currentView = 'overview';
     activeTableId = null;
-
-    if (!prefersReducedMotion) {
-      floorPlanContainer.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-    } else {
-      floorPlanContainer.style.transition = 'none';
-    }
-
-    floorPlanContainer.style.transform = 'translate(0, 0) scale(1)';
-
-    // Remove active highlights
-    const allTableGroups = tablesGroup.querySelectorAll('.floor-table');
-    allTableGroups.forEach(g => g.classList.remove('table-active'));
-
-    // Hide detail overlay and controls
-    hideDetailOverlay();
-    mapControls.classList.add('hidden');
+    floorPlanContainer.style.transition = prefersReducedMotion ? 'none' : 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+    floorPlanContainer.style.transform = 'translate(0,0) scale(1)';
+    tablesGroup.querySelectorAll('.floor-table').forEach(g => g.classList.remove('table-active'));
+    hideSheet();
   }
 
-  // --- Detail Overlay ---
-
-  function showDetailOverlay(tableId: string) {
+  // === Bottom Sheet / Sidebar ===
+  function showSheet(tableId: string) {
     const table = allTables.find(t => t.id === tableId);
     if (!table) return;
-
-    const tableGuests = allGuests.filter(g => g.mesa_id === tableId);
+    const guests = allGuests.filter(g => g.mesa_id === tableId);
 
     detailTableName.textContent = table.name;
     detailGuestList.innerHTML = '';
 
-    if (tableGuests.length === 0) {
-      detailGuestList.innerHTML = '<p class="text-olive-400 text-sm italic">Sem convidados atribuídos</p>';
+    if (guests.length === 0) {
+      detailGuestList.innerHTML = '<p class="sheet-empty">Sem convidados atribuídos</p>';
     } else {
-      tableGuests.forEach(guest => {
-        const guestEl = document.createElement('div');
-        const isHighlighted = selectedGuest && guest.id === selectedGuest.id;
-        guestEl.className = `detail-guest-item ${isHighlighted ? 'detail-guest-highlighted' : ''}`;
-        guestEl.innerHTML = `
-          <span class="detail-guest-dot ${isHighlighted ? 'dot-gold' : ''}"></span>
-          <span class="detail-guest-name">${guest.nome}</span>
+      guests.forEach(guest => {
+        const isMe = selectedGuest && guest.id === selectedGuest.id;
+        const div = document.createElement('div');
+        div.className = 'sheet-guest' + (isMe ? ' sheet-guest-me' : '');
+        div.innerHTML = `
+          <span class="guest-dot${isMe ? ' dot-gold' : ''}"></span>
+          <span class="guest-name">${guest.nome}</span>
+          ${isMe ? '<span class="guest-you">(you)</span>' : ''}
         `;
-        detailGuestList.appendChild(guestEl);
+        detailGuestList.appendChild(div);
       });
     }
 
-    // Announce to screen readers
-    const guestNames = tableGuests.map(g => g.nome).join(', ');
-    announceToMap(`${table.name}. ${tableGuests.length} convidados: ${guestNames || 'Sem convidados'}`);
+    announce(mapAnnouncements, `${table.name}. ${guests.length} convidados.`);
 
-    detailOverlay.classList.remove('hidden');
+    detailSheet.classList.remove('hidden');
+    detailSheet.setAttribute('aria-hidden', 'false');
     requestAnimationFrame(() => {
-      detailOverlay.classList.add('visible');
+      detailSheet.classList.add('visible');
     });
   }
 
-  function hideDetailOverlay() {
-    detailOverlay.classList.remove('visible');
-    setTimeout(() => {
-      detailOverlay.classList.add('hidden');
-    }, 300);
+  function hideSheet() {
+    detailSheet.classList.remove('visible');
+    detailSheet.setAttribute('aria-hidden', 'true');
+    setTimeout(() => detailSheet.classList.add('hidden'), 350);
   }
 
-  // --- Show seating map ---
-
-  async function showSeatingMap() {
+  // === Show map ===
+  async function showMap() {
     if (mapRendered) return;
-
     try {
       const [tables] = await Promise.all([fetchTables(), fetchGuests()]);
       renderFloorPlan(tables);
       mapRendered = true;
-      seatingMapSection.classList.add('map-visible');
-    } catch (error) {
-      tablesGroup.innerHTML = '';
-      const errorText = createSvgElement('text', {
-        x: '500',
-        y: '350',
-        'text-anchor': 'middle',
-        'font-family': 'Montserrat, sans-serif',
-        'font-size': '14',
-        fill: '#c0392b',
-      });
-      errorText.textContent = 'Não foi possível carregar o mapa de mesas.';
-      tablesGroup.appendChild(errorText);
+    } catch {
+      const t = svgEl('text', { x: '500', y: '350', 'text-anchor': 'middle', 'font-family': 'Montserrat, sans-serif', 'font-size': '14', fill: '#c0392b' });
+      t.textContent = 'Não foi possível carregar o mapa.';
+      tablesGroup.appendChild(t);
     }
   }
 
-  // --- Auto-zoom after guest selection ---
-
-  function triggerAutoZoom() {
-    if (!selectedGuest) return;
-
-    if (!selectedGuest.mesa_id) {
-      showNoTableAssigned();
-      return;
-    }
-
-    const tableId = selectedGuest.mesa_id;
-
-    if (prefersReducedMotion) {
-      zoomToTable(tableId);
-      showDetailOverlay(tableId);
-    } else {
-      setTimeout(() => {
-        zoomToTable(tableId);
-        // Show detail after zoom animation completes
-        setTimeout(() => {
-          showDetailOverlay(tableId);
-        }, 850);
-      }, 1500);
-    }
-  }
-
-  function showNoTableAssigned() {
-    detailTableName.textContent = '';
-    detailGuestList.innerHTML = `
-      <div class="text-center py-4">
-        <div class="text-gold-400 text-3xl mb-3">✦</div>
-        <p class="font-montserrat text-gray-700 text-sm leading-relaxed">
-          A sua mesa ainda não foi atribuída.
-        </p>
-        <p class="font-montserrat text-olive-500 text-xs mt-2">
-          Volte mais tarde para descobrir onde se vai sentar.
-        </p>
-      </div>
-    `;
-    detailOverlay.classList.remove('hidden');
-    requestAnimationFrame(() => {
-      detailOverlay.classList.add('visible');
-    });
-    announceToMap('A sua mesa ainda não foi atribuída. Volte mais tarde.');
-  }
-
-  // --- Guest selection ---
-
+  // === Guest selection ===
   function selectGuest(guest: Guest) {
     selectedGuest = guest;
     hideAllMessages();
-    announceToSearch(`${guest.nome} selecionado. A mostrar mapa de mesas.`);
+    announce(searchAnnouncements, `${guest.nome} selecionado.`);
 
-    const event = new CustomEvent('guest-selected', { detail: { guest } });
-    document.dispatchEvent(event);
-
-    seatingMapSection.classList.remove('hidden');
+    // Show map and ementa (don't hide search — keep page scrollable)
+    mapSection.classList.remove('hidden');
     ementaSection.classList.remove('hidden');
-    seatingMapSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Scroll to map section
+    mapSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    showMap().then(() => {
+      if (mapRendered) renderFloorPlan(allTables);
+
+      if (!guest.mesa_id) {
+        showNoTable();
+        return;
+      }
+
+      const delay = prefersReducedMotion ? 0 : 1500;
+      setTimeout(() => {
+        zoomToTable(guest.mesa_id!);
+        const sheetDelay = prefersReducedMotion ? 0 : 850;
+        setTimeout(() => showSheet(guest.mesa_id!), sheetDelay);
+      }, delay);
+    });
   }
 
-  // --- Search handler ---
+  function showNoTable() {
+    detailTableName.textContent = '';
+    detailGuestList.innerHTML = `
+      <div class="sheet-no-table">
+        <div class="sheet-no-table-icon">✦</div>
+        <p>A sua mesa ainda não foi atribuída.</p>
+        <p class="sheet-no-table-hint">Volte mais tarde para descobrir onde se vai sentar.</p>
+      </div>
+    `;
+    detailSheet.classList.remove('hidden');
+    detailSheet.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => detailSheet.classList.add('visible'));
+  }
 
+  // === Search ===
   async function handleSearch(query: string) {
-    if (query.trim() === '') {
-      hideAllMessages();
-      return;
-    }
-
-    showLoading();
+    if (!query.trim()) { hideAllMessages(); return; }
+    hideAllMessages();
+    searchLoading.classList.remove('hidden');
 
     try {
       const guests = await fetchGuests();
-      const matches = searchGuestsByName(guests, query);
+      const q = query.trim().toLowerCase();
+      const matches = guests.filter(g => g.nome.toLowerCase().includes(q));
 
       if (matches.length === 0) {
-        showNoResults();
+        hideAllMessages();
+        noResults.classList.remove('hidden');
+        announce(searchAnnouncements, 'Nenhum resultado encontrado.');
       } else if (matches.length === 1) {
         selectGuest(matches[0]);
       } else {
-        showResults(matches);
+        hideAllMessages();
+        searchResults.classList.remove('hidden');
+        resultsList.innerHTML = '';
+        announce(searchAnnouncements, `${matches.length} resultados encontrados.`);
+        matches.forEach(guest => {
+          const li = document.createElement('li');
+          li.role = 'option';
+          li.tabIndex = 0;
+          li.className = 'result-item';
+          li.innerHTML = `<span>${guest.nome}</span>${guest.mesa_id ? '<span class="result-dot">●</span>' : ''}`;
+          li.addEventListener('click', () => selectGuest(guest));
+          li.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectGuest(guest); }
+          });
+          resultsList.appendChild(li);
+        });
       }
-    } catch (error) {
-      showError();
+    } catch {
+      hideAllMessages();
+      searchError.classList.remove('hidden');
+      announce(searchAnnouncements, 'Erro ao carregar dados.');
     }
   }
 
-  // --- Table click navigation ---
-
+  // === Table click ===
   function navigateToTable(tableId: string) {
-    if (currentView === 'overview') {
-      zoomToTable(tableId);
-      const delay = prefersReducedMotion ? 0 : 850;
-      setTimeout(() => showDetailOverlay(tableId), delay);
-    } else if (currentView === 'detail') {
-      hideDetailOverlay();
-      const allTableGroups = tablesGroup.querySelectorAll('.floor-table');
-      allTableGroups.forEach(g => g.classList.remove('table-active'));
-
-      if (prefersReducedMotion) {
-        zoomToTable(tableId);
-        showDetailOverlay(tableId);
-      } else {
+    if (currentView === 'detail') {
+      hideSheet();
+      setTimeout(() => {
         zoomToOverview();
         setTimeout(() => {
           zoomToTable(tableId);
-          setTimeout(() => showDetailOverlay(tableId), 850);
-        }, 500);
-      }
+          const d = prefersReducedMotion ? 0 : 850;
+          setTimeout(() => showSheet(tableId), d);
+        }, prefersReducedMotion ? 0 : 500);
+      }, 350);
+    } else {
+      zoomToTable(tableId);
+      const d = prefersReducedMotion ? 0 : 850;
+      setTimeout(() => showSheet(tableId), d);
     }
   }
 
-  // --- Event Listeners ---
-
-  searchForm.addEventListener('submit', (e: Event) => {
-    e.preventDefault();
-    handleSearch(searchInput.value);
-  });
-
-  searchInput.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      hideAllMessages();
-      searchInput.value = '';
-    }
-  });
-
-  retryBtn.addEventListener('click', () => {
-    guestsFetched = false;
-    allGuests = [];
-    const query = searchInput.value;
-    if (query.trim()) handleSearch(query);
-  });
+  // === Event listeners ===
+  searchForm.addEventListener('submit', (e) => { e.preventDefault(); handleSearch(searchInput.value); });
+  searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') { hideAllMessages(); searchInput.value = ''; } });
+  retryBtn.addEventListener('click', () => { guestsFetched = false; allGuests = []; handleSearch(searchInput.value); });
 
   backToOverviewBtn.addEventListener('click', () => {
     zoomToOverview();
-    announceToMap('Vista geral das mesas');
+    announce(mapAnnouncements, 'Vista geral das mesas');
   });
 
-  // Table click/keyboard in SVG
-  tablesGroup.addEventListener('click', (e: Event) => {
+  tablesGroup.addEventListener('click', (e) => {
     const target = (e.target as Element).closest('.floor-table');
     if (!target) return;
-    const tableId = target.getAttribute('data-table-id');
-    if (tableId) navigateToTable(tableId);
+    const id = target.getAttribute('data-table-id');
+    if (id) navigateToTable(id);
   });
 
   tablesGroup.addEventListener('keydown', (e: KeyboardEvent) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     const target = (e.target as Element).closest('.floor-table');
     if (!target) return;
-    const tableId = target.getAttribute('data-table-id');
-    if (tableId) {
-      e.preventDefault();
-      navigateToTable(tableId);
-    }
+    const id = target.getAttribute('data-table-id');
+    if (id) { e.preventDefault(); navigateToTable(id); }
   });
 
-  // Escape to return to overview
-  document.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (e.key === 'Escape' && currentView === 'detail') {
-      e.preventDefault();
-      zoomToOverview();
-      announceToMap('Vista geral das mesas');
-    }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && currentView === 'detail') { e.preventDefault(); zoomToOverview(); }
   });
 
-  // Guest selected event triggers map
-  document.addEventListener('guest-selected', ((event: CustomEvent) => {
-    showSeatingMap().then(() => {
-      // Re-render to update seat highlights for the selected guest
-      if (mapRendered) {
-        renderFloorPlan(allTables);
-      }
-      triggerAutoZoom();
-    });
-  }) as EventListener);
-
-  // Smooth scroll to ementa
-  scrollToEmentaLink.addEventListener('click', (e: MouseEvent) => {
+  scrollToEmentaLink.addEventListener('click', (e) => {
     e.preventDefault();
     ementaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 </script>
 
 <style is:global>
-  /* === Search Section === */
-  #guest-search-input::placeholder {
-    font-style: italic;
+  /* ===========================
+     MOBILE-FIRST BASE STYLES
+     =========================== */
+
+  #mesa-main {
+    min-height: 100vh;
+    background: #faf8f3;
+    overflow-x: hidden;
+    position: relative;
   }
 
-  #results-list li:focus-visible {
-    outline: 2px solid #8f8a5e;
-    outline-offset: -2px;
-    background-color: #faf7f0;
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* ===========================
+     SEARCH SECTION
+     =========================== */
 
   #search-section {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
     animation: fadeInUp 0.8s ease forwards;
   }
 
-  #search-results,
-  #no-results {
+  .search-inner {
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .search-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #8f8a5e;
+    margin-bottom: 1rem;
+  }
+
+  .search-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 300;
+    color: #2d2b22;
+    margin: 0 0 0.75rem;
+    line-height: 1.2;
+  }
+
+  .search-ornament {
+    color: #e6b040;
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .search-desc {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    color: #5c6e44;
+    margin-bottom: 2rem;
+  }
+
+  /* Search form */
+  #search-form {
+    width: 100%;
+  }
+
+  .search-input-wrap {
+    position: relative;
+  }
+
+  .search-input-wrap input {
+    width: 100%;
+    padding: 1rem 3.5rem 1rem 1.5rem;
+    border-radius: 9999px;
+    border: 2px solid #ede6d3;
+    background: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    color: #2d2b22;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+
+  .search-input-wrap input::placeholder {
+    color: #a9a57e;
+    font-style: italic;
+  }
+
+  .search-input-wrap input:focus {
+    border-color: #e6b040;
+    box-shadow: 0 0 0 3px rgba(230, 176, 64, 0.15);
+  }
+
+  .search-input-wrap button {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #5c6e44;
+    color: #fff;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .search-input-wrap button:hover {
+    background: #4a5a36;
+  }
+
+  /* Messages */
+  .search-msg {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    color: #5c6e44;
     animation: fadeInUp 0.3s ease forwards;
   }
 
+  .loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ede6d3;
+    border-top-color: #5c6e44;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 0.5rem;
+  }
+
+  .msg-icon {
+    font-size: 2rem;
+    color: #e6b040;
+    margin-bottom: 0.5rem;
+  }
+
+  .msg-hint {
+    color: #8f8a5e;
+    font-size: 0.8rem;
+  }
+
+  .msg-error {
+    color: #c0392b;
+    margin-bottom: 0.75rem;
+  }
+
+  #retry-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    background: #5c6e44;
+    color: #fff;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    cursor: pointer;
+    min-height: 44px;
+  }
+
+  /* Results dropdown */
+  .results-box {
+    background: #fff;
+    border-radius: 1rem;
+    border: 1px solid #ede6d3;
+    box-shadow: 0 8px 32px rgba(93, 89, 60, 0.08);
+    overflow: hidden;
+    margin-top: 1rem;
+  }
+
+  .results-label {
+    padding: 0.75rem 1.25rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #8f8a5e;
+    border-bottom: 1px solid #f5f0e3;
+    margin: 0;
+  }
+
   #results-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 240px;
+    overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: rgba(143, 138, 94, 0.3) transparent;
   }
 
-  #results-list::-webkit-scrollbar {
-    width: 4px;
+  .result-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.875rem 1.25rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    color: #2d2b22;
+    cursor: pointer;
+    border-bottom: 1px solid #faf7f0;
+    min-height: 44px;
+    transition: background 0.15s;
   }
 
-  #results-list::-webkit-scrollbar-thumb {
-    background: rgba(143, 138, 94, 0.3);
-    border-radius: 2px;
+  .result-item:hover, .result-item:focus-visible {
+    background: #faf7f0;
+    outline: none;
   }
 
-  /* === Floor Plan === */
+  .result-dot {
+    color: #8f8a5e;
+    font-size: 0.6rem;
+  }
 
-  .floor-plan-viewport {
+  /* ===========================
+     MAP SECTION
+     =========================== */
+
+  #map-section {
+    position: relative;
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .map-header {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .map-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 300;
+    color: #2d2b22;
+    margin: 0 0 0.4rem;
+  }
+
+  .map-ornament {
+    color: #e6b040;
+    font-size: 0.9rem;
+  }
+
+  #floor-plan-viewport {
     position: relative;
     width: 100%;
     aspect-ratio: 10 / 7;
-    max-height: 600px;
-    border-radius: 1.5rem;
     background: #faf8f3;
-    border: 1px solid #ede6d3;
-    box-shadow: 0 4px 24px rgba(93, 89, 60, 0.06);
     overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid #ede6d3;
+    box-shadow: 0 2px 16px rgba(93, 89, 60, 0.06);
   }
 
-  .floor-plan-container {
+  #floor-plan-container {
     width: 100%;
     height: 100%;
     transform: translate(0, 0) scale(1);
@@ -1008,33 +907,47 @@ import Layout from '../layouts/Layout.astro';
     display: block;
   }
 
-  /* === SVG Table Styles === */
-
-  .table-surface {
-    fill: #f5f0e3;
-    stroke: #c5c2a5;
-    stroke-width: 1.5;
-    transition: stroke 0.3s ease, fill 0.3s ease;
+  #ementa-link {
+    padding: 1rem;
+    text-align: center;
+    background: #faf8f3;
   }
+
+  #scroll-to-ementa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    color: #5c6e44;
+    text-decoration: none;
+    min-height: 44px;
+    transition: color 0.2s;
+  }
+
+  #scroll-to-ementa:hover {
+    color: #e6b040;
+  }
+
+  /* === SVG Table Styles === */
 
   .floor-table {
     cursor: pointer;
     outline: none;
   }
 
-  .floor-table:hover .table-surface {
+  .floor-table:hover circle:first-child {
     fill: #f0eadb;
     stroke: #8f8a5e;
     stroke-width: 2;
   }
 
-  .floor-table:focus-visible .table-surface {
+  .floor-table:focus-visible circle:first-child {
     stroke: #8f8a5e;
     stroke-width: 2.5;
   }
 
-  /* Active/target table with gold pulse */
-  .floor-table.table-active .table-surface {
+  .floor-table.table-active circle:first-child {
     fill: #fdf6e3;
     stroke: #e6b040;
     stroke-width: 2.5;
@@ -1042,150 +955,119 @@ import Layout from '../layouts/Layout.astro';
   }
 
   @keyframes tablePulse {
-    0%, 100% {
-      stroke: #e6b040;
-      filter: drop-shadow(0 0 4px rgba(230, 176, 64, 0.3));
-    }
-    50% {
-      stroke: #b8a44e;
-      filter: drop-shadow(0 0 12px rgba(230, 176, 64, 0.5));
-    }
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(230, 176, 64, 0.3)); }
+    50% { filter: drop-shadow(0 0 12px rgba(230, 176, 64, 0.5)); }
   }
 
-  /* Seat circles */
-  .seat-circle {
-    transition: fill 0.3s ease, stroke 0.3s ease;
+  /* ===========================
+     BOTTOM SHEET (mobile default)
+     =========================== */
+
+  .detail-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 1.25rem 1.25rem 0 0;
+    box-shadow: 0 -4px 32px rgba(0, 0, 0, 0.12);
+    z-index: 100;
+    max-height: 60vh;
+    overflow-y: auto;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
 
-  .seat-empty {
-    fill: #fdfcf9;
-    stroke: #c5c2a5;
-    stroke-width: 1;
-    stroke-dasharray: 3 2;
-  }
-
-  .seat-occupied {
-    fill: #c5c2a5;
-    stroke: #a9a57e;
-    stroke-width: 1;
-    opacity: 0.9;
-  }
-
-  .seat-highlighted {
-    fill: #e6b040;
-    stroke: #d4983a;
-    stroke-width: 1.5;
-    animation: seatGlow 1.5s ease-in-out infinite;
-  }
-
-  @keyframes seatGlow {
-    0%, 100% {
-      filter: drop-shadow(0 0 3px rgba(230, 176, 64, 0.4));
-    }
-    50% {
-      filter: drop-shadow(0 0 8px rgba(230, 176, 64, 0.8));
-    }
-  }
-
-  /* Table name text */
-  .table-name-text {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 9px;
-    font-weight: 600;
-    fill: #74704a;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  /* === Seating Map Section Animation === */
-
-  #seating-map-section {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-
-  #seating-map-section.map-visible {
-    opacity: 1;
+  .detail-sheet.visible {
     transform: translateY(0);
   }
 
-  /* === Detail Overlay === */
-
-  .table-detail-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    width: 280px;
-    background: rgba(255, 255, 255, 0.96);
-    backdrop-filter: blur(8px);
-    border-right: 1px solid #ede6d3;
+  .sheet-drag-handle {
     display: flex;
-    align-items: center;
     justify-content: center;
-    z-index: 20;
-    opacity: 0;
-    transform: translateX(-20px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
-    pointer-events: none;
-    border-radius: 1.5rem 0 0 1.5rem;
+    padding: 0.75rem 0 0.25rem;
   }
 
-  .table-detail-overlay.visible {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
+  .sheet-drag-handle span {
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: #d4d0c4;
   }
 
-  .table-detail-overlay.hidden {
-    display: none;
-  }
-
-  .table-detail-content {
-    padding: 2rem 1.5rem;
-    width: 100%;
-    max-height: 100%;
-    overflow-y: auto;
-  }
-
-  .table-detail-heading {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    font-weight: 400;
-    color: #3d3b28;
-    margin-bottom: 1.5rem;
+  .sheet-back-btn {
+    display: block;
+    width: calc(100% - 2rem);
+    margin: 0.75rem 1rem;
+    padding: 0.875rem 1rem;
+    border-radius: 0.75rem;
+    border: 1.5px solid #c5c2a5;
+    background: #faf8f3;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #5c6e44;
+    cursor: pointer;
     text-align: center;
+    min-height: 44px;
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .sheet-back-btn:hover {
+    background: #f0ebe0;
+    border-color: #8f8a5e;
+  }
+
+  .sheet-content {
+    padding: 0.5rem 1.25rem 1.5rem;
+  }
+
+  .sheet-table-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: #2d2b22;
+    text-align: center;
+    margin: 0 0 1rem;
     padding-bottom: 0.75rem;
     border-bottom: 1px solid #ede6d3;
   }
 
-  .table-detail-guests {
+  .sheet-table-name::before,
+  .sheet-table-name::after {
+    content: '───  ';
+    color: #ede6d3;
+    font-size: 0.8rem;
+  }
+
+  .sheet-table-name::after {
+    content: '  ───';
+  }
+
+  .sheet-guest-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.25rem;
   }
 
-  .detail-guest-item {
+  .sheet-guest {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.5rem 0.75rem;
+    gap: 0.75rem;
+    padding: 0.625rem 0.75rem;
     border-radius: 0.5rem;
-    transition: background 0.2s ease;
+    transition: background 0.15s;
   }
 
-  .detail-guest-item:hover {
-    background: #faf7f0;
-  }
-
-  .detail-guest-highlighted {
+  .sheet-guest-me {
     background: linear-gradient(135deg, #fdf6e3, #f5edc6);
     border: 1px solid #e6b040;
     border-radius: 0.5rem;
   }
 
-  .detail-guest-dot {
+  .guest-dot {
     width: 8px;
     height: 8px;
     border-radius: 50%;
@@ -1193,253 +1075,350 @@ import Layout from '../layouts/Layout.astro';
     flex-shrink: 0;
   }
 
-  .detail-guest-dot.dot-gold {
+  .guest-dot.dot-gold {
     background: #e6b040;
     box-shadow: 0 0 6px rgba(230, 176, 64, 0.5);
   }
 
-  .detail-guest-name {
+  .guest-name {
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 500;
-    color: #3d3b2c;
+    color: #2d2b22;
   }
 
-  .detail-guest-highlighted .detail-guest-name {
+  .sheet-guest-me .guest-name {
     font-weight: 600;
     color: #5c4a10;
   }
 
-  /* === Ementa Section Styles === */
+  .guest-you {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    color: #d4983a;
+    margin-left: auto;
+    font-style: italic;
+  }
+
+  .sheet-empty {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    color: #8f8a5e;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .sheet-no-table {
+    text-align: center;
+    padding: 1.5rem 0;
+  }
+
+  .sheet-no-table-icon {
+    font-size: 2rem;
+    color: #e6b040;
+    margin-bottom: 0.75rem;
+  }
+
+  .sheet-no-table p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    color: #2d2b22;
+    margin: 0 0 0.25rem;
+  }
+
+  .sheet-no-table-hint {
+    font-size: 0.75rem !important;
+    color: #8f8a5e !important;
+  }
+
+  /* ===========================
+     EMENTA SECTION
+     =========================== */
 
   #ementa-section {
-    scroll-margin-top: 2rem;
+    background: #fff;
+    padding: 3rem 1.5rem;
+    scroll-margin-top: 1rem;
+  }
+
+  .ementa-wrapper {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .ementa-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .ementa-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #8f8a5e;
+    margin: 0 0 0.5rem;
+  }
+
+  .ementa-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 300;
+    color: #2d2b22;
+    margin: 0 0 0.75rem;
+  }
+
+  .ementa-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .ementa-line {
+    display: block;
+    width: 3rem;
+    height: 1px;
+    background: #e6b040;
+  }
+
+  .ementa-star {
+    color: #e6b040;
+    font-size: 0.8rem;
+  }
+
+  .ementa-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #5c6e44;
+    margin: 0;
+  }
+
+  .ementa-courses {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 
   .ementa-course {
     background: linear-gradient(135deg, #fdfcf9, #faf7f0);
     border: 1px solid #ede6d3;
-    border-radius: 1.5rem;
-    padding: 2rem 1.5rem;
-    transition: box-shadow 0.3s ease;
+    border-radius: 1rem;
+    padding: 1.5rem 1.25rem;
   }
 
-  .ementa-course:hover {
-    box-shadow: 0 4px 20px rgba(93, 89, 60, 0.08);
+  .course-header {
+    text-align: center;
+    margin-bottom: 1rem;
   }
 
-  @media (min-width: 640px) {
-    .ementa-course {
-      padding: 2.5rem 2rem;
-    }
+  .course-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 400;
+    color: #2d2b22;
+    margin: 0 0 0.4rem;
   }
 
-  .ementa-item {
+  .course-line {
+    display: block;
+    width: 2rem;
+    height: 1px;
+    background: #e6b040;
+    margin: 0 auto;
+  }
+
+  .ementa-course ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    padding: 0.5rem 0;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0.75rem;
   }
 
-  @media (min-width: 640px) {
-    .ementa-item {
-      flex-wrap: nowrap;
-    }
+  .ementa-course li {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
   }
 
-  .ementa-item-name {
+  .item-name {
     font-family: 'Montserrat', sans-serif;
-    font-size: 0.875rem;
+    font-size: 0.85rem;
     font-weight: 500;
-    color: #3d3b2c;
-    white-space: nowrap;
+    color: #2d2b22;
   }
 
-  @media (min-width: 640px) {
-    .ementa-item-name {
-      font-size: 0.9375rem;
-    }
-  }
-
-  .ementa-item-dot {
-    flex: 1;
-    border-bottom: 1px dotted #c5c2a5;
-    min-width: 1rem;
-    margin-bottom: 0.25rem;
+  .item-dot {
     display: none;
   }
 
-  @media (min-width: 640px) {
-    .ementa-item-dot {
-      display: block;
-    }
-  }
-
-  .ementa-item-desc {
+  .item-desc {
     font-family: 'Montserrat', sans-serif;
     font-size: 0.75rem;
     font-style: italic;
     color: #8f8a5e;
-    white-space: nowrap;
   }
 
-  @media (min-width: 640px) {
-    .ementa-item-desc {
-      font-size: 0.8125rem;
-    }
+  .ementa-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
   }
 
-  @media (max-width: 639px) {
-    .ementa-item {
-      flex-direction: column;
-      gap: 0.125rem;
-    }
-
-    .ementa-item-desc {
-      white-space: normal;
-      padding-left: 0;
-    }
+  .ementa-stars {
+    color: #e6b040;
+    font-size: 0.7rem;
   }
 
-  /* === Responsive Adjustments === */
+  .ementa-note {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    color: #8f8a5e;
+    font-style: italic;
+    text-align: center;
+    margin-top: 0.75rem;
+  }
 
-  @media (max-width: 767px) {
-    .floor-plan-viewport {
-      aspect-ratio: 4 / 3;
-      border-radius: 1rem;
+  /* ===========================
+     DESKTOP (768px+)
+     =========================== */
+
+  @media (min-width: 768px) {
+    #search-section {
+      min-height: 70vh;
     }
 
-    .table-detail-overlay {
-      width: 100%;
-      height: auto;
-      max-height: 50%;
-      top: auto;
-      right: 0;
-      bottom: 0;
+    .search-title {
+      font-size: 3rem;
+    }
+
+    /* Map section on desktop */
+    #map-section {
+      padding: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    #floor-plan-viewport {
+      max-height: 600px;
+      border-radius: 1.5rem;
+    }
+
+    /* Desktop: sidebar overlay instead of bottom sheet */
+    .detail-sheet {
+      position: fixed;
+      top: 0;
       left: 0;
-      border-right: none;
-      border-top: 1px solid #ede6d3;
-      border-radius: 1rem 1rem 0 0;
-      transform: translateY(20px);
+      bottom: 0;
+      right: auto;
+      width: 300px;
+      max-height: none;
+      height: 100vh;
+      border-radius: 0 1.5rem 1.5rem 0;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.08);
+      transform: translateX(-100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
     }
 
-    .table-detail-overlay.visible {
-      transform: translateY(0);
+    .detail-sheet.visible {
+      transform: translateX(0);
     }
 
-    .table-name-text {
-      font-size: 9px;
+    .sheet-drag-handle {
+      display: none;
     }
 
-    #results-list li {
-      min-height: 44px;
-      display: flex;
-      align-items: center;
+    .sheet-back-btn {
+      margin-top: 1.5rem;
     }
 
-    #back-to-overview-btn {
-      min-height: 44px;
+    /* Ementa */
+    #ementa-section {
+      padding: 4rem 2rem;
     }
 
-    #scroll-to-ementa {
-      min-height: 44px;
-      display: inline-flex;
-      align-items: center;
+    .ementa-title {
+      font-size: 2.5rem;
+    }
+
+    .ementa-courses {
+      gap: 2rem;
+    }
+
+    .ementa-course {
+      padding: 2rem 2rem;
+    }
+
+    .ementa-course li {
+      flex-direction: row;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+
+    .item-dot {
+      display: block;
+      flex: 1;
+      border-bottom: 1px dotted #c5c2a5;
+      min-width: 1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .item-name {
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .item-desc {
+      font-size: 0.8rem;
+      white-space: nowrap;
     }
   }
+
+  /* ===========================
+     ANIMATIONS
+     =========================== */
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ===========================
+     REDUCED MOTION
+     =========================== */
+
+  @media (prefers-reduced-motion: reduce) {
+    #search-section { animation: none; }
+    .search-msg { animation: none; }
+    #floor-plan-container { transition: none; }
+    .detail-sheet { transition: none; }
+    .floor-table.table-active circle:first-child { animation: none; }
+    .loading-spinner { animation: none; }
+  }
+
+  /* ===========================
+     SMALL PHONES
+     =========================== */
 
   @media (max-width: 374px) {
-    #search-section h1 {
+    .search-title {
       font-size: 1.75rem;
     }
 
-    #guest-search-input {
+    .search-input-wrap input {
       padding-left: 1rem;
-      padding-right: 3.5rem;
-      font-size: 0.875rem;
-    }
-
-    .table-name-text {
-      font-size: 8px;
-    }
-  }
-
-  /* === Reduced Motion === */
-
-  @media (prefers-reduced-motion: reduce) {
-    .floor-plan-container {
-      transition: none;
-    }
-
-    #seating-map-section {
-      transition: none;
-    }
-
-    #seating-map-section.map-visible {
-      opacity: 1;
-      transform: none;
-    }
-
-    .table-detail-overlay {
-      transition: none;
-    }
-
-    .seat-highlighted {
-      animation: none;
-      filter: drop-shadow(0 0 6px rgba(230, 176, 64, 0.6));
-    }
-
-    .floor-table.table-active .table-surface {
-      animation: none;
-      filter: drop-shadow(0 0 8px rgba(230, 176, 64, 0.4));
-    }
-
-    #search-section {
-      animation: none;
-    }
-
-    #search-results,
-    #no-results {
-      animation: none;
-    }
-  }
-
-  /* === Utility === */
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
-  }
-
-  main {
-    overflow-x: hidden;
-  }
-
-  #scroll-to-ementa:focus-visible {
-    outline: 2px solid #8f8a5e;
-    outline-offset: 2px;
-    border-radius: 9999px;
-  }
-
-  #retry-btn:focus-visible {
-    outline: 2px solid #8f8a5e;
-    outline-offset: 2px;
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(16px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+      font-size: 0.9rem;
     }
   }
 </style>
