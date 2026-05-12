@@ -1,2165 +1,1139 @@
 ---
-// Admin Dashboard — Premium SaaS-style UI
-// Login + Confirmações + Mesas management
+// Admin Dashboard — Tânia & Miguel Wedding
 ---
 
 <html lang="pt">
 <head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>Admin — Painel de Gestão</title>
-	<link rel="preconnect" href="https://fonts.googleapis.com" />
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet" />
-	<style>
-		/* ============ RESET & BASE ============ */
-		*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-		
-		:root {
-			--primary: #5c6e44;
-			--primary-hover: #4a5a38;
-			--primary-light: #e8ede3;
-			--secondary: #8f8a5e;
-			--secondary-light: #f5f4ee;
-			--accent: #d4983a;
-			--accent-light: #fdf5e9;
-			--bg: #faf8f5;
-			--bg-subtle: #f5f3ef;
-			--card: #ffffff;
-			--card-border: #efeee8;
-			--card-hover: #fafaf8;
-			--text-primary: #1a1a1a;
-			--text-secondary: #4a4a4a;
-			--text-muted: #8f8a5e;
-			--text-faint: #b8b4a0;
-			--success: #22c55e;
-			--success-bg: #f0fdf4;
-			--success-border: #bbf7d0;
-			--warning: #f59e0b;
-			--warning-bg: #fffbeb;
-			--warning-border: #fde68a;
-			--danger: #ef4444;
-			--danger-bg: #fef2f2;
-			--danger-border: #fecaca;
-			--radius-sm: 8px;
-			--radius-md: 12px;
-			--radius-lg: 16px;
-			--radius-xl: 20px;
-			--radius-full: 9999px;
-			--shadow-sm: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
-			--shadow-md: 0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.03);
-			--shadow-lg: 0 10px 25px rgba(0,0,0,0.06), 0 4px 10px rgba(0,0,0,0.04);
-			--shadow-xl: 0 20px 50px rgba(0,0,0,0.08), 0 8px 20px rgba(0,0,0,0.04);
-			--transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
-			--font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-			--font-display: 'Playfair Display', Georgia, serif;
-		}
-
-		html { font-size: 16px; }
-		body {
-			font-family: var(--font);
-			background: var(--bg);
-			color: var(--text-secondary);
-			min-height: 100vh;
-			-webkit-font-smoothing: antialiased;
-			-moz-osx-font-smoothing: grayscale;
-		}
-
-		/* Custom scrollbar */
-		::-webkit-scrollbar { width: 6px; height: 6px; }
-		::-webkit-scrollbar-track { background: transparent; }
-		::-webkit-scrollbar-thumb { background: #d4d0c8; border-radius: 3px; }
-		::-webkit-scrollbar-thumb:hover { background: #b8b4a0; }
-
-		/* Focus visible */
-		:focus-visible {
-			outline: 2px solid var(--primary);
-			outline-offset: 2px;
-			border-radius: 4px;
-		}
-
-		/* ============ TOAST NOTIFICATIONS ============ */
-		.toast-container {
-			position: fixed;
-			top: 1.5rem;
-			right: 1.5rem;
-			z-index: 9999;
-			display: flex;
-			flex-direction: column;
-			gap: 0.5rem;
-			pointer-events: none;
-		}
-		.toast {
-			pointer-events: auto;
-			padding: 0.875rem 1.25rem;
-			border-radius: var(--radius-md);
-			font-size: 0.8125rem;
-			font-weight: 500;
-			box-shadow: var(--shadow-lg);
-			transform: translateX(120%);
-			opacity: 0;
-			transition: all 300ms cubic-bezier(0.4, 0, 0.2, 1);
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-			max-width: 360px;
-			backdrop-filter: blur(8px);
-		}
-		.toast.show {
-			transform: translateX(0);
-			opacity: 1;
-		}
-		.toast-success {
-			background: var(--success-bg);
-			border: 1px solid var(--success-border);
-			color: #166534;
-		}
-		.toast-error {
-			background: var(--danger-bg);
-			border: 1px solid var(--danger-border);
-			color: #991b1b;
-		}
-		.toast-warning {
-			background: var(--warning-bg);
-			border: 1px solid var(--warning-border);
-			color: #92400e;
-		}
-
-		/* ============ LOGIN ============ */
-		.login-container {
-			min-height: 100vh;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 1.5rem;
-			background: linear-gradient(135deg, #faf8f5 0%, #f0ede6 40%, #e8e4db 100%);
-			position: relative;
-			overflow: hidden;
-		}
-		.login-container::before {
-			content: '';
-			position: absolute;
-			top: -50%;
-			left: -50%;
-			width: 200%;
-			height: 200%;
-			background: radial-gradient(ellipse at 30% 20%, rgba(92,110,68,0.04) 0%, transparent 50%),
-						radial-gradient(ellipse at 70% 80%, rgba(212,152,58,0.04) 0%, transparent 50%);
-			animation: loginBgShift 20s ease-in-out infinite alternate;
-		}
-		@keyframes loginBgShift {
-			0% { transform: translate(0, 0); }
-			100% { transform: translate(-5%, -3%); }
-		}
-		.login-card {
-			background: var(--card);
-			border-radius: var(--radius-xl);
-			padding: 3rem 2.5rem;
-			width: 100%;
-			max-width: 400px;
-			box-shadow: var(--shadow-xl);
-			border: 1px solid var(--card-border);
-			position: relative;
-			z-index: 1;
-		}
-		.login-monogram {
-			width: 72px;
-			height: 72px;
-			margin: 0 auto 1.5rem;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			border-radius: 50%;
-			background: linear-gradient(135deg, var(--primary-light) 0%, #f5f4ee 100%);
-			border: 2px solid var(--card-border);
-		}
-		.login-monogram svg {
-			width: 32px;
-			height: 32px;
-			color: var(--primary);
-		}
-		.login-card h1 {
-			font-family: var(--font-display);
-			font-size: 1.75rem;
-			font-weight: 500;
-			text-align: center;
-			margin-bottom: 0.25rem;
-			color: var(--text-primary);
-			letter-spacing: -0.01em;
-		}
-		.login-subtitle {
-			text-align: center;
-			font-size: 0.8125rem;
-			color: var(--text-muted);
-			margin-bottom: 2.5rem;
-			font-weight: 400;
-		}
-		.form-group {
-			margin-bottom: 1.25rem;
-		}
-		.form-label {
-			display: block;
-			font-size: 0.75rem;
-			font-weight: 500;
-			color: var(--text-secondary);
-			margin-bottom: 0.5rem;
-			letter-spacing: 0.01em;
-		}
-		.form-input {
-			width: 100%;
-			padding: 0.75rem 1rem;
-			border: 1.5px solid var(--card-border);
-			border-radius: var(--radius-sm);
-			font-size: 0.875rem;
-			outline: none;
-			transition: border-color var(--transition), box-shadow var(--transition);
-			font-family: var(--font);
-			background: var(--bg);
-			color: var(--text-primary);
-		}
-		.form-input:hover { border-color: #d4d0c8; }
-		.form-input:focus {
-			border-color: var(--primary);
-			box-shadow: 0 0 0 3px rgba(92,110,68,0.1);
-			background: var(--card);
-		}
-		.form-input::placeholder { color: var(--text-faint); }
-		.login-btn {
-			width: 100%;
-			padding: 0.875rem;
-			background: var(--primary);
-			color: white;
-			border: none;
-			border-radius: var(--radius-sm);
-			font-size: 0.875rem;
-			font-weight: 600;
-			cursor: pointer;
-			transition: all var(--transition);
-			font-family: var(--font);
-			margin-top: 0.5rem;
-		}
-		.login-btn:hover {
-			background: var(--primary-hover);
-			transform: translateY(-1px);
-			box-shadow: var(--shadow-md);
-		}
-		.login-btn:active {
-			transform: translateY(0);
-			box-shadow: none;
-		}
-		.login-error {
-			text-align: center;
-			color: var(--danger);
-			font-size: 0.8125rem;
-			margin-top: 1rem;
-			display: none;
-			padding: 0.625rem;
-			background: var(--danger-bg);
-			border-radius: var(--radius-sm);
-			border: 1px solid var(--danger-border);
-		}
-
-		/* ============ DASHBOARD LAYOUT ============ */
-		.dashboard { display: none; min-height: 100vh; }
-		.dashboard.visible { display: flex; flex-direction: column; }
-
-		/* Top Bar */
-		.topbar {
-			background: var(--card);
-			border-bottom: 1px solid var(--card-border);
-			padding: 0 2rem;
-			height: 64px;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			position: sticky;
-			top: 0;
-			z-index: 100;
-			backdrop-filter: blur(12px);
-			background: rgba(255,255,255,0.92);
-		}
-		.topbar-left {
-			display: flex;
-			align-items: center;
-			gap: 2rem;
-		}
-		.topbar-brand {
-			display: flex;
-			align-items: center;
-			gap: 0.75rem;
-		}
-		.topbar-brand-icon {
-			width: 32px;
-			height: 32px;
-			border-radius: var(--radius-sm);
-			background: linear-gradient(135deg, var(--primary) 0%, #7a9458 100%);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-		.topbar-brand-icon svg {
-			width: 16px;
-			height: 16px;
-			color: white;
-		}
-		.topbar-brand-text {
-			font-weight: 600;
-			font-size: 0.9375rem;
-			color: var(--text-primary);
-			letter-spacing: -0.01em;
-		}
-		.topbar-nav {
-			display: flex;
-			align-items: center;
-			gap: 0;
-			height: 64px;
-		}
-		.topbar-tab {
-			position: relative;
-			padding: 0 1rem;
-			height: 100%;
-			display: flex;
-			align-items: center;
-			font-size: 0.8125rem;
-			font-weight: 500;
-			color: var(--text-muted);
-			cursor: pointer;
-			transition: color var(--transition);
-			border: none;
-			background: none;
-			font-family: var(--font);
-		}
-		.topbar-tab:hover { color: var(--text-primary); }
-		.topbar-tab.active { color: var(--text-primary); }
-		.topbar-tab.active::after {
-			content: '';
-			position: absolute;
-			bottom: 0;
-			left: 1rem;
-			right: 1rem;
-			height: 2px;
-			background: var(--primary);
-			border-radius: 1px 1px 0 0;
-		}
-		.topbar-right {
-			display: flex;
-			align-items: center;
-			gap: 0.75rem;
-		}
-		.topbar-date {
-			font-size: 0.75rem;
-			color: var(--text-faint);
-			display: none;
-		}
-		@media (min-width: 768px) {
-			.topbar-date { display: block; }
-		}
-
-		/* Buttons */
-		.btn {
-			display: inline-flex;
-			align-items: center;
-			gap: 0.375rem;
-			padding: 0.5rem 1rem;
-			border-radius: var(--radius-sm);
-			font-size: 0.8125rem;
-			font-weight: 500;
-			cursor: pointer;
-			transition: all var(--transition);
-			font-family: var(--font);
-			border: 1.5px solid transparent;
-			white-space: nowrap;
-		}
-		.btn svg { width: 14px; height: 14px; flex-shrink: 0; }
-		.btn-primary {
-			background: var(--primary);
-			color: white;
-			border-color: var(--primary);
-		}
-		.btn-primary:hover {
-			background: var(--primary-hover);
-			border-color: var(--primary-hover);
-			transform: translateY(-1px);
-			box-shadow: var(--shadow-sm);
-		}
-		.btn-primary:active { transform: translateY(0); box-shadow: none; }
-		.btn-secondary {
-			background: var(--card);
-			color: var(--text-secondary);
-			border-color: var(--card-border);
-		}
-		.btn-secondary:hover {
-			background: var(--bg-subtle);
-			border-color: #d4d0c8;
-		}
-		.btn-danger {
-			background: var(--card);
-			color: var(--danger);
-			border-color: var(--danger-border);
-		}
-		.btn-danger:hover {
-			background: var(--danger-bg);
-			border-color: var(--danger);
-		}
-		.btn-ghost {
-			background: transparent;
-			color: var(--text-muted);
-			border-color: transparent;
-			padding: 0.5rem 0.625rem;
-		}
-		.btn-ghost:hover {
-			background: var(--bg-subtle);
-			color: var(--text-secondary);
-		}
-		.btn-sm {
-			padding: 0.375rem 0.75rem;
-			font-size: 0.75rem;
-		}
-
-		/* ============ MAIN CONTENT ============ */
-		.main-content {
-			flex: 1;
-			padding: 2rem;
-			max-width: 1400px;
-			margin: 0 auto;
-			width: 100%;
-		}
-		@media (min-width: 1024px) {
-			.main-content { padding: 2.5rem 3rem; }
-		}
-
-		/* Tab Views */
-		.tab-view {
-			display: none;
-			animation: fadeIn 250ms ease;
-		}
-		.tab-view.active { display: block; }
-		@keyframes fadeIn {
-			from { opacity: 0; transform: translateY(4px); }
-			to { opacity: 1; transform: translateY(0); }
-		}
-
-		/* Section Headers */
-		.section-header {
-			margin-bottom: 1.5rem;
-		}
-		.section-title {
-			font-size: 1.5rem;
-			font-weight: 700;
-			color: var(--text-primary);
-			letter-spacing: -0.02em;
-			margin-bottom: 0.25rem;
-		}
-		.section-subtitle {
-			font-size: 0.8125rem;
-			color: var(--text-muted);
-		}
-
-		/* ============ STATS CARDS ============ */
-		.stats-grid {
-			display: grid;
-			grid-template-columns: repeat(4, 1fr);
-			gap: 1rem;
-			margin-bottom: 2rem;
-		}
-		@media (max-width: 768px) {
-			.stats-grid { grid-template-columns: repeat(2, 1fr); }
-		}
-		@media (max-width: 480px) {
-			.stats-grid { grid-template-columns: 1fr; }
-		}
-		.stat-card {
-			background: var(--card);
-			border-radius: var(--radius-md);
-			padding: 1.5rem;
-			border: 1px solid var(--card-border);
-			box-shadow: var(--shadow-sm);
-			transition: all var(--transition);
-			position: relative;
-			overflow: hidden;
-		}
-		.stat-card:hover {
-			box-shadow: var(--shadow-md);
-			transform: translateY(-2px);
-		}
-		.stat-card::before {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: 0;
-			right: 0;
-			height: 3px;
-			border-radius: 3px 3px 0 0;
-		}
-		.stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--primary), #7a9458); }
-		.stat-card:nth-child(2)::before { background: linear-gradient(90deg, #6b8cce, #4a7ab5); }
-		.stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent), #e6b040); }
-		.stat-card:nth-child(4)::before { background: linear-gradient(90deg, #9b7ed8, #7c5cbf); }
-		.stat-icon {
-			width: 40px;
-			height: 40px;
-			border-radius: var(--radius-sm);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			margin-bottom: 1rem;
-		}
-		.stat-icon svg { width: 20px; height: 20px; }
-		.stat-icon-green { background: var(--primary-light); color: var(--primary); }
-		.stat-icon-blue { background: #eef2ff; color: #4a7ab5; }
-		.stat-icon-gold { background: var(--accent-light); color: var(--accent); }
-		.stat-icon-purple { background: #f3f0ff; color: #7c5cbf; }
-		.stat-value {
-			font-size: 2rem;
-			font-weight: 700;
-			color: var(--text-primary);
-			line-height: 1;
-			letter-spacing: -0.02em;
-			margin-bottom: 0.25rem;
-		}
-		.stat-label {
-			font-size: 0.75rem;
-			color: var(--text-muted);
-			font-weight: 500;
-		}
-
-		/* ============ SEARCH BAR ============ */
-		.search-wrapper {
-			margin-bottom: 1.25rem;
-			position: relative;
-			max-width: 400px;
-		}
-		.search-icon {
-			position: absolute;
-			left: 0.875rem;
-			top: 50%;
-			transform: translateY(-50%);
-			color: var(--text-faint);
-			pointer-events: none;
-		}
-		.search-icon svg { width: 16px; height: 16px; }
-		.search-input {
-			width: 100%;
-			padding: 0.625rem 1rem 0.625rem 2.5rem;
-			border: 1.5px solid var(--card-border);
-			border-radius: var(--radius-sm);
-			font-size: 0.8125rem;
-			outline: none;
-			transition: all var(--transition);
-			font-family: var(--font);
-			background: var(--card);
-			color: var(--text-primary);
-		}
-		.search-input:hover { border-color: #d4d0c8; }
-		.search-input:focus {
-			border-color: var(--primary);
-			box-shadow: 0 0 0 3px rgba(92,110,68,0.08);
-		}
-		.search-input::placeholder { color: var(--text-faint); }
-
-		/* ============ TABLE STYLES ============ */
-		.table-card {
-			background: var(--card);
-			border-radius: var(--radius-md);
-			border: 1px solid var(--card-border);
-			box-shadow: var(--shadow-sm);
-			overflow: hidden;
-		}
-		.table-scroll {
-			overflow-x: auto;
-		}
-		table {
-			width: 100%;
-			border-collapse: separate;
-			border-spacing: 0;
-			font-size: 0.8125rem;
-		}
-		thead {
-			position: sticky;
-			top: 0;
-			z-index: 2;
-		}
-		th {
-			padding: 0.75rem 1rem;
-			text-align: left;
-			font-size: 0.6875rem;
-			text-transform: uppercase;
-			letter-spacing: 0.05em;
-			color: var(--text-muted);
-			font-weight: 600;
-			white-space: nowrap;
-			background: var(--bg-subtle);
-			border-bottom: 1px solid var(--card-border);
-		}
-		td {
-			padding: 0.875rem 1rem;
-			vertical-align: middle;
-			border-bottom: 1px solid #f5f3ef;
-			transition: background var(--transition);
-		}
-		tbody tr:last-child td { border-bottom: none; }
-		tbody tr:hover td { background: var(--bg-subtle); }
-		.table-footer {
-			padding: 0.75rem 1rem;
-			background: var(--bg-subtle);
-			border-top: 1px solid var(--card-border);
-			font-size: 0.75rem;
-			color: var(--text-muted);
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-		}
-
-		/* Cell styles */
-		.cell-name {
-			font-weight: 600;
-			color: var(--text-primary);
-			white-space: nowrap;
-		}
-		.cell-phone {
-			color: var(--text-secondary);
-			font-size: 0.8125rem;
-			white-space: nowrap;
-			font-variant-numeric: tabular-nums;
-		}
-		.cell-date {
-			white-space: nowrap;
-			color: var(--text-muted);
-			font-size: 0.75rem;
-			font-variant-numeric: tabular-nums;
-		}
-		.cell-message {
-			color: var(--text-secondary);
-			font-size: 0.8125rem;
-			max-width: 220px;
-			line-height: 1.4;
-			font-style: italic;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-		.cell-none {
-			color: var(--text-faint);
-			font-size: 0.8125rem;
-		}
-
-		/* Badges */
-		.badge {
-			display: inline-flex;
-			align-items: center;
-			padding: 0.1875rem 0.5rem;
-			border-radius: var(--radius-full);
-			font-size: 0.6875rem;
-			font-weight: 500;
-			white-space: nowrap;
-		}
-		.badge-restriction {
-			background: var(--warning-bg);
-			color: #92400e;
-			border: 1px solid var(--warning-border);
-		}
-		.badge-adult {
-			background: var(--primary-light);
-			color: var(--primary);
-		}
-		.badge-child {
-			background: #fef3c7;
-			color: #92400e;
-		}
-
-		/* Companions */
-		.companions-list {
-			display: flex;
-			flex-direction: column;
-			gap: 0.375rem;
-		}
-		.companion-item {
-			display: flex;
-			align-items: center;
-			gap: 0.375rem;
-			flex-wrap: wrap;
-		}
-		.companion-name {
-			font-size: 0.8125rem;
-			color: var(--text-secondary);
-			font-weight: 500;
-		}
-		.companion-allergy {
-			font-size: 0.6875rem;
-			color: var(--accent);
-			font-style: italic;
-		}
-
-		/* Row number */
-		.row-num {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			width: 24px;
-			height: 24px;
-			border-radius: 50%;
-			background: var(--bg-subtle);
-			color: var(--text-muted);
-			font-size: 0.6875rem;
-			font-weight: 600;
-		}
-
-		/* Empty state */
-		.empty-state {
-			text-align: center;
-			padding: 4rem 2rem;
-			color: var(--text-faint);
-		}
-		.empty-state svg {
-			width: 48px;
-			height: 48px;
-			margin-bottom: 1rem;
-			opacity: 0.4;
-		}
-		.empty-state p {
-			font-size: 0.875rem;
-			margin-bottom: 0.25rem;
-		}
-		.empty-state .empty-hint {
-			font-size: 0.75rem;
-		}
-
-		/* ============ MESAS SECTION ============ */
-		.mesas-grid {
-			display: grid;
-			gap: 1.5rem;
-		}
-		.mesas-create-card {
-			background: var(--card);
-			border-radius: var(--radius-md);
-			padding: 1.5rem;
-			border: 1px solid var(--card-border);
-			box-shadow: var(--shadow-sm);
-		}
-		.mesas-create-card h3 {
-			font-size: 0.9375rem;
-			font-weight: 600;
-			color: var(--text-primary);
-			margin-bottom: 1rem;
-		}
-		.inline-form {
-			display: flex;
-			gap: 0.75rem;
-			align-items: center;
-			flex-wrap: wrap;
-		}
-		.inline-form .form-input {
-			min-width: 180px;
-			flex: 1;
-			max-width: 280px;
-		}
-		.inline-form .form-input-sm {
-			min-width: 100px;
-			max-width: 140px;
-			flex: 0;
-		}
-
-		/* Occupancy progress */
-		.occupancy-bar {
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-		}
-		.occupancy-track {
-			flex: 1;
-			height: 6px;
-			background: var(--bg-subtle);
-			border-radius: 3px;
-			overflow: hidden;
-			min-width: 60px;
-			max-width: 100px;
-		}
-		.occupancy-fill {
-			height: 100%;
-			border-radius: 3px;
-			transition: width 300ms ease;
-		}
-		.occupancy-fill-empty { background: #d4d0c8; width: 0%; }
-		.occupancy-fill-ok { background: var(--success); }
-		.occupancy-fill-warning { background: var(--warning); }
-		.occupancy-fill-full { background: var(--danger); }
-		.occupancy-text {
-			font-size: 0.75rem;
-			font-weight: 500;
-			color: var(--text-muted);
-			white-space: nowrap;
-			font-variant-numeric: tabular-nums;
-		}
-
-		/* Edit inputs */
-		.edit-input {
-			padding: 0.375rem 0.625rem;
-			border: 1.5px solid var(--primary);
-			border-radius: var(--radius-sm);
-			font-size: 0.8125rem;
-			outline: none;
-			font-family: var(--font);
-			width: 100%;
-			background: var(--card);
-			transition: box-shadow var(--transition);
-		}
-		.edit-input:focus {
-			box-shadow: 0 0 0 3px rgba(92,110,68,0.1);
-		}
-
-		/* ============ SEATING GRID ============ */
-		.seating-section {
-			margin-top: 2rem;
-		}
-		.seating-section-header {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			margin-bottom: 1.25rem;
-			flex-wrap: wrap;
-			gap: 0.75rem;
-		}
-		.seating-section-header h3 {
-			font-size: 1.125rem;
-			font-weight: 600;
-			color: var(--text-primary);
-			letter-spacing: -0.01em;
-		}
-		.unassigned-badge {
-			display: inline-flex;
-			align-items: center;
-			gap: 0.375rem;
-			padding: 0.375rem 0.875rem;
-			background: var(--warning-bg);
-			border: 1px solid var(--warning-border);
-			border-radius: var(--radius-full);
-			font-size: 0.75rem;
-			font-weight: 600;
-			color: #92400e;
-		}
-		.unassigned-badge svg { width: 14px; height: 14px; }
-		.seating-grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-			gap: 1rem;
-		}
-		@media (max-width: 640px) {
-			.seating-grid { grid-template-columns: 1fr; }
-		}
-		.seating-card {
-			background: var(--card);
-			border-radius: var(--radius-md);
-			padding: 1.25rem;
-			border: 1.5px solid var(--card-border);
-			box-shadow: var(--shadow-sm);
-			transition: all var(--transition);
-			position: relative;
-		}
-		.seating-card:hover {
-			box-shadow: var(--shadow-md);
-			transform: translateY(-2px);
-		}
-		.seating-card-empty { border-color: #e8e6e0; }
-		.seating-card-partial { border-color: #a3d4a3; }
-		.seating-card-full { border-color: #f0c674; }
-		.seating-card-top {
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			margin-bottom: 0.75rem;
-		}
-		.seating-card-name {
-			font-weight: 600;
-			font-size: 0.875rem;
-			color: var(--text-primary);
-		}
-		.seating-card-count {
-			font-size: 0.6875rem;
-			font-weight: 600;
-			padding: 0.125rem 0.5rem;
-			border-radius: var(--radius-full);
-		}
-		.seating-count-empty { background: var(--bg-subtle); color: var(--text-faint); }
-		.seating-count-partial { background: var(--success-bg); color: #166534; border: 1px solid var(--success-border); }
-		.seating-count-full { background: var(--warning-bg); color: #92400e; border: 1px solid var(--warning-border); }
-		.seating-card-guests {
-			list-style: none;
-			padding: 0;
-			margin: 0;
-		}
-		.seating-card-guests li {
-			font-size: 0.75rem;
-			color: var(--text-secondary);
-			padding: 0.25rem 0;
-			border-bottom: 1px solid #f8f7f4;
-			display: flex;
-			align-items: center;
-			gap: 0.375rem;
-		}
-		.seating-card-guests li:last-child { border-bottom: none; }
-		.seating-card-guests li::before {
-			content: '';
-			width: 5px;
-			height: 5px;
-			border-radius: 50%;
-			background: var(--primary);
-			opacity: 0.4;
-			flex-shrink: 0;
-		}
-		.seating-card-empty-msg {
-			font-size: 0.75rem;
-			color: var(--text-faint);
-			font-style: italic;
-		}
-
-		/* ============ GUEST ASSIGNMENT ============ */
-		.assignment-section {
-			margin-top: 2rem;
-		}
-		.assignment-card {
-			background: var(--card);
-			border-radius: var(--radius-md);
-			border: 1px solid var(--card-border);
-			box-shadow: var(--shadow-sm);
-			overflow: hidden;
-		}
-		.assignment-header {
-			padding: 1.25rem 1.5rem;
-			border-bottom: 1px solid var(--card-border);
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			flex-wrap: wrap;
-			gap: 0.75rem;
-		}
-		.assignment-header h3 {
-			font-size: 1rem;
-			font-weight: 600;
-			color: var(--text-primary);
-		}
-		.guest-assign-select {
-			padding: 0.375rem 2rem 0.375rem 0.625rem;
-			border: 1.5px solid var(--card-border);
-			border-radius: var(--radius-sm);
-			font-size: 0.75rem;
-			outline: none;
-			font-family: var(--font);
-			background: var(--card);
-			cursor: pointer;
-			transition: all var(--transition);
-			min-width: 160px;
-			appearance: none;
-			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%238f8a5e' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-			background-repeat: no-repeat;
-			background-position: right 0.5rem center;
-			color: var(--text-secondary);
-		}
-		.guest-assign-select:hover { border-color: #d4d0c8; }
-		.guest-assign-select:focus {
-			border-color: var(--primary);
-			box-shadow: 0 0 0 3px rgba(92,110,68,0.08);
-		}
-
-		/* Status badges */
-		.status-badge {
-			display: inline-flex;
-			align-items: center;
-			gap: 0.25rem;
-			padding: 0.25rem 0.625rem;
-			border-radius: var(--radius-full);
-			font-size: 0.6875rem;
-			font-weight: 500;
-		}
-		.status-assigned {
-			background: var(--success-bg);
-			color: #166534;
-			border: 1px solid var(--success-border);
-		}
-		.status-unassigned {
-			background: var(--bg-subtle);
-			color: var(--text-muted);
-			border: 1px solid var(--card-border);
-		}
-		.status-full {
-			background: var(--warning-bg);
-			color: #92400e;
-			border: 1px solid var(--warning-border);
-		}
-		.guest-row-warning td { background: #fffdf7 !important; }
-		.guest-row-warning:hover td { background: var(--warning-bg) !important; }
-
-		/* ============ CONFIRM DIALOG ============ */
-		.confirm-overlay {
-			position: fixed;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			background: rgba(0,0,0,0.5);
-			backdrop-filter: blur(4px);
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			z-index: 1000;
-			animation: overlayIn 200ms ease;
-		}
-		@keyframes overlayIn {
-			from { opacity: 0; }
-			to { opacity: 1; }
-		}
-		.confirm-dialog {
-			background: var(--card);
-			border-radius: var(--radius-lg);
-			padding: 2rem;
-			max-width: 420px;
-			width: 90%;
-			box-shadow: var(--shadow-xl);
-			animation: dialogIn 250ms cubic-bezier(0.4, 0, 0.2, 1);
-		}
-		@keyframes dialogIn {
-			from { opacity: 0; transform: scale(0.95) translateY(8px); }
-			to { opacity: 1; transform: scale(1) translateY(0); }
-		}
-		.confirm-dialog h3 {
-			font-size: 1.125rem;
-			font-weight: 600;
-			margin-bottom: 0.5rem;
-			color: var(--text-primary);
-		}
-		.confirm-dialog p {
-			font-size: 0.8125rem;
-			color: var(--text-secondary);
-			margin-bottom: 1.5rem;
-			line-height: 1.6;
-		}
-		.confirm-actions {
-			display: flex;
-			gap: 0.75rem;
-			justify-content: flex-end;
-		}
-
-		/* ============ LOADING SPINNER ============ */
-		.spinner {
-			display: inline-block;
-			width: 16px;
-			height: 16px;
-			border: 2px solid var(--card-border);
-			border-top-color: var(--primary);
-			border-radius: 50%;
-			animation: spin 600ms linear infinite;
-		}
-		@keyframes spin {
-			to { transform: rotate(360deg); }
-		}
-		.loading-state {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 3rem;
-			gap: 0.75rem;
-			color: var(--text-muted);
-			font-size: 0.8125rem;
-		}
-
-		/* ============ RESPONSIVE ============ */
-		@media (max-width: 768px) {
-			.topbar { padding: 0 1rem; }
-			.topbar-left { gap: 1rem; }
-			.topbar-brand-text { display: none; }
-			.main-content { padding: 1.25rem; }
-			.section-title { font-size: 1.25rem; }
-			.stat-card { padding: 1.25rem; }
-			.stat-value { font-size: 1.5rem; }
-			.inline-form { flex-direction: column; align-items: stretch; }
-			.inline-form .form-input,
-			.inline-form .form-input-sm { max-width: none; min-width: auto; }
-		}
-	</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin — Tânia & Miguel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <!-- Login Screen -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-card">
+      <div class="login-heart">&#10084;</div>
+      <h1 class="login-title">Tânia & Miguel</h1>
+      <p class="login-subtitle">Painel de Administração</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="username">Utilizador</label>
+          <input type="text" id="username" placeholder="Utilizador" autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="password">Palavra-passe</label>
+          <input type="password" id="password" placeholder="Palavra-passe" autocomplete="current-password" />
+        </div>
+        <p id="login-error" class="login-error"></p>
+        <button type="submit" class="btn btn-primary btn-full">Entrar</button>
+      </form>
+    </div>
+  </div>
 
-<!-- Toast Container -->
-<div id="toast-container" class="toast-container"></div>
+  <!-- Dashboard -->
+  <div id="dashboard" class="dashboard hidden">
+    <!-- Header -->
+    <header class="dash-header">
+      <div class="dash-header-inner">
+        <h1 class="dash-logo">T&M <span>Admin</span></h1>
+        <button id="logout-btn" class="btn btn-outline btn-sm">Sair</button>
+      </div>
+    </header>
 
-<!-- LOGIN SCREEN -->
-<div id="login-screen" class="login-container">
-	<div class="login-card">
-		<div class="login-monogram">
-			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-				<path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-			</svg>
-		</div>
-		<h1>T & M</h1>
-		<p class="login-subtitle">Painel de Administração</p>
-		<form id="login-form">
-			<div class="form-group">
-				<label class="form-label" for="login-user">Utilizador</label>
-				<input type="text" id="login-user" class="form-input" placeholder="admin" autocomplete="username" />
-			</div>
-			<div class="form-group">
-				<label class="form-label" for="login-pass">Password</label>
-				<input type="password" id="login-pass" class="form-input" placeholder="••••••••" autocomplete="current-password" />
-			</div>
-			<button type="submit" class="login-btn">Entrar</button>
-		</form>
-		<p id="login-error" class="login-error">Credenciais inválidas. Tente novamente.</p>
-	</div>
-</div>
+    <!-- Tabs -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" data-tab="confirmacoes">Confirmações</button>
+      <button class="tab-btn" data-tab="mesas">Mesas</button>
+      <button class="tab-btn" data-tab="fotos">Fotos</button>
+    </nav>
 
-<!-- DASHBOARD -->
-<div id="dashboard" class="dashboard">
-	<!-- Top Bar -->
-	<header class="topbar">
-		<div class="topbar-left">
-			<div class="topbar-brand">
-				<div class="topbar-brand-icon">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-					</svg>
-				</div>
-				<span class="topbar-brand-text">T&M Admin</span>
-			</div>
-			<nav class="topbar-nav">
-				<button id="tab-confirmacoes" class="topbar-tab active" data-tab="confirmacoes-view">Confirmações</button>
-				<button id="tab-mesas" class="topbar-tab" data-tab="mesas-view">Mesas</button>
-			</nav>
-		</div>
-		<div class="topbar-right">
-			<span class="topbar-date" id="topbar-date"></span>
-			<button id="export-csv-btn" class="btn btn-primary btn-sm">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-				CSV
-			</button>
-			<button id="logout-btn" class="btn btn-ghost btn-sm">
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-				Sair
-			</button>
-		</div>
-	</header>
+    <!-- Tab: Confirmações -->
+    <section id="tab-confirmacoes" class="tab-content active">
+      <div class="stats-grid">
+        <div class="stat-card stat-card--olive">
+          <div class="stat-label">Total Confirmações</div>
+          <div class="stat-value" id="stat-confirmacoes">0</div>
+        </div>
+        <div class="stat-card stat-card--gold">
+          <div class="stat-label">Total Pessoas</div>
+          <div class="stat-value" id="stat-pessoas">0</div>
+        </div>
+        <div class="stat-card stat-card--green">
+          <div class="stat-label">Adultos</div>
+          <div class="stat-value" id="stat-adultos">0</div>
+        </div>
+        <div class="stat-card stat-card--rose">
+          <div class="stat-label">Crianças</div>
+          <div class="stat-value" id="stat-criancas">0</div>
+        </div>
+      </div>
 
-	<!-- Main Content -->
-	<main class="main-content">
-		<!-- Confirmações Tab View -->
-		<div id="confirmacoes-view" class="tab-view active">
-			<div class="section-header">
-				<h2 class="section-title">Confirmações</h2>
-				<p class="section-subtitle">Visão geral dos convidados confirmados</p>
-			</div>
+      <div class="card">
+        <div class="card-header">
+          <input type="text" id="search-input" class="search-input" placeholder="Pesquisar por nome, telemóvel..." />
+          <button id="export-csv-btn" class="btn btn-primary btn-sm">Exportar CSV</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nome</th>
+                <th>Telemóvel</th>
+                <th>Restrições</th>
+                <th>Acompanhantes</th>
+                <th>Mensagem</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody id="confirmacoes-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-			<!-- Stats -->
-			<div class="stats-grid">
-				<div class="stat-card">
-					<div class="stat-icon stat-icon-green">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-					</div>
-					<div class="stat-value" id="stat-total">0</div>
-					<div class="stat-label">Confirmações</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-icon stat-icon-blue">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-					</div>
-					<div class="stat-value" id="stat-adults">0</div>
-					<div class="stat-label">Adultos</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-icon stat-icon-gold">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-					</div>
-					<div class="stat-value" id="stat-children">0</div>
-					<div class="stat-label">Crianças</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-icon stat-icon-purple">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-					</div>
-					<div class="stat-value" id="stat-total-people">0</div>
-					<div class="stat-label">Total Pessoas</div>
-				</div>
-			</div>
+    <!-- Tab: Mesas -->
+    <section id="tab-mesas" class="tab-content">
+      <div class="mesas-layout">
+        <div class="card">
+          <h3 class="card-title">Criar Nova Mesa</h3>
+          <form id="create-table-form" class="form-inline">
+            <div class="form-group">
+              <label for="table-name">Nome</label>
+              <input type="text" id="table-name" placeholder="Ex: Mesa 1" required />
+            </div>
+            <div class="form-group">
+              <label for="table-capacity">Capacidade</label>
+              <input type="number" id="table-capacity" placeholder="8" min="1" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Criar Mesa</button>
+          </form>
+        </div>
 
-			<!-- Search -->
-			<div class="search-wrapper">
-				<span class="search-icon">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-				</span>
-				<input type="text" id="search-input" class="search-input" placeholder="Pesquisar por nome, telemóvel ou restrição..." />
-			</div>
+        <div class="card">
+          <h3 class="card-title">Lista de Mesas</h3>
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Capacidade</th>
+                  <th>Ocupação</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="mesas-tbody"></tbody>
+            </table>
+          </div>
+        </div>
 
-			<!-- Table -->
-			<div class="table-card">
-				<div class="table-scroll">
-					<table>
-						<thead>
-							<tr>
-								<th>#</th>
-								<th>Nome</th>
-								<th>Telemóvel</th>
-								<th>Restrições</th>
-								<th>Acompanhantes</th>
-								<th>Mensagem</th>
-								<th>Data</th>
-							</tr>
-						</thead>
-						<tbody id="confirmations-table"></tbody>
-					</table>
-				</div>
-				<div class="table-footer">
-					<span id="table-count">0 resultados</span>
-					<span id="table-people-count">0 pessoas no total</span>
-				</div>
-			</div>
-		</div>
+        <div class="card">
+          <h3 class="card-title">Atribuir Convidados</h3>
+          <div class="assign-form">
+            <div class="form-group">
+              <label for="assign-guest">Convidado</label>
+              <select id="assign-guest"><option value="">Selecionar convidado...</option></select>
+            </div>
+            <div class="form-group">
+              <label for="assign-table">Mesa</label>
+              <select id="assign-table"><option value="">Selecionar mesa...</option></select>
+            </div>
+            <button id="assign-btn" class="btn btn-primary">Atribuir</button>
+          </div>
+        </div>
 
-		<!-- Mesas Tab View -->
-		<div id="mesas-view" class="tab-view">
-			<div class="section-header">
-				<h2 class="section-title">Gestão de Mesas</h2>
-				<p class="section-subtitle">Crie mesas e atribua convidados</p>
-			</div>
+        <div class="card">
+          <h3 class="card-title">Visão Geral</h3>
+          <div id="mesas-grid" class="mesas-grid"></div>
+        </div>
+      </div>
+    </section>
 
-			<!-- Create table form -->
-			<div class="mesas-create-card">
-				<h3>
-					<svg style="display:inline;width:16px;height:16px;vertical-align:-2px;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-					Nova Mesa
-				</h3>
-				<form id="create-table-form" class="inline-form">
-					<input type="text" id="new-table-name" placeholder="Nome da mesa (ex: Mesa 1)" required class="form-input" />
-					<input type="number" id="new-table-capacity" placeholder="Lugares" min="1" required class="form-input form-input-sm" />
-					<button type="submit" class="btn btn-primary">Criar Mesa</button>
-				</form>
-			</div>
-
-			<!-- Table list -->
-			<div class="table-card" style="margin-top:1.25rem;">
-				<div class="table-scroll">
-					<table>
-						<thead>
-							<tr>
-								<th>Mesa</th>
-								<th>Capacidade</th>
-								<th>Ocupação</th>
-								<th style="text-align:right;">Ações</th>
-							</tr>
-						</thead>
-						<tbody id="mesas-table-body"></tbody>
-					</table>
-				</div>
-				<div class="table-footer">
-					<span id="mesas-count">0 mesas</span>
-					<span id="mesas-total-capacity"></span>
-				</div>
-			</div>
-
-			<!-- Seating Overview Grid -->
-			<div class="seating-section">
-				<div class="seating-section-header">
-					<h3>Visão Geral</h3>
-					<span id="seating-grid-unassigned" class="unassigned-badge" style="display:none;">
-						<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-						<span id="seating-grid-unassigned-count">0</span> sem mesa
-					</span>
-				</div>
-				<div id="seating-grid" class="seating-grid"></div>
-			</div>
-
-			<!-- Guest Assignment Section -->
-			<div class="assignment-section">
-				<div class="assignment-card">
-					<div class="assignment-header">
-						<h3>Atribuir Convidados</h3>
-						<div class="search-wrapper" style="margin-bottom:0;max-width:280px;">
-							<span class="search-icon">
-								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-							</span>
-							<input type="text" id="guest-assign-search" class="search-input" placeholder="Filtrar convidados..." />
-						</div>
-					</div>
-					<div class="table-scroll">
-						<table>
-							<thead>
-								<tr>
-									<th>#</th>
-									<th>Convidado</th>
-									<th>Mesa Atribuída</th>
-									<th>Estado</th>
-								</tr>
-							</thead>
-							<tbody id="guest-assign-body"></tbody>
-						</table>
-					</div>
-					<div class="table-footer">
-						<span id="guest-assign-count">0 convidados</span>
-						<span id="guest-assign-unassigned">0 sem mesa</span>
-					</div>
-				</div>
-			</div>
-		</div>
-	</main>
-</div>
-
+    <!-- Tab: Fotos -->
+    <section id="tab-fotos" class="tab-content">
+      <div class="card">
+        <h3 class="card-title">Galeria de Fotos</h3>
+        <div id="fotos-grid" class="fotos-grid"></div>
+        <p id="fotos-empty" class="empty-state hidden">Nenhuma foto encontrada.</p>
+      </div>
+    </section>
+  </div>
 <script>
-	// ============================================
-	// TOAST NOTIFICATIONS
-	// ============================================
-	function showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {
-		const container = document.getElementById('toast-container') as HTMLDivElement;
-		const toast = document.createElement('div');
-		toast.className = `toast toast-${type}`;
-		const icons: Record<string, string> = {
-			success: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
-			error: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
-			warning: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'
-		};
-		toast.innerHTML = `${icons[type]}<span>${message}</span>`;
-		container.appendChild(toast);
-		requestAnimationFrame(() => {
-			requestAnimationFrame(() => toast.classList.add('show'));
-		});
-		setTimeout(() => {
-			toast.classList.remove('show');
-			setTimeout(() => toast.remove(), 300);
-		}, 4000);
-	}
-
-	// ============================================
-	// STATIC DATA
-	// ============================================
-	const STATIC_CONFIRMATIONS = [
-		{
-			id: 1,
-			nome: 'Ana Silva',
-			telefone: '+351 912 345 678',
-			restricoes: 'Vegetariana',
-			companions: [
-				{ name: 'Pedro Silva', type: 'adult', allergy: '' },
-				{ name: 'Maria Silva, 5 anos', type: 'child', allergy: 'Intolerância à lactose' },
-			],
-			mensagem: 'Mal podemos esperar! Parabéns aos noivos!',
-			created_at: '2025-03-15T10:30:00',
-		},
-		{
-			id: 2,
-			nome: 'João Costa',
-			telefone: '+351 916 789 012',
-			restricoes: '',
-			companions: [
-				{ name: 'Rita Costa', type: 'adult', allergy: 'Alergia a marisco' },
-			],
-			mensagem: '',
-			created_at: '2025-03-18T14:22:00',
-		},
-		{
-			id: 3,
-			nome: 'Mariana Ferreira',
-			telefone: '+351 910 111 222',
-			restricoes: 'Sem glúten',
-			companions: [],
-			mensagem: 'Vou sozinha mas com muita vontade de celebrar convosco!',
-			created_at: '2025-03-20T09:15:00',
-		},
-		{
-			id: 4,
-			nome: 'Carlos Mendes',
-			telefone: '+351 913 444 555',
-			restricoes: '',
-			companions: [
-				{ name: 'Sofia Mendes', type: 'adult', allergy: '' },
-				{ name: 'Tomás Mendes, 8 anos', type: 'child', allergy: '' },
-				{ name: 'Beatriz Mendes, 3 anos', type: 'child', allergy: 'Alergia a frutos secos' },
-			],
-			mensagem: 'Vamos todos! Grande abraço.',
-			created_at: '2025-03-22T16:45:00',
-		},
-		{
-			id: 5,
-			nome: 'Inês Rodrigues',
-			telefone: '+351 914 666 777',
-			restricoes: 'Vegan',
-			companions: [
-				{ name: 'Miguel Alves', type: 'adult', allergy: 'Vegan' },
-			],
-			mensagem: '',
-			created_at: '2025-04-01T11:00:00',
-		},
-	];
-
-	// ============================================
-	// AUTH
-	// ============================================
-	const ADMIN_USER = 'admin';
-	const ADMIN_PASS = 'taniaemiguel2027';
-
-	const loginScreen = document.getElementById('login-screen') as HTMLDivElement;
-	const dashboard = document.getElementById('dashboard') as HTMLDivElement;
-	const loginForm = document.getElementById('login-form') as HTMLFormElement;
-	const loginError = document.getElementById('login-error') as HTMLParagraphElement;
-	const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
-	const exportBtn = document.getElementById('export-csv-btn') as HTMLButtonElement;
-	const searchInput = document.getElementById('search-input') as HTMLInputElement;
-
-	// Set date in topbar
-	const topbarDate = document.getElementById('topbar-date') as HTMLSpanElement;
-	if (topbarDate) {
-		const now = new Date();
-		topbarDate.textContent = now.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-	}
-
-	if (sessionStorage.getItem('admin_logged_in') === 'true') {
-		showDashboard();
-	}
-
-	loginForm?.addEventListener('submit', (e) => {
-		e.preventDefault();
-		const user = (document.getElementById('login-user') as HTMLInputElement).value;
-		const pass = (document.getElementById('login-pass') as HTMLInputElement).value;
-
-		if (user === ADMIN_USER && pass === ADMIN_PASS) {
-			sessionStorage.setItem('admin_logged_in', 'true');
-			loginError.style.display = 'none';
-			showDashboard();
-		} else {
-			loginError.style.display = 'block';
-			loginError.style.animation = 'none';
-			requestAnimationFrame(() => {
-				loginError.style.animation = 'fadeIn 250ms ease';
-			});
-		}
-	});
-
-	logoutBtn?.addEventListener('click', () => {
-		sessionStorage.removeItem('admin_logged_in');
-		dashboard.classList.remove('visible');
-		loginScreen.style.display = 'flex';
-	});
-
-	function showDashboard() {
-		loginScreen.style.display = 'none';
-		dashboard.classList.add('visible');
-		renderStats(STATIC_CONFIRMATIONS);
-		renderTable(STATIC_CONFIRMATIONS);
-	}
-
-	// ============================================
-	// TAB NAVIGATION
-	// ============================================
-	const tabButtons = document.querySelectorAll('.topbar-tab') as NodeListOf<HTMLButtonElement>;
-	const tabViews = document.querySelectorAll('.tab-view') as NodeListOf<HTMLDivElement>;
-
-	tabButtons.forEach(btn => {
-		btn.addEventListener('click', () => {
-			const targetId = btn.getAttribute('data-tab');
-			if (!targetId) return;
-
-			tabButtons.forEach(b => b.classList.remove('active'));
-			btn.classList.add('active');
-
-			tabViews.forEach(view => {
-				if (view.id === targetId) {
-					view.classList.add('active');
-				} else {
-					view.classList.remove('active');
-				}
-			});
-		});
-	});
-
-	// ============================================
-	// SEARCH
-	// ============================================
-	searchInput?.addEventListener('input', () => {
-		const query = searchInput.value.toLowerCase().trim();
-		if (!query) {
-			renderTable(STATIC_CONFIRMATIONS);
-			return;
-		}
-		const filtered = STATIC_CONFIRMATIONS.filter(row => {
-			const searchable = [
-				row.nome,
-				row.telefone,
-				row.restricoes,
-				row.mensagem,
-				...row.companions.map(c => c.name),
-				...row.companions.map(c => c.allergy),
-			].join(' ').toLowerCase();
-			return searchable.includes(query);
-		});
-		renderTable(filtered);
-	});
-
-	// ============================================
-	// RENDER STATS
-	// ============================================
-	function renderStats(data: typeof STATIC_CONFIRMATIONS) {
-		const totalConfirmations = data.length;
-		let totalAdults = data.length;
-		let totalChildren = 0;
-
-		data.forEach(row => {
-			row.companions.forEach(c => {
-				if (c.type === 'child') totalChildren++;
-				else totalAdults++;
-			});
-		});
-
-		(document.getElementById('stat-total') as HTMLElement).textContent = totalConfirmations.toString();
-		(document.getElementById('stat-adults') as HTMLElement).textContent = totalAdults.toString();
-		(document.getElementById('stat-children') as HTMLElement).textContent = totalChildren.toString();
-		(document.getElementById('stat-total-people') as HTMLElement).textContent = (totalAdults + totalChildren).toString();
-	}
-
-	// ============================================
-	// RENDER TABLE
-	// ============================================
-	function renderTable(data: typeof STATIC_CONFIRMATIONS) {
-		const tbody = document.getElementById('confirmations-table') as HTMLTableSectionElement;
-		tbody.innerHTML = '';
-
-		if (data.length === 0) {
-			tbody.innerHTML = `
-				<tr>
-					<td colspan="7">
-						<div class="empty-state">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="11" x2="23" y2="11"/></svg>
-							<p>Nenhuma confirmação encontrada</p>
-							<p class="empty-hint">Tente ajustar os termos de pesquisa</p>
-						</div>
-					</td>
-				</tr>
-			`;
-			(document.getElementById('table-count') as HTMLElement).textContent = '0 resultados';
-			(document.getElementById('table-people-count') as HTMLElement).textContent = '0 pessoas';
-			return;
-		}
-
-		let totalPeople = 0;
-
-		data.forEach((row, index) => {
-			const tr = document.createElement('tr');
-			const rowPeople = 1 + row.companions.length;
-			totalPeople += rowPeople;
-
-			// Companions
-			let companionsHtml = '';
-			if (row.companions.length === 0) {
-				companionsHtml = '<span class="cell-none">—</span>';
-			} else {
-				const items = row.companions.map(c => {
-					const badgeClass = c.type === 'child' ? 'badge-child' : 'badge-adult';
-					const badgeLabel = c.type === 'child' ? 'Criança' : 'Adulto';
-					const allergyHtml = c.allergy ? `<span class="companion-allergy">(${c.allergy})</span>` : '';
-					return `
-						<div class="companion-item">
-							<span class="badge ${badgeClass}">${badgeLabel}</span>
-							<span class="companion-name">${c.name}</span>
-							${allergyHtml}
-						</div>
-					`;
-				}).join('');
-				companionsHtml = `<div class="companions-list">${items}</div>`;
-			}
-
-			// Restriction
-			const restrictionHtml = row.restricoes 
-				? `<span class="badge badge-restriction">${row.restricoes}</span>` 
-				: '<span class="cell-none">—</span>';
-
-			// Message
-			const messageHtml = row.mensagem 
-				? `<span class="cell-message" title="${row.mensagem}">${row.mensagem}</span>` 
-				: '<span class="cell-none">—</span>';
-
-			// Date
-			const date = new Date(row.created_at);
-			const dateStr = date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-
-			tr.innerHTML = `
-				<td><span class="row-num">${index + 1}</span></td>
-				<td><span class="cell-name">${row.nome}</span></td>
-				<td><span class="cell-phone">${row.telefone}</span></td>
-				<td>${restrictionHtml}</td>
-				<td>${companionsHtml}</td>
-				<td>${messageHtml}</td>
-				<td><span class="cell-date">${dateStr}</span></td>
-			`;
-
-			tbody.appendChild(tr);
-		});
-
-		(document.getElementById('table-count') as HTMLElement).textContent = `${data.length} confirmação${data.length !== 1 ? 'ões' : ''}`;
-		(document.getElementById('table-people-count') as HTMLElement).textContent = `${totalPeople} pessoas no total`;
-	}
-
-	// ============================================
-	// EXPORT CSV
-	// ============================================
-	exportBtn?.addEventListener('click', () => {
-		exportToCSV(STATIC_CONFIRMATIONS);
-		showToast('CSV exportado com sucesso', 'success');
-	});
-
-	function exportToCSV(data: typeof STATIC_CONFIRMATIONS) {
-		const rows: string[][] = [];
-
-		rows.push(['#', 'Nome', 'Telemovel', 'Restricoes', 'Acompanhante', 'Tipo', 'Alergia Acompanhante', 'Mensagem', 'Data']);
-
-		data.forEach((row, index) => {
-			const date = new Date(row.created_at).toLocaleDateString('pt-PT');
-
-			if (row.companions.length === 0) {
-				rows.push([
-					(index + 1).toString(),
-					row.nome,
-					row.telefone,
-					row.restricoes || '',
-					'',
-					'',
-					'',
-					row.mensagem || '',
-					date,
-				]);
-			} else {
-				row.companions.forEach((c, i) => {
-					rows.push([
-						i === 0 ? (index + 1).toString() : '',
-						i === 0 ? row.nome : '',
-						i === 0 ? row.telefone : '',
-						i === 0 ? (row.restricoes || '') : '',
-						c.name,
-						c.type === 'child' ? 'Crianca' : 'Adulto',
-						c.allergy || '',
-						i === 0 ? (row.mensagem || '') : '',
-						i === 0 ? date : '',
-					]);
-				});
-			}
-		});
-
-		const csvContent = rows.map(row => 
-			row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(',')
-		).join('\n');
-
-		const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-		const url = URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = `confirmacoes_casamento_${new Date().toISOString().slice(0,10)}.csv`;
-		link.click();
-		URL.revokeObjectURL(url);
-	}
-
-	// ============================================
-	// MESAS (TABLE MANAGEMENT) - CRUD
-	// ============================================
-	interface TableData {
-		id: string;
-		name: string;
-		capacity: number;
-	}
-
-	interface GuestData {
-		id: string;
-		nome: string;
-		mesa_id: string | null;
-	}
-
-	let mesasTables: TableData[] = [];
-	let mesasGuests: GuestData[] = [];
-	let editingTableId: string | null = null;
-
-	const createTableForm = document.getElementById('create-table-form') as HTMLFormElement;
-	const newTableName = document.getElementById('new-table-name') as HTMLInputElement;
-	const newTableCapacity = document.getElementById('new-table-capacity') as HTMLInputElement;
-	const mesasTableBody = document.getElementById('mesas-table-body') as HTMLTableSectionElement;
-	const mesasCount = document.getElementById('mesas-count') as HTMLSpanElement;
-	const mesasTotalCapacity = document.getElementById('mesas-total-capacity') as HTMLSpanElement;
-
-	// Fetch tables and guests, then render
-	async function loadMesasData() {
-		try {
-			const [tablesRes, guestsRes] = await Promise.all([
-				fetch('/api/tables'),
-				fetch('/api/guests')
-			]);
-
-			if (!tablesRes.ok) throw new Error('Erro ao carregar mesas');
-			if (!guestsRes.ok) throw new Error('Erro ao carregar convidados');
-
-			mesasTables = await tablesRes.json();
-			mesasGuests = await guestsRes.json();
-			renderMesasTable();
-			renderGuestAssignment();
-			renderSeatingGrid();
-		} catch (err: any) {
-			showToast(err.message || 'Erro ao carregar dados', 'error');
-		}
-	}
-
-	// Calculate occupancy for a table
-	function getOccupancy(tableId: string): number {
-		return mesasGuests.filter(g => g.mesa_id === tableId).length;
-	}
-
-	// Render the table list
-	function renderMesasTable() {
-		mesasTableBody.innerHTML = '';
-
-		if (mesasTables.length === 0) {
-			mesasTableBody.innerHTML = `
-				<tr>
-					<td colspan="4">
-						<div class="empty-state">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-							<p>Nenhuma mesa criada</p>
-							<p class="empty-hint">Use o formulário acima para criar a primeira mesa</p>
-						</div>
-					</td>
-				</tr>
-			`;
-			mesasCount.textContent = '0 mesas';
-			if (mesasTotalCapacity) mesasTotalCapacity.textContent = '';
-			return;
-		}
-
-		let totalCap = 0;
-		let totalOcc = 0;
-
-		mesasTables.forEach(table => {
-			const tr = document.createElement('tr');
-			const occupancy = getOccupancy(table.id);
-			const isEditing = editingTableId === table.id;
-			totalCap += table.capacity;
-			totalOcc += occupancy;
-
-			const pct = table.capacity > 0 ? Math.min((occupancy / table.capacity) * 100, 100) : 0;
-			let fillClass = 'occupancy-fill-empty';
-			if (occupancy > 0 && occupancy < table.capacity) fillClass = 'occupancy-fill-ok';
-			else if (occupancy >= table.capacity && occupancy > 0) fillClass = 'occupancy-fill-full';
-			if (pct > 70 && pct < 100) fillClass = 'occupancy-fill-warning';
-
-			if (isEditing) {
-				tr.innerHTML = `
-					<td>
-						<input type="text" class="edit-input" id="edit-name-${table.id}" value="${escapeHtml(table.name)}" />
-					</td>
-					<td>
-						<input type="number" class="edit-input" id="edit-capacity-${table.id}" value="${table.capacity}" min="1" style="width:80px;" />
-					</td>
-					<td>
-						<div class="occupancy-bar">
-							<div class="occupancy-track"><div class="occupancy-fill ${fillClass}" style="width:${pct}%"></div></div>
-							<span class="occupancy-text">${occupancy}/${table.capacity}</span>
-						</div>
-					</td>
-					<td style="text-align:right;">
-						<div style="display:flex;gap:0.5rem;justify-content:flex-end;">
-							<button class="btn btn-primary btn-sm" data-action="save" data-id="${table.id}">Guardar</button>
-							<button class="btn btn-secondary btn-sm" data-action="cancel-edit">Cancelar</button>
-						</div>
-					</td>
-				`;
-			} else {
-				tr.innerHTML = `
-					<td><span class="cell-name">${escapeHtml(table.name)}</span></td>
-					<td>${table.capacity} lugares</td>
-					<td>
-						<div class="occupancy-bar">
-							<div class="occupancy-track"><div class="occupancy-fill ${fillClass}" style="width:${pct}%"></div></div>
-							<span class="occupancy-text">${occupancy}/${table.capacity}</span>
-						</div>
-					</td>
-					<td style="text-align:right;">
-						<div style="display:flex;gap:0.5rem;justify-content:flex-end;">
-							<button class="btn btn-secondary btn-sm" data-action="edit" data-id="${table.id}">Editar</button>
-							<button class="btn btn-danger btn-sm" data-action="delete" data-id="${table.id}" data-name="${escapeHtml(table.name)}" data-occupancy="${occupancy}">Eliminar</button>
-						</div>
-					</td>
-				`;
-			}
-
-			mesasTableBody.appendChild(tr);
-		});
-
-		mesasCount.textContent = `${mesasTables.length} mesa${mesasTables.length !== 1 ? 's' : ''}`;
-		if (mesasTotalCapacity) mesasTotalCapacity.textContent = `${totalOcc}/${totalCap} lugares ocupados`;
-	}
-
-	// Render the seating overview grid
-	function renderSeatingGrid() {
-		const gridContainer = document.getElementById('seating-grid') as HTMLDivElement;
-		const unassignedBadge = document.getElementById('seating-grid-unassigned') as HTMLSpanElement;
-		const unassignedCountEl = document.getElementById('seating-grid-unassigned-count') as HTMLSpanElement;
-
-		if (!gridContainer) return;
-
-		const unassignedCount = mesasGuests.filter(g => !g.mesa_id).length;
-
-		if (unassignedCount > 0) {
-			unassignedBadge.style.display = 'inline-flex';
-			unassignedCountEl.textContent = unassignedCount.toString();
-		} else {
-			unassignedBadge.style.display = 'none';
-		}
-
-		if (mesasTables.length === 0) {
-			gridContainer.innerHTML = `
-				<div class="empty-state" style="grid-column:1/-1;padding:2rem;">
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-					<p>Nenhuma mesa criada ainda</p>
-				</div>
-			`;
-			return;
-		}
-
-		let html = '';
-		mesasTables.forEach(table => {
-			const occupancy = getOccupancy(table.id);
-			const assignedGuests = mesasGuests.filter(g => g.mesa_id === table.id);
-
-			let fillLevel: 'empty' | 'partial' | 'full';
-			if (occupancy === 0) fillLevel = 'empty';
-			else if (occupancy >= table.capacity) fillLevel = 'full';
-			else fillLevel = 'partial';
-
-			const cardClass = `seating-card seating-card-${fillLevel}`;
-			const countClass = `seating-card-count seating-count-${fillLevel}`;
-
-			let guestsHtml = '';
-			if (assignedGuests.length === 0) {
-				guestsHtml = `<p class="seating-card-empty-msg">Sem convidados atribuídos</p>`;
-			} else {
-				guestsHtml = '<ul class="seating-card-guests">';
-				assignedGuests.forEach(guest => {
-					guestsHtml += `<li>${escapeHtml(guest.nome)}</li>`;
-				});
-				guestsHtml += '</ul>';
-			}
-
-			html += `
-				<div class="${cardClass}">
-					<div class="seating-card-top">
-						<span class="seating-card-name">${escapeHtml(table.name)}</span>
-						<span class="${countClass}">${occupancy}/${table.capacity}</span>
-					</div>
-					${guestsHtml}
-				</div>
-			`;
-		});
-
-		gridContainer.innerHTML = html;
-	}
-
-	// Escape HTML to prevent XSS
-	function escapeHtml(text: string): string {
-		const div = document.createElement('div');
-		div.textContent = text;
-		return div.innerHTML;
-	}
-
-	// Create table
-	createTableForm?.addEventListener('submit', async (e) => {
-		e.preventDefault();
-
-		const name = newTableName.value.trim();
-		const capacity = parseInt(newTableCapacity.value, 10);
-
-		if (!name) {
-			showToast('O nome da mesa é obrigatório', 'warning');
-			return;
-		}
-		if (!capacity || capacity < 1) {
-			showToast('A capacidade deve ser pelo menos 1', 'warning');
-			return;
-		}
-
-		try {
-			const res = await fetch('/api/tables', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, capacity })
-			});
-
-			if (!res.ok) {
-				const data = await res.json();
-				throw new Error(data.error || 'Erro ao criar mesa');
-			}
-
-			const newTable: TableData = await res.json();
-			mesasTables.push(newTable);
-			renderMesasTable();
-			renderSeatingGrid();
-
-			newTableName.value = '';
-			newTableCapacity.value = '';
-			showToast(`Mesa "${name}" criada com sucesso`, 'success');
-		} catch (err: any) {
-			showToast(err.message || 'Erro ao criar mesa', 'error');
-		}
-	});
-
-	// Handle table actions (edit, delete, save, cancel)
-	mesasTableBody?.addEventListener('click', async (e) => {
-		const target = e.target as HTMLElement;
-		const button = target.closest('button') as HTMLButtonElement | null;
-		if (!button) return;
-
-		const action = button.getAttribute('data-action');
-		const id = button.getAttribute('data-id');
-
-		if (action === 'edit' && id) {
-			editingTableId = id;
-			renderMesasTable();
-		}
-
-		if (action === 'cancel-edit') {
-			editingTableId = null;
-			renderMesasTable();
-		}
-
-		if (action === 'save' && id) {
-			const nameInput = document.getElementById(`edit-name-${id}`) as HTMLInputElement;
-			const capacityInput = document.getElementById(`edit-capacity-${id}`) as HTMLInputElement;
-
-			const newName = nameInput.value.trim();
-			const newCapacity = parseInt(capacityInput.value, 10);
-
-			if (!newName) {
-				showToast('O nome da mesa é obrigatório', 'warning');
-				return;
-			}
-			if (!newCapacity || newCapacity < 1) {
-				showToast('A capacidade deve ser pelo menos 1', 'warning');
-				return;
-			}
-
-			try {
-				const res = await fetch(`/api/tables/${id}`, {
-					method: 'PATCH',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ name: newName, capacity: newCapacity })
-				});
-
-				if (!res.ok) {
-					const data = await res.json();
-					throw new Error(data.error || 'Erro ao atualizar mesa');
-				}
-
-				const tableIndex = mesasTables.findIndex(t => t.id === id);
-				if (tableIndex !== -1) {
-					mesasTables[tableIndex].name = newName;
-					mesasTables[tableIndex].capacity = newCapacity;
-				}
-
-				editingTableId = null;
-				renderMesasTable();
-				renderSeatingGrid();
-				renderGuestAssignment();
-				showToast(`Mesa "${newName}" atualizada`, 'success');
-			} catch (err: any) {
-				showToast(err.message || 'Erro ao atualizar mesa', 'error');
-			}
-		}
-
-		if (action === 'delete' && id) {
-			const tableName = button.getAttribute('data-name') || 'esta mesa';
-			const occupancy = parseInt(button.getAttribute('data-occupancy') || '0', 10);
-			showDeleteConfirmation(id, tableName, occupancy);
-		}
-	});
-
-	// Show delete confirmation dialog
-	function showDeleteConfirmation(tableId: string, tableName: string, occupancy: number) {
-		const overlay = document.createElement('div');
-		overlay.className = 'confirm-overlay';
-
-		const occupancyWarning = occupancy > 0
-			? `<p style="margin-top:-0.5rem;">⚠️ Esta mesa tem <strong>${occupancy}</strong> convidado${occupancy !== 1 ? 's' : ''} atribuído${occupancy !== 1 ? 's' : ''}. Ao eliminar, ficarão sem mesa.</p>`
-			: '';
-
-		overlay.innerHTML = `
-			<div class="confirm-dialog">
-				<h3>Eliminar Mesa</h3>
-				<p>Tem a certeza que deseja eliminar a mesa "<strong>${escapeHtml(tableName)}</strong>"?</p>
-				${occupancyWarning}
-				<div class="confirm-actions">
-					<button class="btn btn-secondary" id="confirm-cancel">Cancelar</button>
-					<button class="btn btn-danger" id="confirm-delete">Eliminar</button>
-				</div>
-			</div>
-		`;
-
-		document.body.appendChild(overlay);
-
-		const cancelBtn = document.getElementById('confirm-cancel') as HTMLButtonElement;
-		const deleteBtn = document.getElementById('confirm-delete') as HTMLButtonElement;
-
-		cancelBtn.addEventListener('click', () => overlay.remove());
-		overlay.addEventListener('click', (e) => {
-			if (e.target === overlay) overlay.remove();
-		});
-
-		deleteBtn.addEventListener('click', async () => {
-			try {
-				const res = await fetch(`/api/tables/${tableId}`, { method: 'DELETE' });
-
-				if (!res.ok) {
-					const data = await res.json();
-					throw new Error(data.error || 'Erro ao eliminar mesa');
-				}
-
-				mesasTables = mesasTables.filter(t => t.id !== tableId);
-				mesasGuests = mesasGuests.map(g => g.mesa_id === tableId ? { ...g, mesa_id: null } : g);
-				renderMesasTable();
-				renderSeatingGrid();
-				renderGuestAssignment();
-				overlay.remove();
-				showToast(`Mesa "${tableName}" eliminada`, 'success');
-			} catch (err: any) {
-				showToast(err.message || 'Erro ao eliminar mesa', 'error');
-				overlay.remove();
-			}
-		});
-	}
-
-	// Load mesas data when the Mesas tab is activated
-	const mesasTabBtn = document.getElementById('tab-mesas') as HTMLButtonElement;
-	let mesasLoaded = false;
-
-	mesasTabBtn?.addEventListener('click', () => {
-		if (!mesasLoaded) {
-			mesasLoaded = true;
-			loadMesasData();
-		}
-	});
-
-	// ============================================
-	// GUEST ASSIGNMENT
-	// ============================================
-	const guestAssignBody = document.getElementById('guest-assign-body') as HTMLTableSectionElement;
-	const guestAssignCount = document.getElementById('guest-assign-count') as HTMLSpanElement;
-	const guestAssignUnassigned = document.getElementById('guest-assign-unassigned') as HTMLSpanElement;
-	const guestAssignSearch = document.getElementById('guest-assign-search') as HTMLInputElement;
-
-	let guestAssignFilter = '';
-
-	guestAssignSearch?.addEventListener('input', () => {
-		guestAssignFilter = guestAssignSearch.value.toLowerCase().trim();
-		renderGuestAssignment();
-	});
-
-	function renderGuestAssignment() {
-		if (!guestAssignBody) return;
-		guestAssignBody.innerHTML = '';
-
-		let filteredGuests = mesasGuests;
-		if (guestAssignFilter) {
-			filteredGuests = mesasGuests.filter(g => g.nome.toLowerCase().includes(guestAssignFilter));
-		}
-
-		const unassignedCount = mesasGuests.filter(g => !g.mesa_id).length;
-
-		if (filteredGuests.length === 0) {
-			guestAssignBody.innerHTML = `
-				<tr>
-					<td colspan="4">
-						<div class="empty-state">
-							<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-							<p>${guestAssignFilter ? 'Nenhum convidado encontrado' : 'Nenhum convidado registado'}</p>
-						</div>
-					</td>
-				</tr>
-			`;
-			guestAssignCount.textContent = `${mesasGuests.length} convidado${mesasGuests.length !== 1 ? 's' : ''}`;
-			guestAssignUnassigned.textContent = `${unassignedCount} sem mesa`;
-			return;
-		}
-
-		filteredGuests.forEach((guest, index) => {
-			const tr = document.createElement('tr');
-			const currentTable = mesasTables.find(t => t.id === guest.mesa_id);
-			const isAtCapacity = currentTable ? getOccupancy(currentTable.id) >= currentTable.capacity : false;
-
-			if (isAtCapacity && guest.mesa_id) {
-				tr.className = 'guest-row-warning';
-			}
-
-			let optionsHtml = '<option value="">Sem mesa</option>';
-			mesasTables.forEach(table => {
-				const occ = getOccupancy(table.id);
-				const atCapacity = occ >= table.capacity;
-				const selected = guest.mesa_id === table.id ? 'selected' : '';
-				const capacityLabel = atCapacity ? ' ⚠️' : '';
-				optionsHtml += `<option value="${table.id}" ${selected}>${escapeHtml(table.name)} (${occ}/${table.capacity})${capacityLabel}</option>`;
-			});
-
-			let statusHtml = '';
-			if (!guest.mesa_id) {
-				statusHtml = '<span class="status-badge status-unassigned">Sem mesa</span>';
-			} else if (isAtCapacity) {
-				statusHtml = '<span class="status-badge status-full">Mesa lotada</span>';
-			} else {
-				statusHtml = '<span class="status-badge status-assigned">Atribuído</span>';
-			}
-
-			tr.innerHTML = `
-				<td><span class="row-num">${index + 1}</span></td>
-				<td><span class="cell-name">${escapeHtml(guest.nome)}</span></td>
-				<td>
-					<select class="guest-assign-select" data-guest-id="${guest.id}">
-						${optionsHtml}
-					</select>
-				</td>
-				<td>${statusHtml}</td>
-			`;
-
-			guestAssignBody.appendChild(tr);
-		});
-
-		guestAssignCount.textContent = `${mesasGuests.length} convidado${mesasGuests.length !== 1 ? 's' : ''}`;
-		guestAssignUnassigned.textContent = `${unassignedCount} sem mesa`;
-	}
-
-	// Handle guest assignment changes
-	guestAssignBody?.addEventListener('change', async (e) => {
-		const target = e.target as HTMLSelectElement;
-		if (!target.classList.contains('guest-assign-select')) return;
-
-		const guestId = target.getAttribute('data-guest-id');
-		if (!guestId) return;
-
-		const newTableId = target.value || null;
-
-		try {
-			const res = await fetch(`/api/guests/${guestId}/assign`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ table_id: newTableId })
-			});
-
-			if (!res.ok) {
-				const data = await res.json();
-				throw new Error(data.error || 'Erro ao atribuir mesa');
-			}
-
-			const guestIndex = mesasGuests.findIndex(g => g.id === guestId);
-			if (guestIndex !== -1) {
-				mesasGuests[guestIndex].mesa_id = newTableId;
-			}
-
-			renderMesasTable();
-			renderGuestAssignment();
-			renderSeatingGrid();
-			showToast('Mesa atribuída com sucesso', 'success');
-		} catch (err: any) {
-			showToast(err.message || 'Erro ao atribuir mesa', 'error');
-			const guest = mesasGuests.find(g => g.id === guestId);
-			if (guest) {
-				target.value = guest.mesa_id || '';
-			}
-		}
-	});
+  import { supabase } from '../scripts/supabase';
+
+  const SUPABASE_URL = import.meta.env.PUBLIC_SUPABASE_URL;
+  const ADMIN_USER = 'admin';
+  const ADMIN_PASS = 'taniaemiguel2027';
+
+  // DOM Elements
+  const loginScreen = document.getElementById('login-screen') as HTMLDivElement;
+  const dashboard = document.getElementById('dashboard') as HTMLDivElement;
+  const loginForm = document.getElementById('login-form') as HTMLFormElement;
+  const loginError = document.getElementById('login-error') as HTMLParagraphElement;
+  const logoutBtn = document.getElementById('logout-btn') as HTMLButtonElement;
+
+  // Check session
+  function checkSession() {
+    if (sessionStorage.getItem('admin_logged_in') === 'true') {
+      showDashboard();
+    }
+  }
+
+  function showDashboard() {
+    loginScreen.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+    loadConfirmacoes();
+    loadMesas();
+    loadFotos();
+  }
+
+  // Login
+  loginForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const user = (document.getElementById('username') as HTMLInputElement).value.trim();
+    const pass = (document.getElementById('password') as HTMLInputElement).value;
+
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+      sessionStorage.setItem('admin_logged_in', 'true');
+      loginError.textContent = '';
+      showDashboard();
+    } else {
+      loginError.textContent = 'Credenciais inválidas.';
+    }
+  });
+
+  // Logout
+  logoutBtn.addEventListener('click', () => {
+    sessionStorage.removeItem('admin_logged_in');
+    dashboard.classList.add('hidden');
+    loginScreen.classList.remove('hidden');
+  });
+
+  // Tabs
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = (btn as HTMLElement).dataset.tab!;
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`tab-${tab}`)!.classList.add('active');
+    });
+  });
+
+  // ==================== CONFIRMAÇÕES ====================
+  interface GuestRecord {
+    id: string;
+    nome: string;
+    telefone?: string;
+    restricoes?: string;
+    companions?: any[];
+    mensagem?: string;
+    created_at: string;
+    mesa_id?: string | null;
+    acompanha?: number;
+    checked_in?: number;
+  }
+
+  let allRsvps: GuestRecord[] = [];
+
+  async function loadConfirmacoes() {
+    const { data, error } = await supabase
+      .from('guests')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error loading guests:', error);
+      return;
+    }
+
+    allRsvps = data || [];
+    updateStats();
+    renderConfirmacoes(allRsvps);
+  }
+
+  function updateStats() {
+    const total = allRsvps.length;
+    let totalPessoas = 0;
+    let totalAdultos = 0;
+    let totalCriancas = 0;
+
+    allRsvps.forEach(r => {
+      const companions = r.companions || [];
+      const adults = 1 + companions.filter((c: any) => c.type === 'adult').length;
+      const children = companions.filter((c: any) => c.type === 'child').length;
+      totalAdultos += adults;
+      totalCriancas += children;
+      totalPessoas += adults + children;
+    });
+
+    document.getElementById('stat-confirmacoes')!.textContent = String(total);
+    document.getElementById('stat-pessoas')!.textContent = String(totalPessoas);
+    document.getElementById('stat-adultos')!.textContent = String(totalAdultos);
+    document.getElementById('stat-criancas')!.textContent = String(totalCriancas);
+  }
+
+  function renderConfirmacoes(rsvps: GuestRecord[]) {
+    const tbody = document.getElementById('confirmacoes-tbody')!;
+    tbody.innerHTML = rsvps.map(r => {
+      const companions = r.companions || [];
+      const companionCount = companions.length;
+      const companionNames = companions.map((c: any) => c.name || c).join(', ');
+      const date = new Date(r.created_at).toLocaleDateString('pt-PT', {
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+
+      return `<tr>
+        <td><strong>${escapeHtml(r.nome)}</strong></td>
+        <td>${escapeHtml(r.telefone || '—')}</td>
+        <td>${escapeHtml(r.restricoes || '—')}</td>
+        <td>${companionCount > 0 ? `${companionCount} — ${escapeHtml(companionNames)}` : '—'}</td>
+        <td>${escapeHtml(r.mensagem || '—')}</td>
+        <td style="white-space:nowrap">${date}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // Search
+  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase();
+    const filtered = allRsvps.filter(r =>
+      r.nome.toLowerCase().includes(q) ||
+      (r.telefone || '').toLowerCase().includes(q) ||
+      (r.mensagem || '').toLowerCase().includes(q)
+    );
+    renderConfirmacoes(filtered);
+  });
+
+  // Export CSV
+  document.getElementById('export-csv-btn')!.addEventListener('click', () => {
+    const headers = ['Nome', 'Telemóvel', 'Restrições', 'Acompanhantes', 'Mensagem', 'Data'];
+    const rows = allRsvps.map(r => {
+      const companions = (r.companions || []).map((c: any) => c.name || c).join('; ');
+      const date = new Date(r.created_at).toLocaleDateString('pt-PT');
+      return [r.nome, r.telefone || '', r.restricoes || '', companions, r.mensagem || '', date];
+    });
+
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `confirmacoes_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  // ==================== MESAS ====================
+  interface Mesa {
+    id: string;
+    name: string;
+    capacity: number;
+    guests?: string[];
+  }
+
+  let allMesas: Mesa[] = [];
+  let allGuestsList: { id: string; nome: string; mesa_id?: string | null }[] = [];
+
+  async function loadMesas() {
+    const [mesasRes, guestsRes] = await Promise.all([
+      supabase.from('tables').select('*').order('name'),
+      supabase.from('guests').select('id, nome, mesa_id')
+    ]);
+
+    allMesas = mesasRes.data || [];
+    allGuestsList = guestsRes.data || [];
+
+    renderMesasTable();
+    renderMesasGrid();
+    populateDropdowns();
+  }
+
+  function renderMesasTable() {
+    const tbody = document.getElementById('mesas-tbody')!;
+    tbody.innerHTML = allMesas.map(m => {
+      const assigned = allGuestsList.filter(g => g.mesa_id === m.id);
+      const occupancy = assigned.length;
+      const pct = m.capacity > 0 ? Math.round((occupancy / m.capacity) * 100) : 0;
+
+      return `<tr>
+        <td><strong>${escapeHtml(m.name)}</strong></td>
+        <td>${m.capacity}</td>
+        <td>${occupancy}/${m.capacity} (${pct}%)</td>
+        <td class="action-btns">
+          <button class="btn btn-danger btn-icon" onclick="deleteMesa('${m.id}')" title="Eliminar">✕</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function renderMesasGrid() {
+    const grid = document.getElementById('mesas-grid')!;
+    grid.innerHTML = allMesas.map(m => {
+      const assigned = allGuestsList.filter(g => g.mesa_id === m.id);
+      const pct = m.capacity > 0 ? Math.round((assigned.length / m.capacity) * 100) : 0;
+      const guestList = assigned.map(g =>
+        `<div class="mesa-guest-row">
+          <span>${escapeHtml(g.nome)}</span>
+          <button class="btn-unassign" onclick="unassignGuest('${g.id}')" title="Remover da mesa">✕</button>
+        </div>`
+      ).join('');
+
+      return `<div class="mesa-card">
+        <div class="mesa-card-name">${escapeHtml(m.name)}</div>
+        <div class="mesa-card-info">${assigned.length} / ${m.capacity} lugares</div>
+        <div class="mesa-card-bar"><div class="mesa-card-bar-fill" style="width:${pct}%"></div></div>
+        <div class="mesa-card-guests">${guestList || '<em style="color:var(--gray-400)">Sem convidados</em>'}</div>
+      </div>`;
+    }).join('');
+  }
+
+  (window as any).unassignGuest = async (guestId: string) => {
+    const { error } = await supabase.from('guests').update({ mesa_id: null }).eq('id', guestId);
+    if (error) {
+      alert('Erro ao remover da mesa: ' + error.message);
+      return;
+    }
+    await loadMesas();
+  };
+
+  function populateDropdowns() {
+    const guestSelect = document.getElementById('assign-guest') as HTMLSelectElement;
+    const tableSelect = document.getElementById('assign-table') as HTMLSelectElement;
+
+    const unassigned = allGuestsList.filter(g => !g.mesa_id);
+    guestSelect.innerHTML = '<option value="">Selecionar convidado...</option>' +
+      unassigned.map(g => `<option value="${g.id}">${escapeHtml(g.nome)}</option>`).join('');
+
+    tableSelect.innerHTML = '<option value="">Selecionar mesa...</option>' +
+      allMesas.map(m => {
+        const count = allGuestsList.filter(g => g.mesa_id === m.id).length;
+        return `<option value="${m.id}">${escapeHtml(m.name)} (${count}/${m.capacity})</option>`;
+      }).join('');
+  }
+
+  // Create table
+  document.getElementById('create-table-form')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById('table-name') as HTMLInputElement;
+    const capInput = document.getElementById('table-capacity') as HTMLInputElement;
+
+    const name = nameInput.value.trim();
+    const capacity = parseInt(capInput.value);
+
+    if (!name || !capacity) return;
+
+    const { error } = await supabase.from('tables').insert({ name, capacity });
+    if (error) {
+      alert('Erro ao criar mesa: ' + error.message);
+      return;
+    }
+
+    nameInput.value = '';
+    capInput.value = '';
+    await loadMesas();
+  });
+
+  // Delete table
+  (window as any).deleteMesa = async (id: string) => {
+    if (!confirm('Tem certeza que deseja eliminar esta mesa?')) return;
+
+    // Unassign guests first
+    await supabase.from('guests').update({ mesa_id: null }).eq('mesa_id', id);
+    const { error } = await supabase.from('tables').delete().eq('id', id);
+    if (error) {
+      alert('Erro ao eliminar mesa: ' + error.message);
+      return;
+    }
+    await loadMesas();
+  };
+
+  // Assign guest
+  document.getElementById('assign-btn')!.addEventListener('click', async () => {
+    const guestId = (document.getElementById('assign-guest') as HTMLSelectElement).value;
+    const tableId = (document.getElementById('assign-table') as HTMLSelectElement).value;
+
+    if (!guestId || !tableId) {
+      alert('Selecione um convidado e uma mesa.');
+      return;
+    }
+
+    const { error } = await supabase.from('guests').update({ mesa_id: tableId }).eq('id', guestId);
+    if (error) {
+      alert('Erro ao atribuir: ' + error.message);
+      return;
+    }
+    await loadMesas();
+  });
+
+  // ==================== FOTOS ====================
+  async function loadFotos() {
+    const { data, error } = await supabase
+      .from('photos')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    const grid = document.getElementById('fotos-grid')!;
+    const empty = document.getElementById('fotos-empty')!;
+
+    if (error || !data || data.length === 0) {
+      grid.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    grid.innerHTML = data.map(photo => {
+      const thumbUrl = `${SUPABASE_URL}/storage/v1/render/image/public/wedding-photos/${photo.storage_path}?width=400`;
+      const date = new Date(photo.created_at).toLocaleDateString('pt-PT', {
+        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+
+      return `<div class="foto-card">
+        <img src="${thumbUrl}" alt="Foto de ${escapeHtml(photo.uploader_name || 'Anónimo')}" loading="lazy" />
+        <div class="foto-card-info">
+          <div class="foto-card-meta">
+            <strong>${escapeHtml(photo.uploader_name || 'Anónimo')}</strong>
+            ${date}
+          </div>
+          <button class="btn btn-danger btn-icon" onclick="deletePhoto('${photo.id}', '${photo.storage_path}')" title="Eliminar">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  (window as any).deletePhoto = async (id: string, path: string) => {
+    if (!confirm('Tem certeza que deseja eliminar esta foto?')) return;
+
+    await supabase.storage.from('wedding-photos').remove([path]);
+    const { error } = await supabase.from('photos').delete().eq('id', id);
+    if (error) {
+      alert('Erro ao eliminar foto: ' + error.message);
+      return;
+    }
+    await loadFotos();
+  };
+
+  // ==================== UTILS ====================
+  function escapeHtml(str: string): string {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // Init
+  checkSession();
 </script>
 
+<style>
+  :root {
+    --olive: #5c6e44;
+    --olive-light: #7a9157;
+    --gold: #d4983a;
+    --gold-light: #e8b86d;
+    --beige: #faf7f0;
+    --beige-dark: #f0ebe0;
+    --white: #ffffff;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-300: #d1d5db;
+    --gray-400: #9ca3af;
+    --gray-500: #6b7280;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --rose: #e8a0bf;
+    --green: #6db070;
+    --red: #ef4444;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+    --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+    --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.05);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-full: 9999px;
+    --transition: all 0.2s ease;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--beige);
+    color: var(--gray-800);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  h1, h2, h3 { font-family: 'Playfair Display', serif; }
+
+  .hidden { display: none !important; }
+
+  /* Login Screen */
+  .login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--olive) 0%, #3d4a2e 100%);
+    padding: 1rem;
+  }
+
+  .login-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 3rem 2.5rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    animation: fadeInUp 0.6s ease;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .login-heart {
+    font-size: 3rem;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+
+  .login-title {
+    font-size: 1.75rem;
+    color: var(--olive);
+    margin-bottom: 0.25rem;
+  }
+
+  .login-subtitle {
+    color: var(--gray-500);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+    text-align: left;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: var(--transition);
+    background: var(--gray-50);
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: var(--olive);
+    box-shadow: 0 0 0 3px rgba(92, 110, 68, 0.1);
+    background: var(--white);
+  }
+
+  .login-error {
+    color: var(--red);
+    font-size: 0.85rem;
+    min-height: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--olive);
+    color: var(--white);
+  }
+
+  .btn-primary:hover {
+    background: var(--olive-light);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--olive);
+    border: 1.5px solid var(--olive);
+  }
+
+  .btn-outline:hover {
+    background: var(--olive);
+    color: var(--white);
+  }
+
+  .btn-danger {
+    background: var(--red);
+    color: var(--white);
+  }
+
+  .btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-1px);
+  }
+
+  .btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .btn-full { width: 100%; }
+
+  .btn-icon {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 0.85rem;
+  }
+
+  /* Dashboard Header */
+  .dash-header {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .dash-header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .dash-logo {
+    font-size: 1.4rem;
+    color: var(--olive);
+  }
+
+  .dash-logo span {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: var(--gray-400);
+    margin-left: 0.5rem;
+  }
+
+  /* Tabs */
+  .tabs-nav {
+    max-width: 1400px;
+    margin: 1.5rem auto 0;
+    padding: 0 2rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .tab-btn {
+    padding: 0.7rem 1.5rem;
+    border: none;
+    background: var(--white);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    cursor: pointer;
+    transition: var(--transition);
+    border-bottom: 3px solid transparent;
+  }
+
+  .tab-btn:hover {
+    color: var(--olive);
+    background: var(--white);
+  }
+
+  .tab-btn.active {
+    color: var(--olive);
+    border-bottom-color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* Tab Content */
+  .tab-content {
+    display: none;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem 3rem;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .tab-content.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--gray-300);
+    transition: var(--transition);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .stat-card--olive { border-left-color: var(--olive); }
+  .stat-card--gold { border-left-color: var(--gold); }
+  .stat-card--green { border-left-color: var(--green); }
+  .stat-card--rose { border-left-color: var(--rose); }
+
+  .stat-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    color: var(--olive);
+    margin-bottom: 1rem;
+  }
+
+  /* Search */
+  .search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 0.6rem 1rem;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: var(--transition);
+    background: var(--gray-50);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--olive);
+    box-shadow: 0 0 0 3px rgba(92, 110, 68, 0.1);
+    background: var(--white);
+  }
+
+  /* Tables */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-sm);
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  .data-table thead {
+    background: var(--olive);
+    color: var(--white);
+  }
+
+  .data-table th {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  .data-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+  }
+
+  .data-table tbody tr {
+    transition: var(--transition);
+  }
+
+  .data-table tbody tr:nth-child(even) {
+    background: var(--gray-50);
+  }
+
+  .data-table tbody tr:hover {
+    background: rgba(92, 110, 68, 0.05);
+  }
+
+  /* Mesas */
+  .mesas-layout {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .form-inline {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .form-inline .form-group {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 150px;
+  }
+
+  .assign-form {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .assign-form .form-group {
+    flex: 1;
+    min-width: 180px;
+    margin-bottom: 0;
+  }
+
+  .mesas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+  }
+
+  .mesa-card {
+    background: var(--beige);
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 1.25rem;
+    transition: var(--transition);
+  }
+
+  .mesa-card:hover {
+    border-color: var(--olive);
+    box-shadow: var(--shadow);
+  }
+
+  .mesa-card-name {
+    font-weight: 700;
+    color: var(--olive);
+    margin-bottom: 0.25rem;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .mesa-card-info {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    margin-bottom: 0.5rem;
+  }
+
+  .mesa-card-bar {
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .mesa-card-bar-fill {
+    height: 100%;
+    background: var(--olive);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  .mesa-card-guests {
+    font-size: 0.78rem;
+    color: var(--gray-600);
+    line-height: 1.5;
+  }
+
+  .mesa-guest-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.2rem 0;
+  }
+
+  .btn-unassign {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: none;
+    background: var(--gray-200);
+    color: var(--gray-500);
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    flex-shrink: 0;
+  }
+
+  .btn-unassign:hover {
+    background: var(--red);
+    color: var(--white);
+  }
+
+  /* Fotos */
+  .fotos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .foto-card {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
+  }
+
+  .foto-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  .foto-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .foto-card-info {
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .foto-card-meta {
+    font-size: 0.8rem;
+    color: var(--gray-600);
+  }
+
+  .foto-card-meta strong {
+    display: block;
+    color: var(--gray-800);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: var(--gray-400);
+    font-size: 0.95rem;
+  }
+
+  /* Action buttons in table */
+  .action-btns {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .dash-header { padding: 0.75rem 1rem; }
+    .tabs-nav { padding: 0 1rem; }
+    .tab-content { padding: 1rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .form-inline { flex-direction: column; align-items: stretch; }
+    .assign-form { flex-direction: column; align-items: stretch; }
+    .card-header { flex-direction: column; align-items: stretch; }
+    .fotos-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    .tab-btn { padding: 0.6rem 1rem; font-size: 0.8rem; }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .login-card { padding: 2rem 1.5rem; }
+  }
+</style>
 </body>
 </html>

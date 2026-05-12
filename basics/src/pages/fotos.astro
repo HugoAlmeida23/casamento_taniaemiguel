@@ -1,0 +1,1301 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Galeria de Fotos — Tânia & Miguel">
+  <main id="fotos-main">
+    <!-- HEADER -->
+    <header class="fotos-header">
+      <a href={`${import.meta.env.BASE_URL}/`} class="back-link" aria-label="Voltar à página principal">← Voltar</a>
+      <p class="fotos-subtitle">Casamento Tânia & Miguel</p>
+      <h1 class="fotos-title">Galeria de Fotos</h1>
+      <div class="fotos-ornament"><span>✦</span></div>
+    </header>
+
+    <!-- GUEST NAME SECTION (optional) -->
+    <section id="guest-name-section" class="guest-name-section">
+      <div id="name-prompt" class="name-prompt">
+        <label for="guest-name-input" class="name-label">O seu nome (opcional)</label>
+        <div class="name-input-wrap">
+          <input
+            id="guest-name-input"
+            type="text"
+            placeholder="O seu nome..."
+            autocomplete="off"
+            aria-label="O seu nome (opcional)"
+          />
+          <button id="name-save-btn" type="button" aria-label="Guardar nome">✓</button>
+        </div>
+      </div>
+      <div id="name-display" class="name-display hidden">
+        <span id="name-text" class="name-text"></span>
+        <button id="name-edit-btn" type="button" class="name-edit-btn" aria-label="Editar nome">✎</button>
+      </div>
+    </section>
+
+    <!-- PHOTO GRID -->
+    <section id="photo-grid-section" class="photo-grid-section">
+      <div id="photo-grid" class="photo-grid"></div>
+      <div id="empty-state" class="empty-state">
+        <div class="empty-icon">📷</div>
+        <p>Seja o primeiro a partilhar uma foto!</p>
+      </div>
+      <div id="grid-loading" class="grid-loading hidden">
+        <div class="loading-spinner"></div>
+        <span>A carregar...</span>
+      </div>
+      <div id="scroll-sentinel" class="scroll-sentinel"></div>
+    </section>
+
+    <!-- FAB UPLOAD BUTTON -->
+    <button id="fab-upload" class="fab-upload tap-pulse" aria-label="Partilhar Foto">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      </svg>
+    </button>
+
+    <!-- UPLOAD MODAL -->
+    <div id="upload-modal" class="upload-modal hidden" role="dialog" aria-modal="true" aria-label="Enviar foto">
+      <div class="upload-modal-backdrop"></div>
+      <div class="upload-modal-content">
+        <button id="upload-modal-close" class="upload-modal-close" aria-label="Fechar">✕</button>
+        <h2 class="upload-modal-title">Partilhar Foto</h2>
+
+        <div id="upload-file-section" class="upload-file-section">
+          <label for="file-input" class="file-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Toque para selecionar uma foto</span>
+          </label>
+          <input
+            id="file-input"
+            type="file"
+            accept="image/jpeg,image/png,image/heic,image/webp"
+            capture="environment"
+            class="file-input-hidden"
+          />
+        </div>
+
+        <div id="upload-preview" class="upload-preview hidden">
+          <img id="preview-img" src="" alt="Pré-visualização" />
+        </div>
+
+        <div id="upload-progress" class="upload-progress hidden">
+          <div class="progress-bar">
+            <div id="progress-fill" class="progress-fill"></div>
+          </div>
+          <span id="progress-text" class="progress-text">A enviar...</span>
+        </div>
+
+        <div id="upload-success" class="upload-msg upload-success hidden">
+          <span>✓</span> Foto partilhada com sucesso!
+        </div>
+
+        <div id="upload-error" class="upload-msg upload-error hidden">
+          <span id="error-text">Erro ao enviar. Tente novamente.</span>
+          <button id="retry-upload-btn" class="retry-btn" type="button">Tentar novamente</button>
+        </div>
+
+        <button id="upload-submit-btn" class="upload-submit-btn hidden" type="button">Enviar Foto</button>
+      </div>
+    </div>
+
+    <!-- LIGHTBOX -->
+    <div id="lightbox" class="lightbox hidden" role="dialog" aria-modal="true" aria-label="Visualizar foto">
+      <div class="lightbox-backdrop"></div>
+      <button id="lightbox-close" class="lightbox-close" aria-label="Fechar">✕</button>
+      <button id="lightbox-prev" class="lightbox-nav lightbox-prev-btn" aria-label="Foto anterior">‹</button>
+      <button id="lightbox-next" class="lightbox-nav lightbox-next-btn" aria-label="Próxima foto">›</button>
+      <div id="lightbox-img-container" class="lightbox-img-container">
+        <img id="lightbox-img" src="" alt="Foto em ecrã inteiro" />
+      </div>
+    </div>
+
+    <!-- RECONNECTING INDICATOR -->
+    <div id="reconnecting-indicator" class="reconnecting-indicator hidden">
+      <span>Reconectando...</span>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { supabase } from '../scripts/supabase';
+  import {
+    validateFile,
+    generateFilename,
+    compressImage,
+    getThumbnailUrl,
+    getFullResUrl,
+    sortPhotosDescending,
+    formatRelativeTime,
+    setGuestName,
+    getGuestName,
+    type PhotoRecord,
+  } from '../scripts/photo-gallery-utils';
+
+  // === State ===
+  let photos: PhotoRecord[] = [];
+  let currentOffset = 0;
+  const PAGE_SIZE = 20;
+  let isLoadingMore = false;
+  let hasMore = true;
+  let lightboxIndex = -1;
+  let selectedFile: File | null = null;
+  let isUploading = false;
+
+  // === DOM Refs ===
+  const namePrompt = document.getElementById('name-prompt')!;
+  const nameDisplay = document.getElementById('name-display')!;
+  const nameText = document.getElementById('name-text')!;
+  const nameInput = document.getElementById('guest-name-input') as HTMLInputElement;
+  const nameSaveBtn = document.getElementById('name-save-btn')!;
+  const nameEditBtn = document.getElementById('name-edit-btn')!;
+  const photoGrid = document.getElementById('photo-grid')!;
+  const emptyState = document.getElementById('empty-state')!;
+  const gridLoading = document.getElementById('grid-loading')!;
+  const scrollSentinel = document.getElementById('scroll-sentinel')!;
+  const fabUpload = document.getElementById('fab-upload') as HTMLButtonElement;
+  const uploadModal = document.getElementById('upload-modal')!;
+  const uploadModalClose = document.getElementById('upload-modal-close')!;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const uploadFileSection = document.getElementById('upload-file-section')!;
+  const uploadPreview = document.getElementById('upload-preview')!;
+  const previewImg = document.getElementById('preview-img') as HTMLImageElement;
+  const uploadProgress = document.getElementById('upload-progress')!;
+  const progressFill = document.getElementById('progress-fill')!;
+  const progressText = document.getElementById('progress-text')!;
+  const uploadSuccess = document.getElementById('upload-success')!;
+  const uploadError = document.getElementById('upload-error')!;
+  const errorText = document.getElementById('error-text')!;
+  const retryUploadBtn = document.getElementById('retry-upload-btn')!;
+  const uploadSubmitBtn = document.getElementById('upload-submit-btn')!;
+  const lightbox = document.getElementById('lightbox')!;
+  const lightboxClose = document.getElementById('lightbox-close')!;
+  const lightboxPrev = document.getElementById('lightbox-prev')!;
+  const lightboxNext = document.getElementById('lightbox-next')!;
+  const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+  const lightboxImgContainer = document.getElementById('lightbox-img-container')!;
+  const reconnectingIndicator = document.getElementById('reconnecting-indicator')!;
+
+  // === Guest Name (optional) ===
+  function initGuestName() {
+    const stored = getGuestName();
+    if (stored) {
+      showStoredName(stored);
+    } else {
+      namePrompt.classList.remove('hidden');
+      nameDisplay.classList.add('hidden');
+    }
+  }
+
+  function showStoredName(name: string) {
+    namePrompt.classList.add('hidden');
+    nameDisplay.classList.remove('hidden');
+    nameText.textContent = name;
+  }
+
+  nameSaveBtn.addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    if (name) {
+      setGuestName(name);
+      showStoredName(name);
+    }
+  });
+
+  nameInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      nameSaveBtn.click();
+    }
+  });
+
+  nameEditBtn.addEventListener('click', () => {
+    const current = getGuestName() || '';
+    nameInput.value = current;
+    namePrompt.classList.remove('hidden');
+    nameDisplay.classList.add('hidden');
+    nameInput.focus();
+  });
+
+  // === Photo Grid Rendering ===
+  function renderPhotoCard(photo: PhotoRecord): HTMLElement {
+    const card = document.createElement('div');
+    card.className = 'photo-card';
+    card.dataset.photoId = photo.id;
+
+    const img = document.createElement('img');
+    img.src = getThumbnailUrl(photo.storage_path);
+    img.alt = `Foto de ${photo.uploader_name}`;
+    img.loading = 'lazy';
+    img.className = 'photo-card-img';
+
+    const info = document.createElement('div');
+    info.className = 'photo-card-info';
+    info.innerHTML = `
+      <span class="photo-card-name">${photo.uploader_name}</span>
+      <span class="photo-card-time">${formatRelativeTime(photo.created_at)}</span>
+    `;
+
+    card.appendChild(img);
+    card.appendChild(info);
+
+    card.addEventListener('click', () => {
+      const idx = photos.findIndex(p => p.id === photo.id);
+      if (idx !== -1) openLightbox(idx);
+    });
+
+    return card;
+  }
+
+  function renderGrid() {
+    if (photos.length === 0) {
+      emptyState.classList.remove('hidden');
+      photoGrid.classList.add('hidden');
+    } else {
+      emptyState.classList.add('hidden');
+      photoGrid.classList.remove('hidden');
+    }
+  }
+
+  // === Initial Load ===
+  async function loadInitialPhotos() {
+    gridLoading.classList.remove('hidden');
+    try {
+      const { data, error } = await supabase
+        .from('photos')
+        .select('*')
+        .eq('is_visible', true)
+        .order('created_at', { ascending: false })
+        .range(0, PAGE_SIZE - 1);
+
+      if (error) throw error;
+
+      photos = data || [];
+      currentOffset = photos.length;
+      hasMore = photos.length === PAGE_SIZE;
+
+      photoGrid.innerHTML = '';
+      photos.forEach(photo => {
+        photoGrid.appendChild(renderPhotoCard(photo));
+      });
+
+      renderGrid();
+    } catch (err) {
+      console.error('Failed to load photos:', err);
+    } finally {
+      gridLoading.classList.add('hidden');
+    }
+  }
+
+  // === Infinite Scroll ===
+  async function loadMorePhotos() {
+    if (isLoadingMore || !hasMore) return;
+    isLoadingMore = true;
+    gridLoading.classList.remove('hidden');
+
+    try {
+      const { data, error } = await supabase
+        .from('photos')
+        .select('*')
+        .eq('is_visible', true)
+        .order('created_at', { ascending: false })
+        .range(currentOffset, currentOffset + PAGE_SIZE - 1);
+
+      if (error) throw error;
+
+      const newPhotos = data || [];
+      hasMore = newPhotos.length === PAGE_SIZE;
+      currentOffset += newPhotos.length;
+
+      newPhotos.forEach(photo => {
+        photos.push(photo);
+        photoGrid.appendChild(renderPhotoCard(photo));
+      });
+    } catch (err) {
+      console.error('Failed to load more photos:', err);
+    } finally {
+      isLoadingMore = false;
+      gridLoading.classList.add('hidden');
+    }
+  }
+
+  const scrollObserver = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) {
+        loadMorePhotos();
+      }
+    },
+    { rootMargin: '200px' }
+  );
+  scrollObserver.observe(scrollSentinel);
+
+  // === Realtime Subscription ===
+  function subscribeToRealtime() {
+    const channel = supabase
+      .channel('photos-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'photos' },
+        (payload) => {
+          const newPhoto = payload.new as PhotoRecord;
+          if (!newPhoto.is_visible) return;
+
+          // Avoid duplicates
+          if (photos.find(p => p.id === newPhoto.id)) return;
+
+          photos.unshift(newPhoto);
+          const card = renderPhotoCard(newPhoto);
+          card.classList.add('photo-card-new');
+          photoGrid.prepend(card);
+          renderGrid();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'photos' },
+        (payload) => {
+          const deletedId = (payload.old as { id: string }).id;
+          photos = photos.filter(p => p.id !== deletedId);
+          const card = photoGrid.querySelector(`[data-photo-id="${deletedId}"]`);
+          if (card) {
+            card.classList.add('photo-card-removing');
+            setTimeout(() => card.remove(), 300);
+          }
+          renderGrid();
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'CHANNEL_ERROR') {
+          reconnectingIndicator.classList.remove('hidden');
+          setTimeout(() => reconnectingIndicator.classList.add('hidden'), 5000);
+        }
+        if (status === 'SUBSCRIBED') {
+          reconnectingIndicator.classList.add('hidden');
+        }
+      });
+
+    return channel;
+  }
+
+  // === Upload Flow ===
+  fabUpload.addEventListener('click', () => {
+    openUploadModal();
+  });
+
+  function openUploadModal() {
+    resetUploadModal();
+    uploadModal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeUploadModal() {
+    uploadModal.classList.add('hidden');
+    document.body.style.overflow = '';
+    selectedFile = null;
+  }
+
+  function resetUploadModal() {
+    uploadFileSection.classList.remove('hidden');
+    uploadPreview.classList.add('hidden');
+    uploadProgress.classList.add('hidden');
+    uploadSuccess.classList.add('hidden');
+    uploadError.classList.add('hidden');
+    uploadSubmitBtn.classList.add('hidden');
+    fileInput.value = '';
+    selectedFile = null;
+    isUploading = false;
+  }
+
+  uploadModalClose.addEventListener('click', closeUploadModal);
+  uploadModal.querySelector('.upload-modal-backdrop')!.addEventListener('click', closeUploadModal);
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+
+    const validation = validateFile(file);
+    if (!validation.valid) {
+      errorText.textContent = validation.error || 'Erro ao enviar. Tente novamente.';
+      uploadError.classList.remove('hidden');
+      uploadFileSection.classList.add('hidden');
+      return;
+    }
+
+    selectedFile = file;
+    uploadError.classList.add('hidden');
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      previewImg.src = e.target?.result as string;
+      uploadPreview.classList.remove('hidden');
+      uploadFileSection.classList.add('hidden');
+      uploadSubmitBtn.classList.remove('hidden');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  uploadSubmitBtn.addEventListener('click', () => {
+    if (!selectedFile || isUploading) return;
+    performUpload(selectedFile);
+  });
+
+  retryUploadBtn.addEventListener('click', () => {
+    if (selectedFile) {
+      uploadError.classList.add('hidden');
+      performUpload(selectedFile);
+    }
+  });
+
+  async function performUpload(file: File) {
+    isUploading = true;
+    uploadSubmitBtn.classList.add('hidden');
+    uploadProgress.classList.remove('hidden');
+    uploadError.classList.add('hidden');
+    uploadSuccess.classList.add('hidden');
+
+    // Simulate progress
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+      progress = Math.min(progress + Math.random() * 15, 90);
+      progressFill.style.width = `${progress}%`;
+      progressText.textContent = `A enviar... ${Math.round(progress)}%`;
+    }, 200);
+
+    try {
+      // Compress image
+      const compressed = await compressImage(file, 1920, 0.85);
+      const filename = generateFilename();
+
+      // Upload to Supabase Storage
+      const { error: uploadErr } = await supabase.storage
+        .from('wedding-photos')
+        .upload(filename, compressed, {
+          contentType: 'image/jpeg',
+          upsert: false,
+        });
+
+      if (uploadErr) throw uploadErr;
+
+      // Insert photo record
+      const guestName = getGuestName() || 'Anónimo';
+      const { error: insertErr } = await supabase
+        .from('photos')
+        .insert({
+          storage_path: filename,
+          uploader_name: guestName,
+        });
+
+      if (insertErr) throw insertErr;
+
+      // Success
+      clearInterval(progressInterval);
+      progressFill.style.width = '100%';
+      progressText.textContent = '100%';
+
+      setTimeout(() => {
+        uploadProgress.classList.add('hidden');
+        uploadSuccess.classList.remove('hidden');
+        setTimeout(() => {
+          closeUploadModal();
+        }, 1500);
+      }, 300);
+    } catch (err) {
+      console.error('Upload failed:', err);
+      clearInterval(progressInterval);
+      uploadProgress.classList.add('hidden');
+      errorText.textContent = 'Erro ao enviar. Tente novamente.';
+      uploadError.classList.remove('hidden');
+      uploadSubmitBtn.classList.remove('hidden');
+    } finally {
+      isUploading = false;
+    }
+  }
+
+  // === Lightbox ===
+  function openLightbox(index: number) {
+    if (index < 0 || index >= photos.length) return;
+    lightboxIndex = index;
+    const photo = photos[index];
+    lightboxImg.src = getFullResUrl(photo.storage_path);
+    lightbox.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    preloadAdjacent(index);
+  }
+
+  function closeLightbox() {
+    lightbox.classList.add('hidden');
+    document.body.style.overflow = '';
+    lightboxIndex = -1;
+  }
+
+  function navigateLightbox(direction: 'prev' | 'next') {
+    if (lightboxIndex === -1) return;
+    const newIndex = direction === 'prev'
+      ? (lightboxIndex - 1 + photos.length) % photos.length
+      : (lightboxIndex + 1) % photos.length;
+    openLightbox(newIndex);
+  }
+
+  function preloadAdjacent(index: number) {
+    const prevIdx = (index - 1 + photos.length) % photos.length;
+    const nextIdx = (index + 1) % photos.length;
+    if (photos[prevIdx]) {
+      const img = new Image();
+      img.src = getFullResUrl(photos[prevIdx].storage_path);
+    }
+    if (photos[nextIdx]) {
+      const img = new Image();
+      img.src = getFullResUrl(photos[nextIdx].storage_path);
+    }
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightboxPrev.addEventListener('click', () => navigateLightbox('prev'));
+  lightboxNext.addEventListener('click', () => navigateLightbox('next'));
+
+  // Close on backdrop click
+  lightbox.querySelector('.lightbox-backdrop')!.addEventListener('click', closeLightbox);
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (lightbox.classList.contains('hidden')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') navigateLightbox('prev');
+    if (e.key === 'ArrowRight') navigateLightbox('next');
+  });
+
+  // Touch swipe support
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchEndX = 0;
+
+  lightboxImgContainer.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  }, { passive: true });
+
+  lightboxImgContainer.addEventListener('touchmove', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  lightboxImgContainer.addEventListener('touchend', () => {
+    const diffX = touchStartX - touchEndX;
+    const threshold = 50;
+
+    if (Math.abs(diffX) > threshold) {
+      if (diffX > 0) {
+        navigateLightbox('next');
+      } else {
+        navigateLightbox('prev');
+      }
+    }
+  });
+
+  // === Init ===
+  initGuestName();
+  loadInitialPhotos();
+  subscribeToRealtime();
+</script>
+
+<style is:global>
+  /* ===========================
+     FOTOS PAGE — MOBILE-FIRST
+     =========================== */
+
+  #fotos-main {
+    min-height: 100vh;
+    background: #fdfcf9;
+    position: relative;
+    padding-bottom: 5rem;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* ===========================
+     HEADER
+     =========================== */
+
+  .fotos-header {
+    text-align: center;
+    padding: 2rem 1.5rem 1.5rem;
+    position: relative;
+  }
+
+  .back-link {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    color: #8f8a5e;
+    text-decoration: none;
+    transition: color 0.2s;
+    min-width: 44px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .back-link:hover {
+    color: #74704a;
+  }
+
+  .fotos-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #8f8a5e;
+    margin-bottom: 0.5rem;
+  }
+
+  .fotos-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: #2d2b22;
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+  }
+
+  .fotos-ornament {
+    color: #e6b040;
+    font-size: 1rem;
+  }
+
+  /* ===========================
+     GUEST NAME SECTION
+     =========================== */
+
+  .guest-name-section {
+    padding: 0 1.5rem 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .name-prompt {
+    text-align: center;
+  }
+
+  .name-label {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    color: #5c593c;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .name-input-wrap {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+
+  .name-input-wrap input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border-radius: 9999px;
+    border: 2px solid #ede6d3;
+    background: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    color: #2d2b22;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+
+  .name-input-wrap input::placeholder {
+    color: #a9a57e;
+    font-style: italic;
+  }
+
+  .name-input-wrap input:focus {
+    border-color: #e6b040;
+    box-shadow: 0 0 0 3px rgba(230, 176, 64, 0.15);
+  }
+
+  .name-input-wrap button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #8f8a5e;
+    color: #fff;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .name-input-wrap button:hover {
+    background: #74704a;
+  }
+
+  .name-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+  }
+
+  .name-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    color: #5c593c;
+    font-weight: 500;
+  }
+
+  .name-edit-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid #ede6d3;
+    color: #8f8a5e;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .name-edit-btn:hover {
+    background: #f5f0e3;
+  }
+
+  /* ===========================
+     PHOTO GRID (MASONRY)
+     =========================== */
+
+  .photo-grid-section {
+    padding: 0 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .photo-grid {
+    column-count: 2;
+    column-gap: 0.75rem;
+  }
+
+  @media (min-width: 768px) {
+    .photo-grid {
+      column-count: 3;
+      column-gap: 1rem;
+    }
+  }
+
+  .photo-card {
+    break-inside: avoid;
+    margin-bottom: 0.75rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    animation: fadeInUp 0.4s ease forwards;
+  }
+
+  .photo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .photo-card-new {
+    animation: slideInNew 0.5s ease forwards;
+  }
+
+  .photo-card-removing {
+    animation: fadeOut 0.3s ease forwards;
+  }
+
+  @keyframes slideInNew {
+    from {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes fadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.9); }
+  }
+
+  .photo-card-img {
+    width: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  .photo-card-info {
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .photo-card-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: #5c593c;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .photo-card-time {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.65rem;
+    color: #a9a57e;
+    white-space: nowrap;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state p {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    color: #8f8a5e;
+  }
+
+  /* Grid loading */
+  .grid-loading {
+    text-align: center;
+    padding: 2rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    color: #8f8a5e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .grid-loading .loading-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ede6d3;
+    border-top-color: #8f8a5e;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .scroll-sentinel {
+    height: 1px;
+    width: 100%;
+  }
+
+  /* ===========================
+     FAB UPLOAD BUTTON
+     =========================== */
+
+  .fab-upload {
+    position: fixed;
+    bottom: 2rem;
+    right: 1.5rem;
+    width: 56px;
+    height: 56px;
+    min-width: 44px;
+    min-height: 44px;
+    border-radius: 50%;
+    background: #e6b040;
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 16px rgba(230, 176, 64, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s, opacity 0.2s;
+    z-index: 100;
+  }
+
+  .fab-upload:hover:not(:disabled) {
+    background: #d4983a;
+    transform: scale(1.05);
+  }
+
+  .fab-upload:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    animation: none;
+  }
+
+  /* ===========================
+     UPLOAD MODAL
+     =========================== */
+
+  .upload-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .upload-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .upload-modal-content {
+    position: relative;
+    background: #fff;
+    border-radius: 1.5rem;
+    padding: 2rem 1.5rem;
+    max-width: 400px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
+  }
+
+  .upload-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    color: #8f8a5e;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .upload-modal-close:hover {
+    background: #f5f0e3;
+  }
+
+  .upload-modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: #2d2b22;
+    margin: 0 0 1.5rem;
+    text-align: center;
+  }
+
+  .upload-file-section {
+    text-align: center;
+  }
+
+  .file-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 2rem;
+    border: 2px dashed #ede6d3;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    color: #8f8a5e;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+  }
+
+  .file-label:hover {
+    border-color: #e6b040;
+    background: #fdfcf9;
+  }
+
+  .file-input-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .upload-preview {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .upload-preview img {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 0.75rem;
+    object-fit: contain;
+  }
+
+  .upload-progress {
+    margin: 1rem 0;
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #ede6d3;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8f8a5e, #e6b040);
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.2s ease;
+  }
+
+  .progress-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    color: #8f8a5e;
+  }
+
+  .upload-msg {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    margin: 1rem 0;
+  }
+
+  .upload-success {
+    background: #f0f7e6;
+    color: #4a6e2a;
+  }
+
+  .upload-error {
+    background: #fef2f2;
+    color: #c0392b;
+  }
+
+  .retry-btn {
+    margin-top: 0.75rem;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    background: #8f8a5e;
+    color: #fff;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    min-height: 44px;
+    transition: background 0.2s;
+  }
+
+  .retry-btn:hover {
+    background: #74704a;
+  }
+
+  .upload-submit-btn {
+    display: block;
+    width: 100%;
+    padding: 0.875rem;
+    border-radius: 9999px;
+    background: #e6b040;
+    color: #fff;
+    border: none;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    min-height: 44px;
+    transition: background 0.2s;
+    margin-top: 1rem;
+  }
+
+  .upload-submit-btn:hover {
+    background: #d4983a;
+  }
+
+  /* ===========================
+     LIGHTBOX
+     =========================== */
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.2s;
+  }
+
+  .lightbox-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: background 0.2s;
+  }
+
+  .lightbox-nav:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .lightbox-prev-btn {
+    left: 1rem;
+  }
+
+  .lightbox-next-btn {
+    right: 1rem;
+  }
+
+  .lightbox-img-container {
+    position: relative;
+    z-index: 5;
+    max-width: 90vw;
+    max-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .lightbox-img-container img {
+    max-width: 100%;
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: 0.5rem;
+  }
+
+  /* ===========================
+     RECONNECTING INDICATOR
+     =========================== */
+
+  .reconnecting-indicator {
+    position: fixed;
+    top: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fef3cd;
+    color: #856404;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.75rem;
+    z-index: 400;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* ===========================
+     RESPONSIVE
+     =========================== */
+
+  @media (min-width: 768px) {
+    .fotos-title {
+      font-size: 2.5rem;
+    }
+
+    .fotos-header {
+      padding: 3rem 2rem 2rem;
+    }
+
+    .photo-grid-section {
+      padding: 0 2rem;
+    }
+
+    .photo-card-info {
+      padding: 0.625rem 0.875rem;
+    }
+
+    .photo-card-name {
+      font-size: 0.75rem;
+    }
+
+    .photo-card-time {
+      font-size: 0.7rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .fotos-title {
+      font-size: 3rem;
+    }
+
+    .fab-upload {
+      bottom: 2.5rem;
+      right: 2.5rem;
+      width: 64px;
+      height: 64px;
+    }
+  }
+</style>

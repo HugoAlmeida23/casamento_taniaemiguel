@@ -1,28 +1,60 @@
-# casamento_migueltania – Astro + GitHub Pages
+# casamento_taniaemiguel — Astro + Supabase + GitHub Pages
 
-This repo contains an Astro site scaffolded in `./basics` and a GitHub Actions workflow to deploy to Pages.
+Wedding website for Tânia & Miguel. Fully static frontend deployed to GitHub Pages, with Supabase as the backend (database, storage, realtime).
+
+## Architecture
+
+- **Frontend:** Astro static site in `./basics/` (deployed to GitHub Pages)
+- **Admin Panel:** React SPA in `./admin/` (separate dev server)
+- **Backend:** Supabase (PostgreSQL database, Storage, Realtime)
 
 ## Develop locally
 
-```powershell
+### Frontend (wedding site)
+```bash
 cd basics
+npm install
 npm run dev
 ```
 
-## Build locally (optional)
-
-```powershell
-cd basics
-npm run build
-npm run preview
+### Admin panel
+```bash
+cd admin
+npm install
+npm run dev
 ```
+
+## Environment Variables
+
+Create `.env` files from the examples:
+
+**`basics/.env`:**
+```
+PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+```
+
+**`admin/.env`:**
+```
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+```
+
+## Supabase Setup
+
+See [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) for full instructions on creating tables, storage buckets, and RLS policies.
 
 ## Deploy to GitHub Pages
 
-1. Create a new GitHub repo and push this folder.
-2. Ensure your default branch is `main`.
-3. In the repo, go to Settings → Pages and set Source to "GitHub Actions".
-4. If this is a project site (username.github.io/repo), add a repository variable `PAGES_BASE_PATH` with value `/<repo-name>/`. For a user/org site (username.github.io), leave it empty.
-5. Push to `main`. The workflow `.github/workflows/deploy.yml` will build the site from `basics` and publish the `dist` folder to Pages.
+1. Push to `main` branch
+2. GitHub Actions workflow (`.github/workflows/deploy.yml`) builds and deploys automatically
+3. Site available at `https://hugoalmeida23.github.io/casamento_taniaemiguel/`
 
-Deployed URL will appear in the workflow summary under the "Deploy to GitHub Pages" step.
+## Features
+
+- 🎉 Wedding landing page with countdown, ceremony details, timeline, gallery
+- 📸 Live photo gallery (guests upload photos during the event via Supabase)
+- 🪑 Table finder with interactive floor plan
+- 📋 RSVP form with companion management
+- 👔 Dress code, gift list, FAQ, location sections
+- 🔧 Admin panel for guest/table/photo management

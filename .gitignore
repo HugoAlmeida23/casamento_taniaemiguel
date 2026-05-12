@@ -7,6 +7,13 @@ npm-debug.log*
 basics/dist/
 basics/.astro/
 
+# Admin
+admin/dist/
+admin/node_modules/
+
 # Env
 .env
 .env.*.local
+
+# SQLite (legacy)
+*.sqlite

@@ -4,6 +4,7 @@ import { Card, StatCard } from './components/Card';
 import { Modal } from './components/Modal';
 import { Input, Select } from './components/Input';
 import { Badge } from './components/Badge';
+import { supabase } from './supabase';
 
 type Guest = {
   id: string;
@@ -24,7 +25,15 @@ type Table = {
   capacity: number;
 };
 
-const API_BASE = 'http://localhost:4000';
+type PhotoRecord = {
+  id: string;
+  storage_path: string;
+  uploader_name: string;
+  created_at: string;
+  is_visible: boolean;
+};
+
+const ADMIN_PASS = 'changeme'; // Same password as before — change in production
 
 function App() {
   const [guests, setGuests] = useState<Guest[]>([]);
@@ -35,7 +44,11 @@ function App() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showTableModal, setShowTableModal] = useState(false);
-  const [activeView, setActiveView] = useState<'guests' | 'tables'>('guests');
+  const [activeView, setActiveView] = useState<'guests' | 'tables' | 'photos'>('guests');
+  const [photos, setPhotos] = useState<PhotoRecord[]>([]);
+  const [photosLoading, setPhotosLoading] = useState(false);
+  const [photoToDelete, setPhotoToDelete] = useState<PhotoRecord | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -43,6 +56,12 @@ function App() {
       refreshAll();
     }
   }, [token]);
+
+  useEffect(() => {
+    if (token && activeView === 'photos') {
+      loadPhotos();
+    }
+  }, [token, activeView]);
 
   async function refreshAll() {
     setLoading(true);
@@ -52,9 +71,9 @@ function App() {
 
   async function loadGuests() {
     try {
-      const res = await fetch(`${API_BASE}/api/guests`);
-      const j = await res.json();
-      setGuests(j || []);
+      const { data, error } = await supabase.from('guests').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      setGuests(data || []);
     } catch (err) {
       console.error('Failed to load guests', err);
     }
@@ -62,27 +81,93 @@ function App() {
 
   async function loadTables() {
     try {
-      const res = await fetch(`${API_BASE}/api/tables`);
-      const j = await res.json();
-      setTables(j || []);
+      const { data, error } = await supabase.from('tables').select('*');
+      if (error) throw error;
+      setTables(data || []);
     } catch (err) {
       console.error('Failed to load tables', err);
     }
+  }
+
+  async function loadPhotos() {
+    setPhotosLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('photos')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      setPhotos(data || []);
+    } catch (err) {
+      console.error('Failed to load photos', err);
+    } finally {
+      setPhotosLoading(false);
+    }
+  }
+
+  async function deletePhoto(photo: PhotoRecord) {
+    if (!token) {
+      alert('Sessão expirada. Faça login novamente.');
+      return;
+    }
+    setDeleting(true);
+    try {
+      // Delete from Supabase Storage first
+      const { error: storageError } = await supabase.storage
+        .from('wedding-photos')
+        .remove([photo.storage_path]);
+      if (storageError) {
+        alert('Erro ao eliminar ficheiro.');
+        return;
+      }
+
+      // Delete the record from the database
+      const { error: dbError } = await supabase
+        .from('photos')
+        .delete()
+        .eq('id', photo.id);
+      if (dbError) {
+        alert('Erro ao eliminar registo.');
+        return;
+      }
+
+      // Remove from local state
+      setPhotos(prev => prev.filter(p => p.id !== photo.id));
+      setPhotoToDelete(null);
+    } catch (err) {
+      console.error('Failed to delete photo', err);
+      alert('Erro ao eliminar foto.');
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  function getThumbnailUrl(storagePath: string): string {
+    const supabaseUrl = (import.meta as any).env.VITE_SUPABASE_URL;
+    return `${supabaseUrl}/storage/v1/render/image/public/wedding-photos/${storagePath}?width=400`;
+  }
+
+  function formatTimestamp(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleString('pt-PT', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 
   async function doLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/admin/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      });
-      if (!res.ok) throw new Error('Login failed');
-      const j = await res.json();
-      setToken(j.token);
-      setPassword('');
+      if (password === ADMIN_PASS) {
+        setToken('authenticated');
+        setPassword('');
+      } else {
+        throw new Error('Login failed');
+      }
     } catch (err) {
       alert('Login falhou. Verifique a password.');
     } finally {
@@ -97,16 +182,24 @@ function App() {
     setTables([]);
   }
 
+  function exportCSV() {
+    const header = ['id', 'nome', 'email', 'telefone', 'acompanha', 'restricoes', 'mesa_id', 'created_at'];
+    const csv = [header.join(',')]
+      .concat(guests.map(g => header.map(h => `"${String((g as any)[h] ?? '')}"`).join(',')))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'guests.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   async function createTable(name: string, capacity: number) {
     try {
-      await fetch(`${API_BASE}/api/tables`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-token': token || ''
-        },
-        body: JSON.stringify({ name, capacity })
-      });
+      const { error } = await supabase.from('tables').insert({ name, capacity });
+      if (error) throw error;
       await loadTables();
       setShowTableModal(false);
     } catch (err) {
@@ -116,14 +209,11 @@ function App() {
 
   async function saveGuest(g: Guest) {
     try {
-      await fetch(`${API_BASE}/api/guests/${g.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-token': token || ''
-        },
-        body: JSON.stringify(g)
-      });
+      const { error } = await supabase
+        .from('guests')
+        .update({ nome: g.nome, email: g.email, telefone: g.telefone, restricoes: g.restricoes, mesa_id: g.mesa_id })
+        .eq('id', g.id);
+      if (error) throw error;
       setEditing(null);
       await loadGuests();
     } catch (err) {
@@ -134,10 +224,8 @@ function App() {
   async function deleteGuest(guestId: string) {
     if (!confirm('Tem certeza que deseja eliminar este convidado?')) return;
     try {
-      await fetch(`${API_BASE}/api/guests/${guestId}`, {
-        method: 'DELETE',
-        headers: { 'x-admin-token': token || '' }
-      });
+      const { error } = await supabase.from('guests').delete().eq('id', guestId);
+      if (error) throw error;
       await refreshAll();
     } catch (err) {
       alert('Erro ao eliminar');
@@ -146,14 +234,11 @@ function App() {
 
   async function checkIn(guestId: string) {
     try {
-      await fetch(`${API_BASE}/api/guests/${guestId}/checkin`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-admin-token': token || ''
-        },
-        body: JSON.stringify({ present: true })
-      });
+      const { error } = await supabase
+        .from('guests')
+        .update({ checked_in: 1, checkin_time: new Date().toISOString() })
+        .eq('id', guestId);
+      if (error) throw error;
       await loadGuests();
     } catch (err) {
       alert('Erro ao fazer check-in');
@@ -237,7 +322,7 @@ function App() {
                 </svg>
                 Refresh
               </Button>
-              <Button variant="secondary" size="sm" onClick={() => (window.location.href = `${API_BASE}/api/export`)}>
+              <Button variant="secondary" size="sm" onClick={exportCSV}>
                 <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -327,6 +412,19 @@ function App() {
             </svg>
             Mesas
           </button>
+          <button
+            onClick={() => setActiveView('photos')}
+            className={`px-4 py-2 font-medium transition-colors border-b-2 ${
+              activeView === 'photos'
+                ? 'border-rose-600 text-rose-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            <svg className="w-4 h-4 inline mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Fotos
+          </button>
         </div>
 
         {/* Content */}
@@ -398,7 +496,7 @@ function App() {
               </table>
             </div>
           </Card>
-        ) : (
+        ) : activeView === 'tables' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <Card className="border-2 border-dashed border-gray-300 hover:border-rose-400 transition-colors cursor-pointer" onClick={() => setShowTableModal(true)}>
               <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -446,6 +544,73 @@ function App() {
                 </Card>
               );
             })}
+          </div>
+        ) : (
+          /* Photos View */
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Galeria de Fotos</h2>
+                <p className="text-sm text-gray-500">{photos.length} foto{photos.length !== 1 ? 's' : ''} enviada{photos.length !== 1 ? 's' : ''}</p>
+              </div>
+              <Button variant="secondary" size="sm" onClick={loadPhotos} isLoading={photosLoading}>
+                <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Atualizar
+              </Button>
+            </div>
+
+            {photosLoading && photos.length === 0 ? (
+              <div className="text-center py-12">
+                <svg className="animate-spin h-8 w-8 text-rose-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p className="text-gray-500">A carregar fotos...</p>
+              </div>
+            ) : photos.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="inline-block p-4 bg-gray-100 rounded-full mb-4">
+                  <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <p className="text-gray-500 text-lg">Nenhuma foto enviada ainda</p>
+                <p className="text-gray-400 text-sm mt-1">As fotos dos convidados aparecerão aqui</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {photos.map(photo => (
+                  <div key={photo.id} className="group relative bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
+                    <div className="aspect-square overflow-hidden bg-gray-100">
+                      <img
+                        src={getThumbnailUrl(photo.storage_path)}
+                        alt={`Foto de ${photo.uploader_name}`}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+                    <div className="p-3">
+                      <p className="text-sm font-medium text-gray-900 truncate">{photo.uploader_name}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{formatTimestamp(photo.created_at)}</p>
+                    </div>
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        size="sm"
+                        variant="danger"
+                        onClick={() => setPhotoToDelete(photo)}
+                        className="shadow-lg"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </main>
@@ -506,6 +671,43 @@ function App() {
         onClose={() => setShowTableModal(false)}
         onCreate={createTable}
       />
+
+      {/* Delete Photo Confirmation Modal */}
+      <Modal
+        isOpen={!!photoToDelete}
+        onClose={() => setPhotoToDelete(null)}
+        title="Eliminar Foto"
+        size="sm"
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setPhotoToDelete(null)} disabled={deleting}>
+              Cancelar
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => photoToDelete && deletePhoto(photoToDelete)}
+              isLoading={deleting}
+            >
+              Eliminar
+            </Button>
+          </>
+        }
+      >
+        <div className="text-center py-4">
+          <div className="inline-block p-3 bg-red-100 rounded-full mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <p className="text-gray-700 mb-2">Tem certeza que deseja eliminar esta foto?</p>
+          {photoToDelete && (
+            <p className="text-sm text-gray-500">
+              Enviada por <span className="font-medium">{photoToDelete.uploader_name}</span> em {formatTimestamp(photoToDelete.created_at)}
+            </p>
+          )}
+          <p className="text-xs text-red-500 mt-3">Esta ação não pode ser revertida.</p>
+        </div>
+      </Modal>
     </div>
   );
 }

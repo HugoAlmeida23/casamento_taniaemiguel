@@ -1,7 +1,5 @@
 ---
 export function getStaticPaths() {
-  // Guest pages are resolved client-side; no static paths needed at build time.
-  // If you later want pre-rendered guest pages, populate this from your data source.
   return [];
 }
 
@@ -18,20 +16,30 @@ const id = params.id;
     <h1 class="text-2xl font-bold mb-4">Detalhes</h1>
     <div id="content">A carregar...</div>
 
-    <script define:vars={{ id }}>
+    <script>
+      import { supabase } from '../../scripts/supabase';
+
+      const pathParts = window.location.pathname.split('/');
+      const guestId = pathParts[pathParts.length - 1] || pathParts[pathParts.length - 2];
+
       (async () => {
         try {
-          const res = await fetch(`/api/guest/${encodeURIComponent(id)}`);
-          if (!res.ok) throw new Error('not found');
-          const j = await res.json();
-          document.getElementById('content').innerHTML = `
-            <p><strong>Nome:</strong> ${j.nome}</p>
-            <p><strong>Email:</strong> ${j.email}</p>
-            <p><strong>Mesa:</strong> ${j.mesa_id || 'Ainda sem atribuição'}</p>
-            <p><strong>Restrições:</strong> ${j.restricoes || 'Nenhuma'}</p>
+          const { data, error } = await supabase
+            .from('guests')
+            .select('*')
+            .eq('id', guestId)
+            .single();
+
+          if (error || !data) throw new Error('not found');
+
+          document.getElementById('content')!.innerHTML = `
+            <p><strong>Nome:</strong> ${data.nome}</p>
+            <p><strong>Email:</strong> ${data.email || 'N/A'}</p>
+            <p><strong>Mesa:</strong> ${data.mesa_id || 'Ainda sem atribuição'}</p>
+            <p><strong>Restrições:</strong> ${data.restricoes || 'Nenhuma'}</p>
           `;
         } catch (err) {
-          document.getElementById('content').innerText = 'Convidado não encontrado.';
+          document.getElementById('content')!.innerText = 'Convidado não encontrado.';
         }
       })();
     </script>

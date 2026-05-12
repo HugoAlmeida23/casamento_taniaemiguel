@@ -248,13 +248,23 @@
 		};
 
 		try {
-			const resp = await fetch('/api/rsvp', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload),
-			});
+			const { createClient } = await import('@supabase/supabase-js');
+			const supabaseUrl = (import.meta as any).env.PUBLIC_SUPABASE_URL;
+			const supabaseKey = (import.meta as any).env.PUBLIC_SUPABASE_ANON_KEY;
+			const supabase = createClient(supabaseUrl, supabaseKey);
 
-			if (!resp.ok) throw new Error('API error');
+			const { error } = await supabase
+				.from('guests')
+				.insert({
+					nome: payload.nome,
+					telefone: payload.telefone,
+					acompanha: payload.companions.length > 0 ? 1 : 0,
+					restricoes: payload.restricoes || null,
+					companions: payload.companions,
+					mensagem: payload.mensagem || null,
+				});
+
+			if (error) throw new Error(error.message);
 
 			form.reset();
 			companionsList.innerHTML = '';

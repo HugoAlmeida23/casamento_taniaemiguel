@@ -5,22 +5,22 @@ Painel de administração moderno e intuitivo para gestão completa do evento de
 ## Stack
 - **React 18** + TypeScript
 - **Vite** (dev server + build)
-- **Proxy** para `/api` → backend Express (porta 4000)
+- **Supabase** (database + storage + realtime)
 
 ## Desenvolvimento
 
-### 1. Instalar dependências
+### 1. Configurar variáveis de ambiente
+Crie um ficheiro `admin/.env` com:
+```
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here
+```
+
+### 2. Instalar dependências
 ```bash
 cd admin
 npm install
 ```
-
-### 2. Iniciar backend (noutra janela de terminal)
-```bash
-cd ..
-node server/index.js
-```
-O backend vai correr em `http://localhost:4000`.
 
 ### 3. Iniciar o admin dev server
 ```bash
@@ -29,8 +29,7 @@ npm run dev
 O admin vai abrir em `http://localhost:3000`.
 
 ## Login
-- Password padrão: `demo-pass` (ou o valor definido em `server/.env` como `ADMIN_PASS`)
-- Ou use o token demo: `demo-token`
+- Password padrão: `changeme` (definida no código — altere em produção)
 
 ## Build para produção
 ```bash
@@ -39,11 +38,12 @@ npm run preview
 ```
 
 ## Funcionalidades
-- ✅ Login com autenticação via token
+- ✅ Login com autenticação local
 - ✅ Listar todos os convidados com filtro
 - ✅ Editar convidados (nome, email, telefone, mesa)
 - ✅ Criar e atribuir mesas
 - ✅ Check-in de convidados
 - ✅ Eliminar convidados
-- ✅ Exportar CSV de convidados
+- ✅ Exportar CSV de convidados (client-side)
 - ✅ Estatísticas (total, confirmados, check-ins)
+- ✅ Galeria de fotos com moderação (eliminar fotos)

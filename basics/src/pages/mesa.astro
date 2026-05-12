@@ -191,6 +191,8 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
+  import { supabase } from '../scripts/supabase';
+
   // === Types ===
   interface Guest {
     id: string;
@@ -281,18 +283,18 @@ import Layout from '../layouts/Layout.astro';
   // === API ===
   async function fetchGuests(): Promise<Guest[]> {
     if (guestsFetched) return allGuests;
-    const res = await fetch('/api/guests');
-    if (!res.ok) throw new Error('API error');
-    allGuests = await res.json();
+    const { data, error } = await supabase.from('guests').select('*').order('created_at', { ascending: false });
+    if (error) throw new Error(error.message);
+    allGuests = data || [];
     guestsFetched = true;
     return allGuests;
   }
 
   async function fetchTables(): Promise<Table[]> {
     if (tablesFetched) return allTables;
-    const res = await fetch('/api/tables');
-    if (!res.ok) throw new Error('API error');
-    allTables = await res.json();
+    const { data, error } = await supabase.from('tables').select('*');
+    if (error) throw new Error(error.message);
+    allTables = data || [];
     tablesFetched = true;
     return allTables;
   }
