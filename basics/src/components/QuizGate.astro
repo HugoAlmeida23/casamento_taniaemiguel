@@ -1,5 +1,5 @@
 ---
-// Quiz gate - "Quando e onde é que o Miguel pediu a Tânia em namoro?"
+// Quiz gate - "Quando e onde é que o Miguel pediu oficialmente a Tânia em namoro?"
 ---
 
 <div id="quiz-gate" class="fixed inset-0 z-[150] flex items-center justify-center bg-[#faf7f0] opacity-0 pointer-events-none transition-opacity duration-600">
@@ -17,29 +17,30 @@
 		<!-- Question -->
 		<div class="mb-8">
 			<p class="text-base sm:text-lg text-gray-700 font-medium leading-relaxed">
-				Quando e onde é que o Miguel pediu a Tânia em namoro?
+				Quando e onde é que o Miguel pediu oficialmente a Tânia em namoro?
 			</p>
 		</div>
 
 		<!-- Options -->
 		<div class="grid grid-cols-1 gap-3" id="quiz-options">
 			<button class="quiz-option" data-correct="false">
-				<span>Natal de 2017, no Porto</span>
+				<span>Viagem de finalistas (Gandia), 07/04/2017</span>
+			</button>
+			<button class="quiz-option" data-correct="false">
+				<span>Escola Secundária da Trofa, 07/10/2014</span>
 			</button>
 			<button class="quiz-option" data-correct="true">
-				<span>14 de fevereiro de 2018, em Santo Tirso</span>
+				<span>Sevilha, 05/10/2024</span>
 			</button>
 			<button class="quiz-option" data-correct="false">
-				<span>Verão de 2018, no Algarve</span>
-			</button>
-			<button class="quiz-option" data-correct="false">
-				<span>Passagem de ano 2017, em Guimarães</span>
+				<span>Parque Nossa Senhora das Dores, 05/04/2015</span>
 			</button>
 		</div>
 
 		<!-- Feedback message -->
 		<div id="quiz-feedback" class="mt-6 text-sm font-medium opacity-0 transition-opacity duration-300">
 			<p id="quiz-feedback-text"></p>
+			<img id="quiz-feedback-img" src="" alt="" class="hidden mx-auto mt-4 max-w-[280px] rounded-lg shadow-md" />
 		</div>
 	</div>
 </div>
@@ -103,6 +104,7 @@
 	const options = document.querySelectorAll('.quiz-option');
 	const feedback = document.getElementById('quiz-feedback');
 	const feedbackText = document.getElementById('quiz-feedback-text');
+	const feedbackImg = document.getElementById('quiz-feedback-img') as HTMLImageElement;
 
 	let answered = false;
 	let interactive = false;
@@ -132,6 +134,14 @@
 					feedbackText.className = 'text-olive-600';
 				}
 
+				// Show the "Visita Rio Maior – Almeirim 2016" photo
+				if (feedbackImg) {
+					const baseUrl = (document.querySelector('meta[name="base-url"]') as HTMLMetaElement)?.content || '';
+					feedbackImg.src = `${baseUrl}/images/rio-maior-almeirim-2016.jpg`;
+					feedbackImg.alt = 'Visita Rio Maior – Almeirim 2016 — WTF?!';
+					feedbackImg.classList.remove('hidden');
+				}
+
 				setTimeout(() => {
 					quizGate?.classList.add('dismissed');
 					document.body.style.overflow = '';
@@ -141,18 +151,18 @@
 						document.removeEventListener('touchmove', (window as any).__preventScroll);
 					}
 					window.scrollTo(0, 0);
-				}, 1500);
+				}, 2500);
 
 				setTimeout(() => {
 					quizGate?.remove();
-				}, 2500);
+				}, 3500);
 
 			} else {
 				btn.classList.add('wrong');
 				
 				if (feedback) feedback.style.opacity = '1';
 				if (feedbackText) {
-					feedbackText.textContent = '😅 Não é essa! Tenta outra vez.';
+					feedbackText.textContent = 'Não é essa! Tenta outra vez.';
 					feedbackText.className = 'text-red-500';
 				}
 

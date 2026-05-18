@@ -1,74 +1,35 @@
 ---
-// Full-screen envelope — the entire viewport is the envelope
-// Golden wax seal "TM" centered → tap → seal cracks & shatters → 
-// envelope splits open (two halves slide apart) → invitation card fades in → transition to quiz
+// Full-screen realistic envelope with gold wax seal
+// Uses actual images: envelope-background.jpg and wax-seal.png
+// The envelope image covers the full viewport, seal sits at the flap junction
+// Tap → seal shakes & fades → envelope fades out → quiz appears
 ---
 
 <div id="intro-screen" class="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden cursor-pointer select-none" role="button" aria-label="Abrir convite" tabindex="0">
 	
-	<!-- Solid background that stays behind the envelope halves so the main page never shows -->
-	<div id="intro-bg" class="absolute inset-0 bg-[#f5f0e3]"></div>
-
-	<!-- ENVELOPE TOP HALF (slides up on open) -->
-	<div id="envelope-top" class="envelope-half envelope-top">
-		<div class="envelope-base"></div>
-		<div class="envelope-texture"></div>
-		<div class="envelope-gold-frame-top"></div>
+	<!-- Full-screen envelope photo — covers entire viewport -->
+	<div id="envelope-bg" class="absolute inset-0">
+		<img 
+			src={`${import.meta.env.BASE_URL}/images/envelope-background.jpg`}
+			alt="" 
+			class="w-full h-full object-cover object-center"
+			loading="eager"
+		/>
 	</div>
 
-	<!-- ENVELOPE BOTTOM HALF (slides down on open) -->
-	<div id="envelope-bottom" class="envelope-half envelope-bottom">
-		<div class="envelope-base"></div>
-		<div class="envelope-texture"></div>
-		<div class="envelope-gold-frame-bottom"></div>
-	</div>
-
-	<!-- Center fold line -->
-	<div id="fold-line" class="fold-line"></div>
-
-	<!-- Subtle floating gold particles -->
-	<div class="particles" aria-hidden="true">
-		<span class="particle p1"></span>
-		<span class="particle p2"></span>
-		<span class="particle p3"></span>
-		<span class="particle p4"></span>
-		<span class="particle p5"></span>
-		<span class="particle p6"></span>
-	</div>
-
-	<!-- Golden wax seal with TM monogram -->
+	<!-- Realistic gold wax seal — positioned at the flap junction point -->
 	<div id="wax-seal" class="wax-seal">
-		<div class="seal-outer-ring"></div>
-		<div class="seal-body">
-			<div class="seal-shine"></div>
-			<span class="seal-monogram">TM</span>
-		</div>
-		<!-- Seal fragments (appear on break) -->
-		<div id="seal-fragments" class="seal-fragments">
-			<span class="fragment f1"></span>
-			<span class="fragment f2"></span>
-			<span class="fragment f3"></span>
-			<span class="fragment f4"></span>
-			<span class="fragment f5"></span>
-			<span class="fragment f6"></span>
-		</div>
-	</div>
-
-	<!-- The invitation card (hidden behind envelope, fades in after split) -->
-	<div id="invitation-card" class="invitation-card">
-		<div class="card-paper"></div>
-		<div class="card-content">
-			<div class="card-top-ornament"></div>
-			<p class="card-label">Convite de Casamento</p>
-			<h2 class="card-names">Tânia <span class="card-amp">&</span> Miguel</h2>
-			<div class="card-divider">
-				<span class="card-line"></span>
-				<span class="card-leaf">🌿</span>
-				<span class="card-line"></span>
-			</div>
-			<p class="card-date">20 de Junho de 2027</p>
-			<p class="card-venue">Quinta da Lage — Santo Tirso</p>
-			<div class="card-bottom-ornament"></div>
+		<img 
+			src={`${import.meta.env.BASE_URL}/images/wax-seal.png`}
+			alt="Selo de cera dourado T&M" 
+			class="seal-img"
+			loading="eager"
+		/>
+		<!-- T & M monogram — embossed into the wax -->
+		<div class="seal-monogram-wrap">
+			<span class="seal-monogram">T</span>
+			<span class="seal-monogram seal-amp">&</span>
+			<span class="seal-monogram">M</span>
 		</div>
 	</div>
 
@@ -78,366 +39,147 @@
 
 <style>
 	/* ============================================
-	   ENVELOPE HALVES — full screen split
+	   ENVELOPE — single full-screen image
 	   ============================================ */
-	.envelope-half {
-		position: absolute;
-		left: 0;
-		right: 0;
-		overflow: hidden;
-		z-index: 3;
-		transition: transform 1s cubic-bezier(0.6, 0, 0.2, 1);
+	#envelope-bg {
+		z-index: 2;
+		transition: opacity 0.8s ease;
 	}
 
-	.envelope-top {
-		top: 0;
-		bottom: 50%;
-		transform: translateY(0);
-	}
-
-	.envelope-bottom {
-		top: 50%;
-		bottom: 0;
-		transform: translateY(0);
-	}
-
-	.envelope-top.open {
-		transform: translateY(-100%);
-	}
-
-	.envelope-bottom.open {
-		transform: translateY(100%);
-	}
-
-	.envelope-base {
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(160deg, #7a8c5e 0%, #6b7d50 30%, #5f7244 60%, #5c6e44 100%);
-	}
-
-	.envelope-texture {
-		position: absolute;
-		inset: 0;
-		opacity: 0.1;
-		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-	}
-
-	.envelope-gold-frame-top {
-		position: absolute;
-		top: 12px;
-		left: 12px;
-		right: 12px;
-		bottom: 0;
-		border-top: 1.5px solid rgba(212, 168, 83, 0.3);
-		border-left: 1.5px solid rgba(212, 168, 83, 0.3);
-		border-right: 1.5px solid rgba(212, 168, 83, 0.3);
-		pointer-events: none;
-	}
-
-	.envelope-gold-frame-bottom {
-		position: absolute;
-		top: 0;
-		left: 12px;
-		right: 12px;
-		bottom: 12px;
-		border-bottom: 1.5px solid rgba(212, 168, 83, 0.3);
-		border-left: 1.5px solid rgba(212, 168, 83, 0.3);
-		border-right: 1.5px solid rgba(212, 168, 83, 0.3);
-		pointer-events: none;
-	}
-
-	/* Center fold line */
-	.fold-line {
-		position: absolute;
-		top: 50%;
-		left: 5%;
-		right: 5%;
-		height: 1px;
-		background: rgba(0,0,0,0.12);
-		transform: translateY(-50%);
-		z-index: 4;
-		transition: opacity 0.3s ease;
-	}
-
-	.fold-line.hidden {
+	#envelope-bg.fade-out {
 		opacity: 0;
 	}
 
 	/* ============================================
-	   PARTICLES
-	   ============================================ */
-	.particles {
-		position: absolute;
-		inset: 0;
-		pointer-events: none;
-		z-index: 5;
-	}
-
-	.particle {
-		position: absolute;
-		width: 2px;
-		height: 2px;
-		border-radius: 50%;
-		background: rgba(212, 168, 83, 0.5);
-		box-shadow: 0 0 6px rgba(212, 168, 83, 0.3);
-	}
-
-	.p1 { left: 15%; animation: drift 14s linear infinite; animation-delay: 0s; }
-	.p2 { left: 35%; animation: drift 16s linear infinite; animation-delay: 2s; }
-	.p3 { left: 55%; animation: drift 12s linear infinite; animation-delay: 4s; }
-	.p4 { left: 70%; animation: drift 15s linear infinite; animation-delay: 1s; }
-	.p5 { left: 85%; animation: drift 13s linear infinite; animation-delay: 3s; }
-	.p6 { left: 45%; animation: drift 17s linear infinite; animation-delay: 5s; }
-
-	@keyframes drift {
-		0% { bottom: -5%; opacity: 0; transform: translateX(0) scale(0.5); }
-		10% { opacity: 0.5; }
-		50% { transform: translateX(10px) scale(1); }
-		90% { opacity: 0.3; }
-		100% { bottom: 105%; opacity: 0; transform: translateX(-8px) scale(0.3); }
-	}
-
-	/* ============================================
-	   WAX SEAL — large, golden, centered
+	   WAX SEAL — large, at the flap junction
+	   Adjust top/left to match where the flap point
+	   lands on your specific envelope image.
 	   ============================================ */
 	.wax-seal {
+		position: absolute;
+		top: 80%;
+		left: 51%;
+		transform: translate(-50%, -50%);
+		z-index: 30;
+		width: 200px;
+		height: 200px;
+		transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
+	}
+
+	@media (min-width: 640px) {
+		.wax-seal {
+			width: 320px;
+			height: 320px;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.wax-seal {
+			width: 380px;
+			height: 380px;
+		}
+	}
+
+	.seal-img {
+		width: 100%;
+		height: 100%;
+		display: block;
+		max-width: none;
+		filter: drop-shadow(0 8px 30px rgba(0,0,0,0.5)) drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+	}
+
+	/* Monogram wrapper — centered on the seal */
+	.seal-monogram-wrap {
 		position: absolute;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		z-index: 30;
-		transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+		display: flex;
+		align-items: baseline;
+		gap: 1px;
+		z-index: 2;
+		pointer-events: none;
 	}
 
-	.seal-outer-ring {
+	/* Embossed text effect — looks pressed/stamped into wax */
+	.seal-monogram {
+		font-family: 'Times New Roman', Times, serif;
+		font-weight: 700;
+		font-size: 2.4rem;
+		color: transparent;
+		background: linear-gradient(180deg, rgba(120,80,20,0.7) 0%, rgba(180,130,50,0.9) 40%, rgba(220,180,80,0.6) 100%);
+		-webkit-background-clip: text;
+		background-clip: text;
+		text-shadow: 
+			0 -1px 1px rgba(255,240,180,0.5),
+			0 1px 2px rgba(0,0,0,0.6),
+			0 2px 4px rgba(0,0,0,0.3),
+			0 0 6px rgba(160,120,40,0.2);
+		letter-spacing: 0.02em;
+		line-height: 1;
+	}
+
+	.seal-amp {
+		font-size: 1.4rem;
+		font-style: italic;
+		margin: 0 3px;
+		vertical-align: baseline;
+		position: relative;
+		top: -2px;
+	}
+
+	@media (min-width: 640px) {
+		.seal-monogram {
+			font-size: 3.2rem;
+		}
+		.seal-amp {
+			font-size: 1.8rem;
+			top: -3px;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.seal-monogram {
+			font-size: 3.8rem;
+		}
+		.seal-amp {
+			font-size: 2.1rem;
+			top: -4px;
+		}
+	}
+
+	/* Subtle pulse glow around seal */
+	.wax-seal::after {
+		content: '';
 		position: absolute;
-		inset: -6px;
+		inset: -10px;
 		border-radius: 50%;
-		border: 2px solid rgba(212, 168, 83, 0.2);
+		border: 1.5px solid rgba(212, 168, 83, 0.2);
 		animation: sealPulse 3s ease-in-out infinite;
 	}
 
 	@keyframes sealPulse {
-		0%, 100% { transform: scale(1); opacity: 0.5; }
-		50% { transform: scale(1.08); opacity: 1; }
+		0%, 100% { transform: scale(1); opacity: 0.3; }
+		50% { transform: scale(1.05); opacity: 0.7; }
 	}
-
-	.seal-body {
-		width: 80px;
-		height: 80px;
-		border-radius: 50%;
-		background: radial-gradient(circle at 35% 30%, #edc972 0%, #d4983a 35%, #b87a2e 70%, #995c27 100%);
-		box-shadow: 0 6px 30px rgba(100,60,0,0.5), 
-		            0 2px 8px rgba(0,0,0,0.3),
-		            inset 0 2px 6px rgba(255,240,180,0.35),
-		            inset 0 -3px 6px rgba(0,0,0,0.2);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		position: relative;
-		overflow: hidden;
-	}
-
-	@media (min-width: 640px) {
-		.seal-body {
-			width: 100px;
-			height: 100px;
-		}
-		.seal-outer-ring {
-			inset: -8px;
-		}
-		.seal-monogram {
-			font-size: 1.6rem !important;
-		}
-	}
-
-	.seal-shine {
-		position: absolute;
-		top: 10%;
-		left: 15%;
-		width: 45%;
-		height: 30%;
-		border-radius: 50%;
-		background: rgba(255,255,255,0.22);
-		filter: blur(4px);
-	}
-
-	.seal-monogram {
-		font-family: 'Playfair Display', serif;
-		font-weight: 600;
-		font-size: 1.3rem;
-		color: rgba(255, 250, 230, 0.95);
-		text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-		position: relative;
-		z-index: 2;
-		letter-spacing: 0.1em;
-	}
-
-	/* Seal fragments (fly out on break) */
-	.seal-fragments {
-		position: absolute;
-		inset: 0;
-		pointer-events: none;
-		opacity: 0;
-	}
-
-	.seal-fragments.active .fragment {
-		opacity: 1;
-	}
-
-	.fragment {
-		position: absolute;
-		width: 12px;
-		height: 12px;
-		border-radius: 50% 30% 50% 30%;
-		background: radial-gradient(circle, #d4983a, #b87a2e);
-		box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-		opacity: 0;
-		transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.3, 1), opacity 0.7s ease;
-	}
-
-	.seal-fragments.active .f1 { transform: translate(-40px, -50px) rotate(120deg) scale(0.5); opacity: 0; }
-	.seal-fragments.active .f2 { transform: translate(45px, -40px) rotate(-80deg) scale(0.4); opacity: 0; }
-	.seal-fragments.active .f3 { transform: translate(-50px, 30px) rotate(200deg) scale(0.6); opacity: 0; }
-	.seal-fragments.active .f4 { transform: translate(40px, 45px) rotate(-150deg) scale(0.5); opacity: 0; }
-	.seal-fragments.active .f5 { transform: translate(10px, -60px) rotate(90deg) scale(0.3); opacity: 0; }
-	.seal-fragments.active .f6 { transform: translate(-20px, 55px) rotate(-60deg) scale(0.4); opacity: 0; }
-
-	.f1 { top: 20%; left: 30%; }
-	.f2 { top: 25%; right: 25%; }
-	.f3 { bottom: 30%; left: 20%; }
-	.f4 { bottom: 25%; right: 20%; }
-	.f5 { top: 10%; left: 50%; }
-	.f6 { bottom: 15%; left: 45%; }
 
 	/* Seal shake before break */
 	.wax-seal.shake {
-		animation: sealShake 0.4s ease;
+		animation: sealShake 0.5s ease;
 	}
 
 	@keyframes sealShake {
 		0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-		20% { transform: translate(-50%, -50%) rotate(-3deg) scale(1.02); }
-		40% { transform: translate(-50%, -50%) rotate(3deg) scale(1.04); }
-		60% { transform: translate(-50%, -50%) rotate(-2deg) scale(1.02); }
+		20% { transform: translate(-50%, -50%) rotate(-4deg) scale(1.03); }
+		40% { transform: translate(-50%, -50%) rotate(4deg) scale(1.05); }
+		60% { transform: translate(-50%, -50%) rotate(-3deg) scale(1.03); }
 		80% { transform: translate(-50%, -50%) rotate(2deg) scale(1.01); }
 	}
 
 	.wax-seal.broken {
-		transform: translate(-50%, -50%) scale(1.2);
+		transform: translate(-50%, -50%) scale(1.3);
 		opacity: 0;
-	}
-
-	/* ============================================
-	   INVITATION CARD
-	   ============================================ */
-	.invitation-card {
-		position: absolute;
-		left: 50%;
-		top: 50%;
-		transform: translate(-50%, -50%) scale(0.85);
-		width: 78vw;
-		max-width: 360px;
-		aspect-ratio: 3 / 4;
-		z-index: 2;
-		border-radius: 8px;
-		overflow: hidden;
-		opacity: 0;
-		transition: opacity 0.8s ease 0.2s, transform 0.8s cubic-bezier(0.34, 1.2, 0.64, 1) 0.2s;
-	}
-
-	.card-paper {
-		position: absolute;
-		inset: 0;
-		background: linear-gradient(180deg, #fffef9 0%, #faf7f0 100%);
-		box-shadow: 0 12px 50px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.1);
-		border: 1px solid rgba(212,168,83,0.15);
-	}
-
-	.card-content {
-		position: absolute;
-		inset: 0;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		padding: 2rem 1.5rem;
-		opacity: 0;
-		transform: translateY(10px);
-		transition: opacity 0.6s ease 0.3s, transform 0.6s ease 0.3s;
-	}
-
-	.card-top-ornament,
-	.card-bottom-ornament {
-		width: 40px;
-		height: 1px;
-		background: linear-gradient(90deg, transparent, rgba(143,138,94,0.5), transparent);
-	}
-
-	.card-top-ornament { margin-bottom: 16px; }
-	.card-bottom-ornament { margin-top: 16px; }
-
-	.card-label {
-		font-size: 0.6rem;
-		text-transform: uppercase;
-		letter-spacing: 0.3em;
-		color: #8f8a5e;
-		margin-bottom: 14px;
-	}
-
-	.card-names {
-		font-family: 'Playfair Display', serif;
-		font-size: clamp(1.8rem, 6vw, 2.8rem);
-		font-weight: 300;
-		color: #2a2a2a;
-		letter-spacing: -0.02em;
-	}
-
-	.card-amp {
-		color: #8f8a5e;
-		font-style: italic;
-		margin: 0 4px;
-	}
-
-	.card-divider {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		margin: 14px 0;
-	}
-
-	.card-line {
-		width: 28px;
-		height: 1px;
-		background: #d4c5a5;
-	}
-
-	.card-leaf {
-		font-size: 0.9rem;
-	}
-
-	.card-date {
-		font-size: 0.85rem;
-		color: #555;
-		letter-spacing: 0.05em;
-		margin-top: 4px;
-	}
-
-	.card-venue {
-		font-size: 0.7rem;
-		color: #999;
-		margin-top: 5px;
-	}
-
-	/* Card visible */
-	.invitation-card.visible {
-		opacity: 1;
-		transform: translate(-50%, -50%) scale(1);
-	}
-
-	.invitation-card.visible .card-content {
-		opacity: 1;
-		transform: translateY(0);
+		transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
 	}
 
 	/* ============================================
@@ -449,42 +191,34 @@
 		transition: opacity 0.7s ease;
 	}
 
-	#intro-bg {
-		z-index: 1;
-		transition: none;
-	}
-
 	/* ============================================
 	   TAP HINT
 	   ============================================ */
 	.tap-hint {
 		position: absolute;
-		bottom: 2rem;
+		bottom: 2.5rem;
 		left: 50%;
 		transform: translateX(-50%);
-		font-size: 0.65rem;
+		font-size: 0.7rem;
 		text-transform: uppercase;
-		letter-spacing: 0.3em;
-		color: rgba(255,255,255,0.4);
+		letter-spacing: 0.25em;
+		color: rgba(255,255,255,0.5);
 		z-index: 40;
 		animation: hintPulse 2.5s ease-in-out infinite;
 		transition: opacity 0.4s ease;
+		text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 	}
 
 	@keyframes hintPulse {
-		0%, 100% { opacity: 0.35; transform: translateX(-50%) translateY(0); }
-		50% { opacity: 0.65; transform: translateX(-50%) translateY(-3px); }
+		0%, 100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
+		50% { opacity: 0.7; transform: translateX(-50%) translateY(-3px); }
 	}
 </style>
 
 <script>
 	const intro = document.getElementById('intro-screen');
 	const seal = document.getElementById('wax-seal');
-	const sealFragments = document.getElementById('seal-fragments');
-	const envelopeTop = document.getElementById('envelope-top');
-	const envelopeBottom = document.getElementById('envelope-bottom');
-	const foldLine = document.getElementById('fold-line');
-	const card = document.getElementById('invitation-card');
+	const envelopeBg = document.getElementById('envelope-bg');
 	const hint = document.getElementById('tap-hint');
 
 	let opened = false;
@@ -495,43 +229,35 @@
 
 		if (hint) hint.style.opacity = '0';
 
-		// Step 1: Seal shakes (0ms)
+		// Step 1: Seal shakes
 		seal?.classList.add('shake');
 
-		// Step 2: Seal breaks & fragments fly (500ms)
+		// Step 2: Seal fades out (500ms)
 		setTimeout(() => {
 			seal?.classList.remove('shake');
 			seal?.classList.add('broken');
-			sealFragments?.classList.add('active');
-			foldLine?.classList.add('hidden');
 		}, 500);
 
-		// Step 3: Envelope halves split apart (900ms)
+		// Step 3: Envelope fades out (1000ms)
 		setTimeout(() => {
-			envelopeTop?.classList.add('open');
-			envelopeBottom?.classList.add('open');
-		}, 900);
+			envelopeBg?.classList.add('fade-out');
+		}, 1000);
 
-		// Step 4: Card appears (1400ms)
-		setTimeout(() => {
-			card?.classList.add('visible');
-		}, 1400);
-
-		// Step 5: Dismiss intro, show quiz (3800ms)
+		// Step 4: Dismiss intro, show quiz (1800ms)
 		setTimeout(() => {
 			intro?.classList.add('dismissed');
 			if (typeof (window as any).showQuizGate === 'function') {
 				(window as any).showQuizGate();
 			}
-		}, 4000);
+		}, 1800);
 
-		// Step 6: Remove from DOM
+		// Step 5: Remove from DOM
 		setTimeout(() => {
 			intro?.remove();
-		}, 4700);
+		}, 2500);
 	}
 
-	// Lock scroll
+	// Lock scroll while intro is showing
 	document.body.style.overflow = 'hidden';
 	document.documentElement.style.overflow = 'hidden';
 	
