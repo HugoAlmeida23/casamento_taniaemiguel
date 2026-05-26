@@ -17,6 +17,13 @@
 		-moz-osx-font-smoothing: grayscale;
 		font-family: 'Montserrat', sans-serif;
 	}
+
+	/* Sand texture background */
+	.bg-sand {
+		background-repeat: repeat;
+		background-size: 800px auto;
+		background-color: #f5f2eb;
+	}
 }
 
 @layer components {
@@ -52,7 +59,7 @@
 
 	/* Card style */
 	.wedding-card {
-		@apply bg-white rounded-3xl shadow-sm border border-beige-200 p-6 md:p-8;
+		@apply bg-white/80 backdrop-blur-sm rounded-3xl shadow-sm border border-beige-200 p-6 md:p-8;
 	}
 }
 

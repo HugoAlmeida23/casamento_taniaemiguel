@@ -40,7 +40,23 @@
 		<!-- Feedback message -->
 		<div id="quiz-feedback" class="mt-6 text-sm font-medium opacity-0 transition-opacity duration-300">
 			<p id="quiz-feedback-text"></p>
-			<img id="quiz-feedback-img" src="" alt="" class="hidden mx-auto mt-4 max-w-[280px] rounded-lg shadow-md" />
+		</div>
+	</div>
+</div>
+
+<!-- Full-screen WTF reveal -->
+<div id="wtf-reveal" class="fixed inset-0 z-[160] flex flex-col items-center justify-center bg-[#faf7f0] opacity-0 pointer-events-none transition-opacity duration-500">
+	<div class="text-center px-6 max-w-lg mx-auto">
+		<h2 id="wtf-text" class="text-6xl sm:text-8xl md:text-9xl font-black text-gray-900 mb-6 opacity-0" style="font-family: 'Playfair Display', serif; transform: scale(0.3);">
+			WTF?!
+		</h2>
+		<div id="wtf-img-wrap" class="opacity-0 rounded-2xl overflow-hidden shadow-2xl mx-auto max-w-sm md:max-w-md" style="transform: translateY(40px);">
+			<img 
+				id="wtf-img"
+				src=""
+				alt="Visita Rio Maior – Almeirim 2016"
+				class="w-full h-auto"
+			/>
 		</div>
 	</div>
 </div>
@@ -97,6 +113,24 @@
 		50% { transform: scale(1.02); }
 		100% { transform: scale(1); }
 	}
+
+	/* WTF Reveal animations */
+	#wtf-reveal.visible {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
+	#wtf-text.animate {
+		opacity: 1;
+		transform: scale(1);
+		transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+
+	#wtf-img-wrap.animate {
+		opacity: 1;
+		transform: translateY(0);
+		transition: opacity 0.5s ease 0.3s, transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s;
+	}
 </style>
 
 <script>
@@ -104,7 +138,10 @@
 	const options = document.querySelectorAll('.quiz-option');
 	const feedback = document.getElementById('quiz-feedback');
 	const feedbackText = document.getElementById('quiz-feedback-text');
-	const feedbackImg = document.getElementById('quiz-feedback-img') as HTMLImageElement;
+	const wtfReveal = document.getElementById('wtf-reveal');
+	const wtfText = document.getElementById('wtf-text');
+	const wtfImgWrap = document.getElementById('wtf-img-wrap');
+	const wtfImg = document.getElementById('wtf-img') as HTMLImageElement;
 
 	let answered = false;
 	let interactive = false;
@@ -113,7 +150,7 @@
 		quizGate?.classList.add('visible');
 		setTimeout(() => {
 			interactive = true;
-		}, 800);
+		}, 600);
 	};
 
 	options.forEach(btn => {
@@ -130,20 +167,37 @@
 
 				if (feedback) feedback.style.opacity = '1';
 				if (feedbackText) {
-					feedbackText.textContent = '🌿 Correto! Bem-vindo/a ao nosso casamento!';
+					feedbackText.textContent = '🌿 Correto!';
 					feedbackText.className = 'text-olive-600';
 				}
 
-				// Show the "Visita Rio Maior – Almeirim 2016" photo
-				if (feedbackImg) {
-					const baseUrl = (document.querySelector('meta[name="base-url"]') as HTMLMetaElement)?.content || '';
-					feedbackImg.src = `${baseUrl}/images/rio-maior-almeirim-2016.jpg`;
-					feedbackImg.alt = 'Visita Rio Maior – Almeirim 2016 — WTF?!';
-					feedbackImg.classList.remove('hidden');
+				// Set the WTF image
+				const baseUrl = (document.querySelector('meta[name="base-url"]') as HTMLMetaElement)?.content || '';
+				if (wtfImg) {
+					wtfImg.src = `${baseUrl}/images/rio-maior-almeirim-2016.jpg`;
 				}
 
+				// Show WTF reveal after a short pause
 				setTimeout(() => {
 					quizGate?.classList.add('dismissed');
+					wtfReveal?.classList.add('visible');
+
+					// Animate elements in sequence
+					setTimeout(() => wtfText?.classList.add('animate'), 100);
+					setTimeout(() => wtfImgWrap?.classList.add('animate'), 200);
+				}, 800);
+
+				// Dismiss WTF and show main content
+				setTimeout(() => {
+					const mainContent = document.getElementById('main-content');
+					if (mainContent) {
+						mainContent.style.transition = 'opacity 0.6s ease';
+						mainContent.style.opacity = '1';
+						mainContent.style.pointerEvents = '';
+					}
+					wtfReveal!.style.transition = 'opacity 0.8s ease';
+					wtfReveal!.style.opacity = '0';
+					wtfReveal!.style.pointerEvents = 'none';
 					document.body.style.overflow = '';
 					document.documentElement.style.overflow = '';
 					if ((window as any).__preventScroll) {
@@ -151,11 +205,13 @@
 						document.removeEventListener('touchmove', (window as any).__preventScroll);
 					}
 					window.scrollTo(0, 0);
-				}, 2500);
+				}, 4500);
 
+				// Clean up DOM
 				setTimeout(() => {
 					quizGate?.remove();
-				}, 3500);
+					wtfReveal?.remove();
+				}, 5500);
 
 			} else {
 				btn.classList.add('wrong');

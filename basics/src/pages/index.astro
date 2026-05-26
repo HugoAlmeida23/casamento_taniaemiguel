@@ -8,7 +8,6 @@ import Ceremony from '../sections/Ceremony.astro';
 import Timeline from '../sections/Timeline.astro';
 import LoveStory from '../sections/LoveStory.astro';
 import Gallery from '../sections/Gallery.astro';
-import DressCode from '../sections/DressCode.astro';
 import GiftList from '../sections/GiftList.astro';
 import Location from '../sections/Location.astro';
 import Faq from '../sections/Faq.astro';
@@ -16,19 +15,20 @@ import RSVP from '../sections/RSVP.astro';
 import Contact from '../sections/Contact.astro';
 ---
 
-<Layout title="Tânia & Miguel — 20 de Junho de 2027">
+<Layout title="Tânia & Miguel — 28 de Maio de 2027">
 	<IntroScreen />
 	<QuizGate />
-	<HeroModern />
-	<CountdownModern />
-	<Ceremony />
-	<Timeline />
-	<LoveStory />
-	<Gallery />
-	<DressCode />
-	<GiftList />
-	<Location />
-	<Faq />
-	<RSVP />
-	<Contact />
+	<div id="main-content" style="opacity: 0; pointer-events: none;">
+		<HeroModern />
+		<CountdownModern />
+		<Ceremony />
+		<Timeline />
+		<LoveStory />
+		<Gallery />
+		<GiftList />
+		<Location />
+		<Faq />
+		<RSVP />
+		<Contact />
+	</div>
 </Layout>

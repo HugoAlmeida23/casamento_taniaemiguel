@@ -238,20 +238,24 @@
 			seal?.classList.add('broken');
 		}, 500);
 
-		// Step 3: Envelope fades out (1000ms)
+		// Step 3: Show quiz BEFORE envelope fades (so no flash of main content)
 		setTimeout(() => {
-			envelopeBg?.classList.add('fade-out');
-		}, 1000);
-
-		// Step 4: Dismiss intro, show quiz (1800ms)
-		setTimeout(() => {
-			intro?.classList.add('dismissed');
 			if (typeof (window as any).showQuizGate === 'function') {
 				(window as any).showQuizGate();
 			}
+		}, 800);
+
+		// Step 4: Envelope fades out (1200ms) — quiz is already visible behind it
+		setTimeout(() => {
+			envelopeBg?.classList.add('fade-out');
+		}, 1200);
+
+		// Step 5: Dismiss intro (1800ms)
+		setTimeout(() => {
+			intro?.classList.add('dismissed');
 		}, 1800);
 
-		// Step 5: Remove from DOM
+		// Step 6: Remove from DOM
 		setTimeout(() => {
 			intro?.remove();
 		}, 2500);
