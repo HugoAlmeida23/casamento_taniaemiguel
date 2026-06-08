@@ -5,7 +5,7 @@
 <div id="intro-screen" class="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden select-none bg-black">
 	
 	<!-- Static envelope with seal (shown first) -->
-	<div id="envelope-static" class="absolute inset-0 cursor-pointer" role="button" aria-label="Abrir convite" tabindex="0">
+	<div id="envelope-static" class="absolute inset-0 cursor-pointer flex items-center justify-center" role="button" aria-label="Abrir convite" tabindex="0">
 		<img 
 			src={`${import.meta.env.BASE_URL}/images/envelope-with-seal.png`}
 			alt="Convite de casamento" 
@@ -20,7 +20,6 @@
 	<video 
 		id="envelope-video"
 		class="w-full h-full object-cover opacity-0 pointer-events-none"
-		style="object-position: center 55%;"
 		muted
 		playsinline
 		preload="auto"
