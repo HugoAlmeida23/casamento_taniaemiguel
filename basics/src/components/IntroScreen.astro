@@ -1,199 +1,63 @@
 ---
-// Full-screen realistic envelope with gold wax seal
-// Uses actual images: envelope-background.jpg and wax-seal.png
-// The envelope image covers the full viewport, seal sits at the flap junction
-// Tap → seal shakes & fades → envelope fades out → quiz appears
+// Intro: envelope with seal (static) → tap → video plays → video ends → quiz
 ---
 
-<div id="intro-screen" class="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden cursor-pointer select-none" role="button" aria-label="Abrir convite" tabindex="0">
+<div id="intro-screen" class="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden select-none bg-black">
 	
-	<!-- Full-screen envelope photo — covers entire viewport -->
-	<div id="envelope-bg" class="absolute inset-0">
+	<!-- Static envelope with seal (shown first) -->
+	<div id="envelope-static" class="absolute inset-0 cursor-pointer" role="button" aria-label="Abrir convite" tabindex="0">
 		<img 
-			src={`${import.meta.env.BASE_URL}/images/envelope-background.jpg`}
-			alt="" 
+			src={`${import.meta.env.BASE_URL}/images/envelope-with-seal.png`}
+			alt="Convite de casamento" 
 			class="w-full h-full object-cover object-center"
 			loading="eager"
 		/>
+		<!-- Tap hint -->
+		<p id="tap-hint" class="tap-hint">Toque para abrir</p>
 	</div>
 
-	<!-- Realistic gold wax seal — positioned at the flap junction point -->
-	<div id="wax-seal" class="wax-seal">
-		<img 
-			src={`${import.meta.env.BASE_URL}/images/wax-seal.png`}
-			alt="Selo de cera dourado T&M" 
-			class="seal-img"
-			loading="eager"
-		/>
-		<!-- T & M monogram — embossed into the wax -->
-		<div class="seal-monogram-wrap">
-			<span class="seal-monogram">T</span>
-			<span class="seal-monogram seal-amp">&</span>
-			<span class="seal-monogram">M</span>
-		</div>
-	</div>
-
-	<!-- Tap hint -->
-	<p id="tap-hint" class="tap-hint">Toque para abrir</p>
+	<!-- Video (hidden initially, plays after tap) -->
+	<video 
+		id="envelope-video"
+		class="w-full h-full object-cover opacity-0 pointer-events-none"
+		style="object-position: center 55%;"
+		muted
+		playsinline
+		preload="auto"
+	>
+		<source src={`${import.meta.env.BASE_URL}/images/envelope.mp4`} type="video/mp4" />
+	</video>
 </div>
 
 <style>
-	/* ============================================
-	   ENVELOPE — single full-screen image
-	   ============================================ */
-	#envelope-bg {
-		z-index: 2;
-		transition: opacity 0.8s ease;
-	}
-
-	#envelope-bg.fade-out {
-		opacity: 0;
-	}
-
-	/* ============================================
-	   WAX SEAL — large, at the flap junction
-	   Adjust top/left to match where the flap point
-	   lands on your specific envelope image.
-	   ============================================ */
-	.wax-seal {
-		position: absolute;
-		top: 80%;
-		left: 51%;
-		transform: translate(-50%, -50%);
-		z-index: 30;
-		width: 200px;
-		height: 200px;
-		transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease;
-	}
-
-	@media (min-width: 640px) {
-		.wax-seal {
-			width: 320px;
-			height: 320px;
-		}
-	}
-
-	@media (min-width: 1024px) {
-		.wax-seal {
-			width: 380px;
-			height: 380px;
-		}
-	}
-
-	.seal-img {
-		width: 100%;
-		height: 100%;
-		display: block;
-		max-width: none;
-		filter: drop-shadow(0 8px 30px rgba(0,0,0,0.5)) drop-shadow(0 2px 6px rgba(0,0,0,0.3));
-	}
-
-	/* Monogram wrapper — centered on the seal */
-	.seal-monogram-wrap {
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%);
-		display: flex;
-		align-items: baseline;
-		gap: 1px;
-		z-index: 2;
-		pointer-events: none;
-	}
-
-	/* Embossed text effect — looks pressed/stamped into wax */
-	.seal-monogram {
-		font-family: 'Times New Roman', Times, serif;
-		font-weight: 700;
-		font-size: 2.4rem;
-		color: transparent;
-		background: linear-gradient(180deg, rgba(120,80,20,0.7) 0%, rgba(180,130,50,0.9) 40%, rgba(220,180,80,0.6) 100%);
-		-webkit-background-clip: text;
-		background-clip: text;
-		text-shadow: 
-			0 -1px 1px rgba(255,240,180,0.5),
-			0 1px 2px rgba(0,0,0,0.6),
-			0 2px 4px rgba(0,0,0,0.3),
-			0 0 6px rgba(160,120,40,0.2);
-		letter-spacing: 0.02em;
-		line-height: 1;
-	}
-
-	.seal-amp {
-		font-size: 1.4rem;
-		font-style: italic;
-		margin: 0 3px;
-		vertical-align: baseline;
-		position: relative;
-		top: -2px;
-	}
-
-	@media (min-width: 640px) {
-		.seal-monogram {
-			font-size: 3.2rem;
-		}
-		.seal-amp {
-			font-size: 1.8rem;
-			top: -3px;
-		}
-	}
-
-	@media (min-width: 1024px) {
-		.seal-monogram {
-			font-size: 3.8rem;
-		}
-		.seal-amp {
-			font-size: 2.1rem;
-			top: -4px;
-		}
-	}
-
-	/* Subtle pulse glow around seal */
-	.wax-seal::after {
-		content: '';
-		position: absolute;
-		inset: -10px;
-		border-radius: 50%;
-		border: 1.5px solid rgba(212, 168, 83, 0.2);
-		animation: sealPulse 3s ease-in-out infinite;
-	}
-
-	@keyframes sealPulse {
-		0%, 100% { transform: scale(1); opacity: 0.3; }
-		50% { transform: scale(1.05); opacity: 0.7; }
-	}
-
-	/* Seal shake before break */
-	.wax-seal.shake {
-		animation: sealShake 0.5s ease;
-	}
-
-	@keyframes sealShake {
-		0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-		20% { transform: translate(-50%, -50%) rotate(-4deg) scale(1.03); }
-		40% { transform: translate(-50%, -50%) rotate(4deg) scale(1.05); }
-		60% { transform: translate(-50%, -50%) rotate(-3deg) scale(1.03); }
-		80% { transform: translate(-50%, -50%) rotate(2deg) scale(1.01); }
-	}
-
-	.wax-seal.broken {
-		transform: translate(-50%, -50%) scale(1.3);
-		opacity: 0;
-		transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
-	}
-
-	/* ============================================
-	   DISMISS
-	   ============================================ */
-	#intro-screen.dismissed {
-		opacity: 0;
-		pointer-events: none;
+	#intro-screen {
 		transition: opacity 0.7s ease;
 	}
 
-	/* ============================================
-	   TAP HINT
-	   ============================================ */
+	#intro-screen.dismissed {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	#envelope-static {
+		z-index: 10;
+		transition: opacity 0.3s ease;
+	}
+
+	#envelope-static.hidden {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	#envelope-video {
+		transition: opacity 0.3s ease;
+	}
+
+	#envelope-video.visible {
+		opacity: 1;
+		pointer-events: auto;
+	}
+
 	.tap-hint {
 		position: absolute;
 		bottom: 2.5rem;
@@ -202,88 +66,97 @@
 		font-size: 0.7rem;
 		text-transform: uppercase;
 		letter-spacing: 0.25em;
-		color: rgba(255,255,255,0.5);
+		color: rgba(255,255,255,0.6);
 		z-index: 40;
 		animation: hintPulse 2.5s ease-in-out infinite;
-		transition: opacity 0.4s ease;
-		text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+		text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 	}
 
 	@keyframes hintPulse {
 		0%, 100% { opacity: 0.4; transform: translateX(-50%) translateY(0); }
-		50% { opacity: 0.7; transform: translateX(-50%) translateY(-3px); }
+		50% { opacity: 0.8; transform: translateX(-50%) translateY(-3px); }
 	}
 </style>
 
 <script>
 	const intro = document.getElementById('intro-screen');
-	const seal = document.getElementById('wax-seal');
-	const envelopeBg = document.getElementById('envelope-bg');
-	const hint = document.getElementById('tap-hint');
+	const envelopeStatic = document.getElementById('envelope-static');
+	const video = document.getElementById('envelope-video') as HTMLVideoElement;
 
-	let opened = false;
+	// Skip intro if user already completed the quiz
+	if (localStorage.getItem('wedding_quiz_passed') === 'true') {
+		intro?.remove();
+		document.getElementById('quiz-gate')?.remove();
+		document.getElementById('wtf-reveal')?.remove();
+		const mainContent = document.getElementById('main-content');
+		if (mainContent) {
+			mainContent.style.opacity = '1';
+			mainContent.style.pointerEvents = '';
+		}
+	} else {
+		// Lock scroll while intro is showing
+		document.body.style.overflow = 'hidden';
+		document.documentElement.style.overflow = 'hidden';
+		
+		(window as any).__preventScroll = function(e: Event) {
+			e.preventDefault();
+		};
+		document.addEventListener('wheel', (window as any).__preventScroll, { passive: false });
+		document.addEventListener('touchmove', (window as any).__preventScroll, { passive: false });
+	}
 
-	function openEnvelope() {
-		if (opened) return;
-		opened = true;
+	let videoStarted = false;
+	let dismissed = false;
 
-		if (hint) hint.style.opacity = '0';
+	function startVideo() {
+		if (videoStarted) return;
+		videoStarted = true;
 
-		// Step 1: Seal shakes
-		seal?.classList.add('shake');
+		// Hide static envelope, show video
+		envelopeStatic?.classList.add('hidden');
+		video?.classList.add('visible');
+		video?.play();
+	}
 
-		// Step 2: Seal fades out (500ms)
-		setTimeout(() => {
-			seal?.classList.remove('shake');
-			seal?.classList.add('broken');
-		}, 500);
+	function dismissIntro() {
+		if (dismissed) return;
+		dismissed = true;
 
-		// Step 3: Show quiz BEFORE envelope fades (so no flash of main content)
+		if (video) video.pause();
+
+		// Show quiz before fading out
 		setTimeout(() => {
 			if (typeof (window as any).showQuizGate === 'function') {
 				(window as any).showQuizGate();
 			}
-		}, 800);
+		}, 100);
 
-		// Step 4: Envelope fades out (1200ms) — quiz is already visible behind it
-		setTimeout(() => {
-			envelopeBg?.classList.add('fade-out');
-		}, 1200);
-
-		// Step 5: Dismiss intro (1800ms)
+		// Fade out intro
 		setTimeout(() => {
 			intro?.classList.add('dismissed');
-		}, 1800);
+		}, 400);
 
-		// Step 6: Remove from DOM
+		// Remove from DOM
 		setTimeout(() => {
 			intro?.remove();
-		}, 2500);
+		}, 1100);
 	}
 
-	// Lock scroll while intro is showing
-	document.body.style.overflow = 'hidden';
-	document.documentElement.style.overflow = 'hidden';
-	
-	(window as any).__preventScroll = function(e: Event) {
-		e.preventDefault();
-	};
-	document.addEventListener('wheel', (window as any).__preventScroll, { passive: false });
-	document.addEventListener('touchmove', (window as any).__preventScroll, { passive: false });
-
-	intro?.addEventListener('click', (e) => {
+	// Tap on envelope → start video
+	envelopeStatic?.addEventListener('click', (e) => {
 		e.stopPropagation();
-		e.stopImmediatePropagation();
-		openEnvelope();
+		startVideo();
 	});
 
-	intro?.addEventListener('mouseup', (e) => { e.stopPropagation(); });
-	intro?.addEventListener('touchend', (e) => { e.stopPropagation(); });
-
-	intro?.addEventListener('keydown', (e) => {
+	envelopeStatic?.addEventListener('keydown', (e) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
-			openEnvelope();
+			startVideo();
 		}
+	});
+
+	// When video ends → transition to quiz
+	video?.addEventListener('ended', () => {
+		dismissIntro();
 	});
 </script>

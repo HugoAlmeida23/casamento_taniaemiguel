@@ -163,6 +163,9 @@
 				answered = true;
 				btn.classList.add('correct');
 				
+				// Save to localStorage so we don't ask again
+				localStorage.setItem('wedding_quiz_passed', 'true');
+				
 				options.forEach(b => (b as HTMLButtonElement).disabled = true);
 
 				if (feedback) feedback.style.opacity = '1';
