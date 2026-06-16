@@ -1,0 +1,183 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const baseUrl = import.meta.env.BASE_URL;
+---
+
+<Layout title="O Grande Dia — Tânia & Miguel">
+	<main class="pt-12 pb-16">
+		<!-- Page Header -->
+		<div class="wedding-section pb-8">
+			<div class="max-w-4xl mx-auto text-center">
+				<p class="section-subtitle">28 de Maio de 2027</p>
+				<h1 class="section-title text-4xl md:text-5xl lg:text-6xl">O Grande Dia</h1>
+				<div class="ornament">
+					<span class="text-lg">💍</span>
+				</div>
+				<p class="text-gray-600 text-sm md:text-base max-w-xl mx-auto mt-4">
+					Tudo o que precisas de saber para aproveitares este dia connosco.
+				</p>
+			</div>
+		</div>
+
+		<!-- Table Seating Section -->
+		<section id="mesas" class="wedding-section bg-white">
+			<div class="max-w-4xl mx-auto">
+				<div class="section-header">
+					<p class="section-subtitle">Organização</p>
+					<h2 class="section-title">Disposição das Mesas</h2>
+					<div class="ornament">
+						<span class="text-lg">🪑</span>
+					</div>
+				</div>
+
+				<div class="wedding-card text-center max-w-2xl mx-auto">
+					<div class="text-4xl mb-4">🍽️</div>
+					<p class="text-gray-700 mb-6">
+						Para tornar o jantar ainda mais especial, organizámos as mesas com todo o carinho.
+						Descobre onde vais ficar sentado(a) e quem serão os teus companheiros de mesa!
+					</p>
+					<a 
+						href={`${baseUrl}/mesas`}
+						class="inline-flex items-center gap-2 px-6 py-3 bg-olive-500 hover:bg-olive-600 text-white text-sm font-medium rounded-full transition-colors"
+					>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+						</svg>
+						Encontrar a minha mesa
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<!-- Menu Section -->
+		<section id="menu" class="wedding-section">
+			<div class="max-w-4xl mx-auto">
+				<div class="section-header">
+					<p class="section-subtitle">Gastronomia</p>
+					<h2 class="section-title">Menu</h2>
+					<div class="ornament">
+						<span class="text-lg">🍷</span>
+					</div>
+				</div>
+
+				<div class="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+					<!-- Entrada -->
+					<div class="wedding-card text-center">
+						<div class="text-3xl mb-3">🥗</div>
+						<h3 class="text-lg font-light text-gray-900 mb-3" style="font-family: 'Playfair Display', serif;">
+							Entrada
+						</h3>
+						<ul class="text-sm text-gray-600 space-y-2">
+							<li>Cocktail de boas-vindas</li>
+							<li>Tábua de queijos e enchidos</li>
+							<li>Crostini variados</li>
+						</ul>
+					</div>
+
+					<!-- Prato Principal -->
+					<div class="wedding-card text-center">
+						<div class="text-3xl mb-3">🥩</div>
+						<h3 class="text-lg font-light text-gray-900 mb-3" style="font-family: 'Playfair Display', serif;">
+							Prato Principal
+						</h3>
+						<ul class="text-sm text-gray-600 space-y-2">
+							<li>Peixe do dia ao forno</li>
+							<li>Carne assada com legumes</li>
+							<li>Opção vegetariana</li>
+						</ul>
+					</div>
+
+					<!-- Sobremesa -->
+					<div class="wedding-card text-center">
+						<div class="text-3xl mb-3">🎂</div>
+						<h3 class="text-lg font-light text-gray-900 mb-3" style="font-family: 'Playfair Display', serif;">
+							Sobremesa
+						</h3>
+						<ul class="text-sm text-gray-600 space-y-2">
+							<li>Bolo de casamento</li>
+							<li>Mesa de doces tradicionais</li>
+							<li>Fruta da época</li>
+						</ul>
+					</div>
+				</div>
+
+				<p class="text-center text-xs text-gray-500 mt-6 italic">
+					Menu sujeito a pequenas alterações. Se tens restrições alimentares, certifica-te que as indicaste no RSVP.
+				</p>
+			</div>
+		</section>
+
+		<!-- Live Gallery Section -->
+		<section id="galeria-ao-vivo" class="wedding-section bg-white">
+			<div class="max-w-4xl mx-auto">
+				<div class="section-header">
+					<p class="section-subtitle">Partilha</p>
+					<h2 class="section-title">Galeria ao Vivo</h2>
+					<div class="ornament">
+						<span class="text-lg">📸</span>
+					</div>
+				</div>
+
+				<div class="wedding-card text-center max-w-2xl mx-auto">
+					<div class="text-4xl mb-4">🤳</div>
+					<p class="text-gray-700 mb-6">
+						Queremos ver este dia pelos vossos olhos! Faz upload das tuas fotos e vídeos em tempo real 
+						e vê o que os outros convidados estão a captar. Juntos vamos criar um álbum inesquecível.
+					</p>
+					<a 
+						href={`${baseUrl}/galeria-ao-vivo`}
+						class="inline-flex items-center gap-2 px-6 py-3 bg-olive-500 hover:bg-olive-600 text-white text-sm font-medium rounded-full transition-colors"
+					>
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+						</svg>
+						Abrir galeria ao vivo
+					</a>
+				</div>
+			</div>
+		</section>
+
+		<!-- Memories Section -->
+		<section id="recordacoes" class="wedding-section">
+			<div class="max-w-4xl mx-auto">
+				<div class="section-header">
+					<p class="section-subtitle">Recordações</p>
+					<h2 class="section-title">Memórias deste Dia</h2>
+					<div class="ornament">
+						<span class="text-lg">💛</span>
+					</div>
+				</div>
+
+				<div class="wedding-card text-center max-w-2xl mx-auto">
+					<div class="text-4xl mb-4">✨</div>
+					<p class="text-gray-700 text-base md:text-lg leading-relaxed mb-4">
+						Cada foto é uma memória, cada memória é um tesouro.
+					</p>
+					<p class="text-gray-600 text-sm md:text-base leading-relaxed">
+						Gostaríamos muito que partilhassem connosco as fotos e vídeos que tirarem ao longo do dia. 
+						São estes momentos espontâneos, capturados pelos vossos olhos, que tornam este dia verdadeiramente único. 
+						Não há filtros nem poses perfeitas — apenas amor, alegria e muitas gargalhadas.
+					</p>
+					<p class="text-gray-600 text-sm md:text-base leading-relaxed mt-4">
+						Partilhem à vontade na galeria ao vivo ou enviem-nos mais tarde. 
+						Cada imagem será uma recordação que vamos guardar para sempre. 💕
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Back to main page link -->
+		<div class="text-center mt-8">
+			<a 
+				href={`${baseUrl}/`}
+				class="inline-flex items-center gap-2 text-olive-600 hover:text-olive-700 text-sm font-medium transition-colors"
+			>
+				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+				</svg>
+				Voltar à página principal
+			</a>
+		</div>
+	</main>
+</Layout>

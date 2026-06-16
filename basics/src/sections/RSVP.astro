@@ -16,32 +16,33 @@
 			<form id="rsvp-form" class="space-y-5" autocomplete="on">
 				<!-- Nome -->
 				<div>
-					<label for="nome" class="rsvp-label">O teu nome *</label>
-					<input type="text" id="nome" name="nome" required class="rsvp-input" placeholder="O teu nome completo" />
+					<label for="nome" class="rsvp-label">Nome *</label>
+					<input type="text" id="nome" name="nome" required maxlength="100" class="rsvp-input" placeholder="Primeiro e último nome" />
 				</div>
 
-				<!-- Telefone -->
+				<!-- Telemóvel -->
 				<div>
 					<label for="telefone" class="rsvp-label">Telemóvel *</label>
 					<input type="tel" id="telefone" name="telefone" required class="rsvp-input" placeholder="+351 912 345 678" />
 				</div>
 
-				<!-- Restrições do próprio -->
+				<!-- Alergias/Restrições alimentares -->
 				<div>
-					<label for="restricoes" class="rsvp-label">As tuas alergias ou restrições alimentares</label>
-					<input type="text" id="restricoes" name="restricoes" class="rsvp-input" placeholder="Vegetariano, alergias, etc. (opcional)" />
+					<label for="restricoes" class="rsvp-label">Alergias/Restrições alimentares</label>
+					<input type="text" id="restricoes" name="restricoes" class="rsvp-input" placeholder="Glúten, lactose, vegetariano, vegan, …" />
 				</div>
 
 				<!-- Acompanhantes section -->
 				<div>
 					<label class="rsvp-label">Acompanhantes</label>
-					<p class="text-xs text-gray-400 mb-3">Adiciona as pessoas que vêm contigo e indica alergias caso tenham.</p>
+					<p class="text-xs text-gray-400 mb-2">Adiciona as pessoas que vêm contigo e indica alergias caso tenham.</p>
+					<p id="companions-count" class="text-xs text-gray-400 mb-3 hidden"></p>
 					
 					<!-- List of companions -->
 					<div id="companions-list" class="space-y-3 mb-4"></div>
 
 					<!-- Add buttons -->
-					<div class="flex gap-3">
+					<div id="add-buttons-container" class="flex gap-3">
 						<button 
 							type="button" 
 							id="add-adult-btn"
@@ -124,6 +125,15 @@
 		to { opacity: 1; transform: translateY(0); }
 	}
 
+	@keyframes fadeOut {
+		from { opacity: 1; transform: translateY(0); }
+		to { opacity: 0; transform: translateY(-8px); }
+	}
+
+	.companion-card.removing {
+		animation: fadeOut 0.3s ease forwards;
+	}
+
 	.companion-remove {
 		@apply absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors;
 	}
@@ -150,18 +160,53 @@
 </style>
 
 <script>
+	const MAX_COMPANIONS = 10;
+
 	const form = document.getElementById('rsvp-form') as HTMLFormElement;
 	const message = document.getElementById('rsvp-message') as HTMLDivElement;
 	const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
 	const companionsList = document.getElementById('companions-list') as HTMLDivElement;
 	const addAdultBtn = document.getElementById('add-adult-btn') as HTMLButtonElement;
 	const addChildBtn = document.getElementById('add-child-btn') as HTMLButtonElement;
+	const addButtonsContainer = document.getElementById('add-buttons-container') as HTMLDivElement;
+	const companionsCount = document.getElementById('companions-count') as HTMLParagraphElement;
 
-	let companionCount = 0;
+	let companionIdCounter = 0;
+
+	function getCompanionCount(): number {
+		return companionsList.querySelectorAll('.companion-card').length;
+	}
+
+	function updateCompanionUI() {
+		const count = getCompanionCount();
+		
+		// Show/hide counter
+		if (count > 0) {
+			companionsCount.classList.remove('hidden');
+			companionsCount.textContent = `${count} de ${MAX_COMPANIONS} acompanhantes`;
+		} else {
+			companionsCount.classList.add('hidden');
+		}
+
+		// Disable/enable add buttons when at max
+		if (count >= MAX_COMPANIONS) {
+			addAdultBtn.disabled = true;
+			addChildBtn.disabled = true;
+			addAdultBtn.classList.add('opacity-50', 'cursor-not-allowed');
+			addChildBtn.classList.add('opacity-50', 'cursor-not-allowed');
+		} else {
+			addAdultBtn.disabled = false;
+			addChildBtn.disabled = false;
+			addAdultBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+			addChildBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+		}
+	}
 
 	function addCompanion(type: 'adult' | 'child') {
-		companionCount++;
-		const id = companionCount;
+		if (getCompanionCount() >= MAX_COMPANIONS) return;
+
+		companionIdCounter++;
+		const id = companionIdCounter;
 
 		const card = document.createElement('div');
 		card.className = 'companion-card';
@@ -171,22 +216,40 @@
 		const badgeClass = type === 'adult' ? 'adult' : 'child';
 		const badgeText = type === 'adult' ? 'Adulto' : 'Criança';
 
+		const ageField = type === 'child' 
+			? `<input 
+				type="number" 
+				name="companion_age_${id}" 
+				placeholder="Idade" 
+				min="0" 
+				max="17" 
+				step="1"
+				class="w-20 px-3 py-3 border border-beige-300 rounded-xl text-gray-900 bg-white text-sm transition-all duration-200 focus:outline-none focus:border-olive-400 focus:ring-3 focus:ring-olive-100"
+			/>`
+			: '';
+
+		const nameRowClass = type === 'child' ? 'flex gap-2 items-start' : '';
+
 		card.innerHTML = `
-			<button type="button" class="companion-remove" aria-label="Remover" data-remove="${id}">
+			<button type="button" class="companion-remove" aria-label="Remover acompanhante" data-remove="${id}">
 				<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 				</svg>
 			</button>
 			<span class="companion-badge ${badgeClass}">${badgeText}</span>
-			<input 
-				type="text" 
-				name="companion_name_${id}" 
-				placeholder="${type === 'child' ? 'Nome e idade (ex: Maria, 3 anos)' : 'Nome'}" 
-				class="w-full px-4 py-3 border border-beige-300 rounded-xl text-gray-900 bg-white text-sm transition-all duration-200 focus:outline-none focus:border-olive-400 focus:ring-3 focus:ring-olive-100"
-			/>
+			<div class="${nameRowClass}">
+				<input 
+					type="text" 
+					name="companion_name_${id}" 
+					placeholder="Primeiro e último nome" 
+					class="flex-1 w-full px-4 py-3 border border-beige-300 rounded-xl text-gray-900 bg-white text-sm transition-all duration-200 focus:outline-none focus:border-olive-400 focus:ring-3 focus:ring-olive-100"
+				/>
+				${ageField}
+			</div>
 			<input 
 				type="text" 
 				name="companion_allergy_${id}" 
+				maxlength="200"
 				placeholder="Alergias / restrições alimentares (opcional)" 
 				class="w-full px-4 py-3 border border-beige-300 rounded-xl text-gray-900 bg-white text-sm transition-all duration-200 focus:outline-none focus:border-olive-400 focus:ring-3 focus:ring-olive-100"
 			/>
@@ -197,11 +260,14 @@
 		// Attach remove handler
 		const removeBtn = card.querySelector(`[data-remove="${id}"]`);
 		removeBtn?.addEventListener('click', () => {
-			card.style.opacity = '0';
-			card.style.transform = 'translateY(-8px)';
-			card.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
-			setTimeout(() => card.remove(), 200);
+			card.classList.add('removing');
+			setTimeout(() => {
+				card.remove();
+				updateCompanionUI();
+			}, 300);
 		});
+
+		updateCompanionUI();
 	}
 
 	addAdultBtn?.addEventListener('click', () => addCompanion('adult'));
@@ -220,21 +286,31 @@
 
 		const formData = new FormData(form);
 
-		// Collect companions
-		const companions: {name: string, type: string, allergy: string}[] = [];
+		// Collect companions — filter out those with empty names
+		const companions: {name: string, type: string, age?: number, allergy: string}[] = [];
 		const cards = companionsList.querySelectorAll('.companion-card');
 		cards.forEach(card => {
 			const cardEl = card as HTMLElement;
 			const id = cardEl.dataset.companionId;
 			const type = cardEl.dataset.type || 'adult';
-			const name = formData.get(`companion_name_${id}`) as string;
-			const allergy = formData.get(`companion_allergy_${id}`) as string;
-			if (name?.trim()) {
-				companions.push({ 
-					name: name.trim(), 
+			const name = (formData.get(`companion_name_${id}`) as string || '').trim();
+			const allergy = (formData.get(`companion_allergy_${id}`) as string || '').trim();
+
+			if (name) {
+				const companion: {name: string, type: string, age?: number, allergy: string} = { 
+					name, 
 					type, 
-					allergy: allergy?.trim() || '' 
-				});
+					allergy
+				};
+
+				if (type === 'child') {
+					const ageValue = formData.get(`companion_age_${id}`) as string;
+					if (ageValue !== null && ageValue !== '') {
+						companion.age = parseInt(ageValue, 10);
+					}
+				}
+
+				companions.push(companion);
 			}
 		});
 
@@ -268,7 +344,8 @@
 
 			form.reset();
 			companionsList.innerHTML = '';
-			companionCount = 0;
+			companionIdCounter = 0;
+			updateCompanionUI();
 
 			message.classList.remove('hidden');
 			message.classList.add('success');

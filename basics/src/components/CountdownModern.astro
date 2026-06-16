@@ -1,14 +1,20 @@
 ---
-// Elegant countdown — olive/beige palette
+// Elegant countdown — olive/beige palette with sand texture background
 ---
 
-<section class="wedding-section bg-[#faf7f0]">
+<section class="wedding-section countdown-section">
 	<div class="max-w-4xl mx-auto text-center">
 		<div class="section-header">
 			<p class="section-subtitle">Countdown</p>
 			<h2 class="section-title">PARA O DIA MAIS ESPECIAL DAS NOSSAS VIDAS</h2>
 			<div class="ornament">
-				<span class="text-lg">🌿</span>
+				<img
+					src="/casamento_taniaemiguel/images/wax-seal-prata.png"
+					alt="TM wax seal logo"
+					class="wax-seal-ornament"
+					width="64"
+					height="64"
+				/>
 			</div>
 		</div>
 
@@ -34,22 +40,61 @@
 </section>
 
 <script>
+	function getLisbonDate(): { year: number; month: number; day: number } {
+		const now = new Date();
+		const formatter = new Intl.DateTimeFormat('en-CA', {
+			timeZone: 'Europe/Lisbon',
+			year: 'numeric',
+			month: '2-digit',
+			day: '2-digit',
+		});
+		// en-CA formats as YYYY-MM-DD
+		const parts = formatter.format(now).split('-');
+		return {
+			year: parseInt(parts[0], 10),
+			month: parseInt(parts[1], 10),
+			day: parseInt(parts[2], 10),
+		};
+	}
+
+	function isWeddingDayOrAfter(): boolean {
+		const { year, month, day } = getLisbonDate();
+		// Wedding date: 2027-05-28
+		if (year > 2027) return true;
+		if (year === 2027 && month > 5) return true;
+		if (year === 2027 && month === 5 && day >= 28) return true;
+		return false;
+	}
+
+	function showWeddingDayMessage() {
+		const el = document.getElementById('countdown');
+		if (el) {
+			const baseUrl = import.meta.env.BASE_URL.replace(/\/$/, '');
+			el.innerHTML = `
+				<div class="text-center wedding-day-message">
+					<p class="text-3xl md:text-5xl font-light text-gray-900" style="font-family: 'Playfair Display', serif;">
+						HOJE É O GRANDE DIA
+					</p>
+					<a href="${baseUrl}/dia" class="wedding-day-link">
+						Clica aqui para veres todos os detalhes!
+					</a>
+				</div>
+			`;
+		}
+	}
+
 	function updateCountdown() {
+		if (isWeddingDayOrAfter()) {
+			showWeddingDayMessage();
+			return;
+		}
+
 		const weddingDate = new Date('2027-05-28T12:30:00').getTime();
 		const now = new Date().getTime();
 		const distance = weddingDate - now;
 
 		if (distance < 0) {
-			const el = document.getElementById('countdown');
-			if (el) {
-				el.innerHTML = `
-					<div class="text-center">
-						<p class="text-3xl md:text-5xl font-light text-gray-900" style="font-family: 'Playfair Display', serif;">
-							Hoje é o grande dia! 🎉
-						</p>
-					</div>
-				`;
-			}
+			showWeddingDayMessage();
 			return;
 		}
 
@@ -72,3 +117,41 @@
 	updateCountdown();
 	setInterval(updateCountdown, 1000);
 </script>
+
+<style>
+	.countdown-section {
+		background-image: url('/casamento_taniaemiguel/images/sand-texture.jpg');
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+	}
+
+	.wax-seal-ornament {
+		width: clamp(48px, 8vw, 80px);
+		height: auto;
+		display: block;
+		margin: 0 auto;
+		/* Match the beige-400 decorative line color (#e0d5be) using sepia + hue adjust */
+		filter: sepia(20%) saturate(60%) brightness(95%) hue-rotate(-10deg);
+	}
+
+	.wedding-day-message {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.5rem;
+	}
+
+	.wedding-day-link {
+		font-family: 'Montserrat', sans-serif;
+		font-size: 1.125rem;
+		color: #6b7c3e;
+		text-decoration: underline;
+		text-underline-offset: 4px;
+		transition: color 0.2s ease;
+	}
+
+	.wedding-day-link:hover {
+		color: #4a5a2b;
+	}
+</style>

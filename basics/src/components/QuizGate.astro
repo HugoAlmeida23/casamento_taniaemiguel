@@ -41,11 +41,23 @@
 		<div id="quiz-feedback" class="mt-6 text-sm font-medium opacity-0 transition-opacity duration-300">
 			<p id="quiz-feedback-text"></p>
 		</div>
+
+		<!-- Skip link -->
+		<div class="mt-8">
+			<button
+				id="quiz-skip-link"
+				type="button"
+				class="quiz-skip-link"
+				aria-label="Avançar para o site sem responder ao quiz"
+			>
+				Avançar sem responder
+			</button>
+		</div>
 	</div>
 </div>
 
-<!-- Full-screen WTF reveal -->
-<div id="wtf-reveal" class="fixed inset-0 z-[160] flex flex-col items-center justify-center bg-[#faf7f0] opacity-0 pointer-events-none transition-opacity duration-500">
+<!-- Full-screen WTF reveal (tap to advance) -->
+<div id="wtf-reveal" class="fixed inset-0 z-[160] flex flex-col items-center justify-center bg-[#faf7f0] opacity-0 pointer-events-none transition-opacity duration-500 cursor-pointer" role="button" tabindex="0" aria-label="Toca para continuar">
 	<div class="text-center px-6 max-w-lg mx-auto">
 		<h2 id="wtf-text" class="text-6xl sm:text-8xl md:text-9xl font-black text-gray-900 mb-6 opacity-0" style="font-family: 'Playfair Display', serif; transform: scale(0.3);">
 			WTF?!
@@ -58,6 +70,7 @@
 				class="w-full h-auto"
 			/>
 		</div>
+		<p id="wtf-tap-hint" class="mt-6 text-sm text-gray-500 opacity-0 transition-opacity duration-500">Toca para continuar</p>
 	</div>
 </div>
 
@@ -114,6 +127,18 @@
 		100% { transform: scale(1); }
 	}
 
+	.quiz-skip-link {
+		@apply inline-flex items-center justify-center text-sm text-gray-500 underline underline-offset-4 decoration-gray-300 transition-colors duration-200 hover:text-olive-600 hover:decoration-olive-400 focus:text-olive-600 focus:decoration-olive-400 focus:outline-none focus:ring-2 focus:ring-olive-400 focus:ring-offset-2 rounded;
+		min-width: 44px;
+		min-height: 44px;
+		padding: 10px 16px;
+		pointer-events: none;
+	}
+
+	#quiz-gate.visible .quiz-skip-link {
+		pointer-events: auto;
+	}
+
 	/* WTF Reveal animations */
 	#wtf-reveal.visible {
 		opacity: 1;
@@ -142,9 +167,16 @@
 	const wtfText = document.getElementById('wtf-text');
 	const wtfImgWrap = document.getElementById('wtf-img-wrap');
 	const wtfImg = document.getElementById('wtf-img') as HTMLImageElement;
+	const wtfTapHint = document.getElementById('wtf-tap-hint');
+	const skipLink = document.getElementById('quiz-skip-link');
 
 	let answered = false;
 	let interactive = false;
+	let waitingForTap = false;
+
+	// State machine:
+	// CheckStorage → ShowQuiz → CorrectFeedback → WTFReveal → WaitingForTap → Dismissed
+	//                ShowQuiz → WrongFeedback → ShowQuiz (retry)
 
 	window.showQuizGate = function() {
 		quizGate?.classList.add('visible');
@@ -152,6 +184,107 @@
 			interactive = true;
 		}, 600);
 	};
+
+	// Dismiss WTF overlay and reveal main content
+	function dismissOverlay() {
+		const mainContent = document.getElementById('main-content');
+		if (mainContent) {
+			mainContent.style.transition = 'opacity 0.6s ease';
+			mainContent.style.opacity = '1';
+			mainContent.style.pointerEvents = '';
+		}
+		if (wtfReveal) {
+			wtfReveal.style.transition = 'opacity 0.8s ease';
+			wtfReveal.style.opacity = '0';
+			wtfReveal.style.pointerEvents = 'none';
+		}
+		document.body.style.overflow = '';
+		document.documentElement.style.overflow = '';
+		if ((window as any).__preventScroll) {
+			document.removeEventListener('wheel', (window as any).__preventScroll);
+			document.removeEventListener('touchmove', (window as any).__preventScroll);
+		}
+		window.scrollTo(0, 0);
+
+		// Clean up DOM after fade completes
+		setTimeout(() => {
+			quizGate?.remove();
+			wtfReveal?.remove();
+		}, 1000);
+	}
+
+	// Skip link: dismiss quiz directly without WTF reveal
+	function handleSkip() {
+		if (answered) return;
+		answered = true;
+
+		// Persist bypass in localStorage
+		try {
+			localStorage.setItem('wedding_quiz_passed', 'true');
+		} catch (e) {
+			// localStorage unavailable (private browsing) — continue without persistence
+		}
+
+		// Dismiss quiz gate overlay directly (bypass WTF reveal)
+		if (quizGate) {
+			quizGate.style.transition = 'opacity 0.8s ease';
+			quizGate.style.opacity = '0';
+			quizGate.style.pointerEvents = 'none';
+		}
+
+		// Reveal main content
+		const mainContent = document.getElementById('main-content');
+		if (mainContent) {
+			mainContent.style.transition = 'opacity 0.6s ease';
+			mainContent.style.opacity = '1';
+			mainContent.style.pointerEvents = '';
+		}
+
+		// Unlock scroll
+		document.body.style.overflow = '';
+		document.documentElement.style.overflow = '';
+		if ((window as any).__preventScroll) {
+			document.removeEventListener('wheel', (window as any).__preventScroll);
+			document.removeEventListener('touchmove', (window as any).__preventScroll);
+		}
+		window.scrollTo(0, 0);
+
+		// Clean up DOM after transitions complete
+		setTimeout(() => {
+			quizGate?.remove();
+			wtfReveal?.remove();
+		}, 1000);
+	}
+
+	// Attach skip link event listeners
+	if (skipLink) {
+		skipLink.addEventListener('click', handleSkip);
+		skipLink.addEventListener('keydown', (e: KeyboardEvent) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				handleSkip();
+			}
+		});
+	}
+
+	// Tap-to-advance: listen for click/tap and keyboard on the WTF overlay
+	function handleWtfTap(e: Event) {
+		if (!waitingForTap) return;
+		e.preventDefault();
+		waitingForTap = false;
+		dismissOverlay();
+	}
+
+	if (wtfReveal) {
+		wtfReveal.addEventListener('click', handleWtfTap);
+		wtfReveal.addEventListener('keydown', (e: KeyboardEvent) => {
+			if (waitingForTap && (e.key === 'Enter' || e.key === ' ')) {
+				e.preventDefault();
+				waitingForTap = false;
+				dismissOverlay();
+			}
+		});
+	}
 
 	options.forEach(btn => {
 		btn.addEventListener('click', () => {
@@ -164,7 +297,11 @@
 				btn.classList.add('correct');
 				
 				// Save to localStorage so we don't ask again
-				localStorage.setItem('wedding_quiz_passed', 'true');
+				try {
+					localStorage.setItem('wedding_quiz_passed', 'true');
+				} catch (e) {
+					// localStorage unavailable (private browsing) — continue without persistence
+				}
 				
 				options.forEach(b => (b as HTMLButtonElement).disabled = true);
 
@@ -180,41 +317,23 @@
 					wtfImg.src = `${baseUrl}/images/rio-maior-almeirim-2016.jpg`;
 				}
 
-				// Show WTF reveal after a short pause
+				// After 800ms "Correto!" feedback, transition to WTF reveal
 				setTimeout(() => {
 					quizGate?.classList.add('dismissed');
 					wtfReveal?.classList.add('visible');
 
-					// Animate elements in sequence
+					// Animate text in
 					setTimeout(() => wtfText?.classList.add('animate'), 100);
-					setTimeout(() => wtfImgWrap?.classList.add('animate'), 200);
+					// Animate photo in 300ms after text
+					setTimeout(() => {
+						wtfImgWrap?.classList.add('animate');
+						// Show tap hint after photo appears and enable tap-to-advance
+						setTimeout(() => {
+							if (wtfTapHint) wtfTapHint.style.opacity = '1';
+							waitingForTap = true;
+						}, 600);
+					}, 400);
 				}, 800);
-
-				// Dismiss WTF and show main content
-				setTimeout(() => {
-					const mainContent = document.getElementById('main-content');
-					if (mainContent) {
-						mainContent.style.transition = 'opacity 0.6s ease';
-						mainContent.style.opacity = '1';
-						mainContent.style.pointerEvents = '';
-					}
-					wtfReveal!.style.transition = 'opacity 0.8s ease';
-					wtfReveal!.style.opacity = '0';
-					wtfReveal!.style.pointerEvents = 'none';
-					document.body.style.overflow = '';
-					document.documentElement.style.overflow = '';
-					if ((window as any).__preventScroll) {
-						document.removeEventListener('wheel', (window as any).__preventScroll);
-						document.removeEventListener('touchmove', (window as any).__preventScroll);
-					}
-					window.scrollTo(0, 0);
-				}, 4500);
-
-				// Clean up DOM
-				setTimeout(() => {
-					quizGate?.remove();
-					wtfReveal?.remove();
-				}, 5500);
 
 			} else {
 				btn.classList.add('wrong');
@@ -225,6 +344,7 @@
 					feedbackText.className = 'text-red-500';
 				}
 
+				// Shake animation (1500ms) then reset
 				setTimeout(() => {
 					btn.classList.remove('wrong');
 					if (feedback) feedback.style.opacity = '0';

@@ -1,0 +1,87 @@
+---
+// Casamento Solidário — Charity donations section
+---
+
+<section id="solidarity" class="wedding-section bg-white">
+	<div class="max-w-4xl mx-auto">
+		<div class="section-header">
+			<h2 class="section-title">Este é um casamento solidário!</h2>
+			<div class="ornament">
+				<span class="text-lg">🌿</span>
+			</div>
+		</div>
+
+		<div class="text-center mb-10">
+			<p class="text-gray-600 leading-relaxed max-w-2xl mx-auto">
+				Em vez das tradicionais lembranças de casamento, decidimos fazer donativos a instituições de solidariedade que nos são queridas. Se quiseres, podes também contribuir visitando os sites destas organizações.
+			</p>
+		</div>
+
+		<!-- Charity links -->
+		<div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+			<!-- Nariz Vermelho -->
+			<a
+				href="https://www.narizvermelho.pt/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="wedding-card flex flex-col items-center justify-center gap-3 p-6 hover:shadow-md transition-shadow"
+			>
+				<img
+					src={`${import.meta.env.BASE_URL}/images/charities/nariz-vermelho-logo.png`}
+					alt="Nariz Vermelho"
+					class="max-h-[48px] w-auto object-contain"
+					loading="lazy"
+				/>
+				<span class="text-xs text-olive-600 font-medium text-center">Nariz Vermelho</span>
+			</a>
+
+			<!-- Acreditar -->
+			<a
+				href="https://www.acreditar.org.pt/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="wedding-card flex flex-col items-center justify-center gap-3 p-6 hover:shadow-md transition-shadow"
+			>
+				<img
+					src={`${import.meta.env.BASE_URL}/images/charities/acreditar-logo.png`}
+					alt="Acreditar"
+					class="max-h-[48px] w-auto object-contain"
+					loading="lazy"
+				/>
+				<span class="text-xs text-olive-600 font-medium text-center">Acreditar</span>
+			</a>
+
+			<!-- Make-A-Wish -->
+			<a
+				href="https://makeawish.pt/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="wedding-card flex flex-col items-center justify-center gap-3 p-6 hover:shadow-md transition-shadow"
+			>
+				<img
+					src={`${import.meta.env.BASE_URL}/images/charities/make-a-wish-logo.png`}
+					alt="Make-A-Wish"
+					class="max-h-[48px] w-auto object-contain"
+					loading="lazy"
+				/>
+				<span class="text-xs text-olive-600 font-medium text-center">Make-A-Wish</span>
+			</a>
+
+			<!-- UNICEF -->
+			<a
+				href="https://unicef.pt/"
+				target="_blank"
+				rel="noopener noreferrer"
+				class="wedding-card flex flex-col items-center justify-center gap-3 p-6 hover:shadow-md transition-shadow"
+			>
+				<img
+					src={`${import.meta.env.BASE_URL}/images/charities/unicef-logo.png`}
+					alt="UNICEF"
+					class="max-h-[48px] w-auto object-contain"
+					loading="lazy"
+				/>
+				<span class="text-xs text-olive-600 font-medium text-center">UNICEF</span>
+			</a>
+		</div>
+	</div>
+</section>

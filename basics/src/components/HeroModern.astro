@@ -1,11 +1,12 @@
 ---
 // Hero section — Plaza de España (Seville) illustration with elegant wedding overlay
 // Design: names in signature font, date in boxes, tagline at bottom
+// Contrast: text-shadow on all overlay text for readability over illustration
 ---
 
 <section class="relative min-h-screen flex flex-col items-center justify-start overflow-hidden">
 	<!-- Background: Plaza de España illustration -->
-	<div class="absolute inset-0">
+	<div class="absolute inset-0 z-0">
 		<img 
 			src={`${import.meta.env.BASE_URL}/images/plaza-espana-seville.png`}
 			alt="Ilustração da Plaza de España em Sevilha" 
@@ -14,43 +15,43 @@
 		/>
 	</div>
 
-	<!-- Content overlay -->
-	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto flex flex-col items-center pt-16 md:pt-20">
-		<!-- Welcome text -->
-		<p class="text-lg md:text-2xl text-gray-800 font-medium mb-8" style="font-family: 'Montserrat', sans-serif;">
+	<!-- Content overlay — z-10 ensures text is above the illustration -->
+	<div class="relative z-10 text-center px-6 max-w-3xl mx-auto flex flex-col items-center pt-16 md:pt-20 hero-text-overlay">
+		<!-- Welcome text (sans-serif: Montserrat) -->
+		<p class="text-lg md:text-xl lg:text-2xl text-gray-800 font-medium mb-8 font-montserrat">
 			Bem-vindos ao nosso casamento!
 		</p>
 
-		<!-- Names in signature font — compact layout with "e" inline -->
-		<div class="text-center" style="font-family: 'Mrs Saint Delafield', cursive;">
-			<p class="text-6xl sm:text-7xl md:text-9xl text-gray-800 leading-none mb-0">Tânia</p>
+		<!-- Names in signature/cursive font (Mrs Saint Delafield) -->
+		<div class="text-center font-cursive">
+			<p class="text-[48px] sm:text-7xl md:text-[96px] lg:text-9xl text-gray-800 leading-none mb-0">Tânia</p>
 			<p class="text-3xl sm:text-4xl md:text-5xl text-gray-800 leading-none ml-16 sm:ml-20 md:ml-28 -mt-2 md:-mt-4 mb-0">e</p>
-			<p class="text-6xl sm:text-7xl md:text-9xl text-gray-800 leading-none -mt-2 md:-mt-4">Miguel</p>
+			<p class="text-[48px] sm:text-7xl md:text-[96px] lg:text-9xl text-gray-800 leading-none -mt-2 md:-mt-4">Miguel</p>
 		</div>
 
-		<!-- Date in styled format: lines above/below "Maio" and "2027", "28" large in center with "12h30" below -->
+		<!-- Date in styled format (serif: Playfair Display) -->
 		<div class="flex items-center justify-center gap-4 md:gap-6 mt-10 mb-8">
 			<!-- Maio -->
 			<div class="flex flex-col items-center">
 				<span class="w-full h-px bg-gray-600 mb-1"></span>
-				<span class="text-lg md:text-2xl text-gray-700 font-light tracking-wide px-2" style="font-family: 'Montserrat', sans-serif;">Maio</span>
+				<span class="text-base md:text-xl lg:text-2xl text-gray-700 font-light tracking-wide px-2 font-playfair">Maio</span>
 				<span class="w-full h-px bg-gray-600 mt-1"></span>
 			</div>
 			<!-- 28 + 12h30 -->
 			<div class="flex flex-col items-center">
-				<span class="text-4xl md:text-5xl text-gray-800 font-light" style="font-family: 'Playfair Display', serif;">28</span>
-				<span class="text-xs md:text-sm text-gray-500 font-light italic -mt-1">12h30</span>
+				<span class="text-4xl md:text-5xl text-gray-800 font-light font-playfair">28</span>
+				<span class="text-base md:text-lg text-gray-500 font-light italic -mt-1 font-playfair">12h30</span>
 			</div>
 			<!-- 2027 -->
 			<div class="flex flex-col items-center">
 				<span class="w-full h-px bg-gray-600 mb-1"></span>
-				<span class="text-lg md:text-2xl text-gray-700 font-light tracking-wide px-2" style="font-family: 'Montserrat', sans-serif;">2027</span>
+				<span class="text-base md:text-xl lg:text-2xl text-gray-700 font-light tracking-wide px-2 font-playfair">2027</span>
 				<span class="w-full h-px bg-gray-600 mt-1"></span>
 			</div>
 		</div>
 
-		<!-- Tagline -->
-		<p class="text-base md:text-lg text-gray-700 italic font-light" style="font-family: 'Playfair Display', serif;">
+		<!-- Tagline (serif: Playfair Display) -->
+		<p class="text-base md:text-lg text-gray-700 italic font-light font-playfair">
 			Dois corações, uma só história.
 		</p>
 
@@ -62,3 +63,29 @@
 		</div>
 	</div>
 </section>
+
+<style>
+	/* Font family utility classes */
+	.font-cursive {
+		font-family: 'Mrs Saint Delafield', cursive;
+	}
+	.font-playfair {
+		font-family: 'Playfair Display', serif;
+	}
+	.font-montserrat {
+		font-family: 'Montserrat', sans-serif;
+	}
+
+	/* Text contrast: text-shadow applied to all overlay text */
+	.hero-text-overlay p,
+	.hero-text-overlay span,
+	.hero-text-overlay div {
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	}
+
+	/* Remove text-shadow from decorative lines and SVG */
+	.hero-text-overlay svg,
+	.hero-text-overlay .h-px {
+		text-shadow: none;
+	}
+</style>
