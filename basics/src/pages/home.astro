@@ -1,7 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import IntroScreen from '../components/IntroScreen.astro';
-import QuizGate from '../components/QuizGate.astro';
 import HeroModern from '../components/HeroModern.astro';
 import CountdownModern from '../components/CountdownModern.astro';
 import Ceremony from '../sections/Ceremony.astro';
@@ -18,9 +16,7 @@ import Contact from '../sections/Contact.astro';
 ---
 
 <Layout title="Tânia & Miguel — 28 de Maio de 2027">
-	<IntroScreen />
-	<QuizGate />
-	<div id="main-content" style="opacity: 0; pointer-events: none;">
+	<div id="main-content">
 		<HeroModern />
 		<CountdownModern />
 		<Ceremony />
@@ -35,3 +31,12 @@ import Contact from '../sections/Contact.astro';
 		<Contact />
 	</div>
 </Layout>
+
+<script>
+	// Mark quiz as passed so if they navigate to root later, they won't see the quiz
+	try {
+		localStorage.setItem('wedding_quiz_passed', 'true');
+	} catch (e) {
+		// localStorage unavailable — no-op
+	}
+</script>
