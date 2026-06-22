@@ -12,7 +12,7 @@ const baseUrl = import.meta.env.BASE_URL;
 				<p class="section-subtitle">28 de Maio de 2027</p>
 				<h1 class="section-title text-4xl md:text-5xl lg:text-6xl">O Grande Dia</h1>
 				<div class="ornament">
-					<span class="text-lg">💍</span>
+					<img src={`${baseUrl}/images/TM_LOGO.png`} alt="Logo" class="h-10 w-auto" />
 				</div>
 				<p class="text-gray-600 text-sm md:text-base max-w-xl mx-auto mt-4">
 					Tudo o que precisas de saber para aproveitares este dia connosco.
@@ -27,7 +27,7 @@ const baseUrl = import.meta.env.BASE_URL;
 					<p class="section-subtitle">Organização</p>
 					<h2 class="section-title">Disposição das Mesas</h2>
 					<div class="ornament">
-						<span class="text-lg">🪑</span>
+						<img src={`${baseUrl}/images/TM_LOGO.png`} alt="Logo" class="h-10 w-auto" />
 					</div>
 				</div>
 
@@ -38,7 +38,7 @@ const baseUrl = import.meta.env.BASE_URL;
 						Descobre onde vais ficar sentado(a) e quem serão os teus companheiros de mesa!
 					</p>
 					<a 
-						href={`${baseUrl}/mesas`}
+						href={`${baseUrl}/mesa`}
 						class="inline-flex items-center gap-2 px-6 py-3 bg-olive-500 hover:bg-olive-600 text-white text-sm font-medium rounded-full transition-colors"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@ const baseUrl = import.meta.env.BASE_URL;
 					<p class="section-subtitle">Gastronomia</p>
 					<h2 class="section-title">Menu</h2>
 					<div class="ornament">
-						<span class="text-lg">🍷</span>
+						<img src={`${baseUrl}/images/TM_LOGO.png`} alt="Logo" class="h-10 w-auto" />
 					</div>
 				</div>
 
@@ -115,7 +115,7 @@ const baseUrl = import.meta.env.BASE_URL;
 					<p class="section-subtitle">Partilha</p>
 					<h2 class="section-title">Galeria ao Vivo</h2>
 					<div class="ornament">
-						<span class="text-lg">📸</span>
+						<img src={`${baseUrl}/images/TM_LOGO.png`} alt="Logo" class="h-10 w-auto" />
 					</div>
 				</div>
 
@@ -126,7 +126,7 @@ const baseUrl = import.meta.env.BASE_URL;
 						e vê o que os outros convidados estão a captar. Juntos vamos criar um álbum inesquecível.
 					</p>
 					<a 
-						href={`${baseUrl}/galeria-ao-vivo`}
+						href={`${baseUrl}/fotos`}
 						class="inline-flex items-center gap-2 px-6 py-3 bg-olive-500 hover:bg-olive-600 text-white text-sm font-medium rounded-full transition-colors"
 					>
 						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,31 +138,42 @@ const baseUrl = import.meta.env.BASE_URL;
 			</div>
 		</section>
 
-		<!-- Memories Section -->
-		<section id="recordacoes" class="wedding-section">
+		<!-- Solidarity Section -->
+		<section id="solidarity-dia" class="wedding-section bg-white">
 			<div class="max-w-4xl mx-auto">
 				<div class="section-header">
-					<p class="section-subtitle">Recordações</p>
-					<h2 class="section-title">Memórias deste Dia</h2>
+					<h2 class="section-title">Este é um casamento solidário!</h2>
 					<div class="ornament">
-						<span class="text-lg">💛</span>
+						<img src={`${baseUrl}/images/TM_LOGO.png`} alt="Logo" class="h-10 w-auto" />
 					</div>
 				</div>
 
-				<div class="wedding-card text-center max-w-2xl mx-auto">
-					<div class="text-4xl mb-4">✨</div>
-					<p class="text-gray-700 text-base md:text-lg leading-relaxed mb-4">
-						Cada foto é uma memória, cada memória é um tesouro.
+				<div class="text-center mb-10 space-y-4">
+					<p class="text-gray-600 leading-relaxed max-w-2xl mx-auto text-justify">
+						O melhor presente que podemos receber é a tua presença, mas o melhor presente que podemos dar é a esperança. Neste dia, escolhemos transformar as tradicionais lembranças de casamento em sorrisos e apoio a quem mais precisa, através de donativos a instituições de solidariedade social.
 					</p>
-					<p class="text-gray-600 text-sm md:text-base leading-relaxed">
-						Gostaríamos muito que partilhassem connosco as fotos e vídeos que tirarem ao longo do dia. 
-						São estes momentos espontâneos, capturados pelos vossos olhos, que tornam este dia verdadeiramente único. 
-						Não há filtros nem poses perfeitas — apenas amor, alegria e muitas gargalhadas.
+					<p class="text-gray-600 leading-relaxed max-w-2xl mx-auto text-justify">
+						Porque a tua presença nos faz felizes, e a tua generosidade pode fazer a diferença na vida de muitos. Se te quiseres juntar a esta causa podes fazê-lo diretamente através dos links abaixo:
 					</p>
-					<p class="text-gray-600 text-sm md:text-base leading-relaxed mt-4">
-						Partilhem à vontade na galeria ao vivo ou enviem-nos mais tarde. 
-						Cada imagem será uma recordação que vamos guardar para sempre. 💕
-					</p>
+				</div>
+
+				<div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+					<a href="https://narizvermelho.pt/lojinha/" target="_blank" rel="noopener noreferrer" class="wedding-card flex flex-col items-center justify-center gap-3 p-6 hover:shadow-md transition-shadow">
+						<img src={`${baseUrl}/images/charities/nariz-vermelho-logo.png`} alt="Nariz Vermelho" class="max-h-[48px] w-auto object-contain" loading="lazy" />
+						<span class="text-xs text-olive-600 font-medium text-center">Nariz Vermelho</span>
+					</a>
+					<a href="https://acreditar.org.pt/colaborar/presentes-solidarios/" target="_blank" rel="noopener noreferrer" class="wedding-card flex flex-col items-center justify-center gap-3 p-6 hover:shadow-md transition-shadow">
+						<img src={`${baseUrl}/images/charities/acreditar-logo.png`} alt="Acreditar" class="max-h-[48px] w-auto object-contain" loading="lazy" />
+						<span class="text-xs text-olive-600 font-medium text-center">Acreditar</span>
+					</a>
+					<a href="https://makeawish.pt/montra-solidaria/" target="_blank" rel="noopener noreferrer" class="wedding-card flex flex-col items-center justify-center gap-3 p-6 hover:shadow-md transition-shadow">
+						<img src={`${baseUrl}/images/charities/make-a-wish-logo.png`} alt="Make-A-Wish" class="max-h-[48px] w-auto object-contain" loading="lazy" />
+						<span class="text-xs text-olive-600 font-medium text-center">Make-A-Wish</span>
+					</a>
+					<a href="https://presentesparaavida.unicef.pt/todos-os-produtos/" target="_blank" rel="noopener noreferrer" class="wedding-card flex flex-col items-center justify-center gap-3 p-6 hover:shadow-md transition-shadow">
+						<img src={`${baseUrl}/images/charities/unicef-logo.png`} alt="UNICEF" class="max-h-[48px] w-auto object-contain" loading="lazy" />
+						<span class="text-xs text-olive-600 font-medium text-center">UNICEF</span>
+					</a>
 				</div>
 			</div>
 		</section>

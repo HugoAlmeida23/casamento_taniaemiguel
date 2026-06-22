@@ -5,26 +5,29 @@ const images = [
 	{ src: '2022_02.jpg', alt: 'Foto do casal 2' },
 	{ src: '2023_05_3.jpg', alt: 'Foto do casal 3' },
 	{ src: '2024_10_2.jpg', alt: 'Foto do casal 4' },
+	{ src: '18.jpg', alt: 'Foto do casal 5' },
+	{ src: '33.jpg', alt: 'Foto do casal 6' },
+	{ src: '36.jpg', alt: 'Foto do casal 7' },
 ];
 ---
 
 <section id="gallery" class="wedding-section" style="background-image: url('/casamento_taniaemiguel/images/sand-texture.jpg'); background-size: cover; background-position: center;">
 	<div class="max-w-5xl mx-auto">
 		<div class="section-header">
-			<p class="section-subtitle">Memórias</p>
-			<h2 class="section-title">Galeria</h2>
+			<p class="section-subtitle">Galeria</p>
+			<h2 class="section-title">Memórias</h2>
 			<div class="ornament">
-				<img src={`${import.meta.env.BASE_URL}/images/TM_LOGO.png`} alt="Logo" class="h-5 w-auto" />
+				<img src={`${import.meta.env.BASE_URL}/images/TM_LOGO.png`} alt="Logo" class="h-10 w-auto" />
 			</div>
 		</div>
 
-		<!-- Masonry-style grid -->
-		<div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+		<!-- Compact grid -->
+		<div class="grid grid-cols-3 md:grid-cols-4 gap-2 md:gap-3">
 			{images.map((img, i) => (
 				<div 
-					class={`gallery-item group relative rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-lg transition-shadow duration-300 ${i === 0 || i === 5 ? 'row-span-2' : ''}`}
+					class="gallery-item group relative rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-300"
 				>
-					<div class={`${i === 0 || i === 5 ? 'h-full min-h-[300px] md:min-h-[400px]' : 'aspect-square'}`}>
+					<div class="aspect-[4/3]">
 						<img 
 							src={`${import.meta.env.BASE_URL}/images/${img.src}`}
 							alt={img.alt}
