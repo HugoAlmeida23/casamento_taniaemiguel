@@ -50,60 +50,110 @@ const baseUrl = import.meta.env.BASE_URL;
 			</div>
 		</section>
 
-		<!-- Menu Section -->
-		<section id="menu" class="wedding-section">
-			<div class="max-w-4xl mx-auto">
+		<!-- Ementa Section -->
+		<section id="ementa-section" class="wedding-section" aria-labelledby="ementa-heading">
+			<div class="max-w-3xl mx-auto">
 				<div class="section-header">
 					<p class="section-subtitle">Gastronomia</p>
-					<h2 class="section-title">Menu</h2>
+					<h2 id="ementa-heading" class="section-title">Ementa</h2>
 					<div class="ornament">
 						<img src={`${baseUrl}/images/TM_LOGO.png`} alt="Logo" class="h-10 w-auto" />
 					</div>
+					<p class="text-gray-500 text-sm mt-2">Uma seleção cuidada de sabores para celebrar este dia especial</p>
 				</div>
 
-				<div class="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-					<!-- Entrada -->
-					<div class="wedding-card text-center">
-						<div class="text-3xl mb-3">🥗</div>
-						<h3 class="text-lg font-light text-gray-900 mb-3" style="font-family: 'Playfair Display', serif;">
-							Entrada
-						</h3>
-						<ul class="text-sm text-gray-600 space-y-2">
-							<li>Cocktail de boas-vindas</li>
-							<li>Tábua de queijos e enchidos</li>
-							<li>Crostini variados</li>
+				<div class="space-y-8">
+					<!-- Entradas -->
+					<div class="wedding-card p-6">
+						<h3 class="text-lg font-light text-gray-900 mb-4 text-center" style="font-family: 'Playfair Display', serif;">Entradas</h3>
+						<ul class="space-y-3 text-sm text-gray-600">
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Tábua de Queijos e Enchidos da Região</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Seleção artesanal com mel e frutos secos</span>
+							</li>
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Alheira Frita com Grelos Salteados</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Receita tradicional portuguesa</span>
+							</li>
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Gambas ao Alho com Coentros</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Servidas com pão torrado caseiro</span>
+							</li>
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Salada de Polvo Grelhado</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Com batata, cebola roxa e azeite virgem</span>
+							</li>
 						</ul>
 					</div>
 
 					<!-- Prato Principal -->
-					<div class="wedding-card text-center">
-						<div class="text-3xl mb-3">🥩</div>
-						<h3 class="text-lg font-light text-gray-900 mb-3" style="font-family: 'Playfair Display', serif;">
-							Prato Principal
-						</h3>
-						<ul class="text-sm text-gray-600 space-y-2">
-							<li>Peixe do dia ao forno</li>
-							<li>Carne assada com legumes</li>
-							<li>Opção vegetariana</li>
+					<div class="wedding-card p-6">
+						<h3 class="text-lg font-light text-gray-900 mb-4 text-center" style="font-family: 'Playfair Display', serif;">Prato Principal</h3>
+						<ul class="space-y-3 text-sm text-gray-600">
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Lombo de Vitela Assado com Ervas</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Acompanhado de puré de batata trufado</span>
+							</li>
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Bacalhau com Broa e Espinafres</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Gratinado no forno com azeite da casa</span>
+							</li>
 						</ul>
 					</div>
 
 					<!-- Sobremesa -->
-					<div class="wedding-card text-center">
-						<div class="text-3xl mb-3">🎂</div>
-						<h3 class="text-lg font-light text-gray-900 mb-3" style="font-family: 'Playfair Display', serif;">
-							Sobremesa
-						</h3>
-						<ul class="text-sm text-gray-600 space-y-2">
-							<li>Bolo de casamento</li>
-							<li>Mesa de doces tradicionais</li>
-							<li>Fruta da época</li>
+					<div class="wedding-card p-6">
+						<h3 class="text-lg font-light text-gray-900 mb-4 text-center" style="font-family: 'Playfair Display', serif;">Sobremesa</h3>
+						<ul class="space-y-3 text-sm text-gray-600">
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Bolo de Noiva</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Camadas de baunilha com creme de framboesa</span>
+							</li>
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Leite-Creme Queimado</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Receita conventual com canela</span>
+							</li>
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Mesa de Doces Regionais</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Pastéis de nata, travesseiros e queijadas</span>
+							</li>
+						</ul>
+					</div>
+
+					<!-- Bebidas -->
+					<div class="wedding-card p-6">
+						<h3 class="text-lg font-light text-gray-900 mb-4 text-center" style="font-family: 'Playfair Display', serif;">Bebidas</h3>
+						<ul class="space-y-3 text-sm text-gray-600">
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Espumante de Boas-Vindas</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Bruto natural da região</span>
+							</li>
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Vinho Branco e Tinto da Quinta</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Seleção do enólogo para a ocasião</span>
+							</li>
+							<li class="flex justify-between items-baseline gap-2">
+								<span class="font-medium text-gray-800">Águas, Sumos Naturais e Café</span>
+								<span class="border-b border-dotted border-gray-300 flex-1 mx-2"></span>
+								<span class="text-gray-500 text-xs italic">Disponíveis durante toda a refeição</span>
+							</li>
 						</ul>
 					</div>
 				</div>
 
 				<p class="text-center text-xs text-gray-500 mt-6 italic">
-					Menu sujeito a pequenas alterações. Se tens restrições alimentares, certifica-te que as indicaste no RSVP.
+					Menu sujeito a pequenas alterações sazonais
 				</p>
 			</div>
 		</section>
