@@ -1,14 +1,49 @@
 ---
 // Photo gallery with lightbox — olive/beige palette
+// Show 6 preview photos + "Ver todas" button to open full gallery lightbox
 const images = [
-	{ src: '2021_10.jpg', alt: 'Foto do casal 1' },
-	{ src: '2022_02.jpg', alt: 'Foto do casal 2' },
-	{ src: '2023_05_3.jpg', alt: 'Foto do casal 3' },
-	{ src: '2024_10_2.jpg', alt: 'Foto do casal 4' },
-	{ src: '18.jpg', alt: 'Foto do casal 5' },
-	{ src: '33.jpg', alt: 'Foto do casal 6' },
-	{ src: '36.jpg', alt: 'Foto do casal 7' },
+	{ src: 'memorias/18.JPG', alt: 'Memória 1' },
+	{ src: 'memorias/2021_10.jpg', alt: 'Memória 2' },
+	{ src: 'memorias/2022_02.jpg', alt: 'Memória 3' },
+	{ src: 'memorias/2023_05_3.jpg', alt: 'Memória 4' },
+	{ src: 'memorias/26.jpg', alt: 'Memória 5' },
+	{ src: 'memorias/33.jpg', alt: 'Memória 6' },
+	{ src: 'memorias/36.jpg', alt: 'Memória 7' },
+	{ src: 'memorias/39.jpg', alt: 'Memória 8' },
+	{ src: 'memorias/IMG_20201011_130444.jpg', alt: 'Memória 9' },
+	{ src: 'memorias/IMG_20210918_151723.jpg', alt: 'Memória 10' },
+	{ src: 'memorias/IMG_20231006_162301.jpg', alt: 'Memória 11' },
+	{ src: 'memorias/IMG_20260628_165114.jpg', alt: 'Memória 12' },
+	{ src: 'memorias/IMG-20210705-WA0021.jpg', alt: 'Memória 13' },
+	{ src: 'memorias/IMG-20230530-WA0029.jpg', alt: 'Memória 14' },
+	{ src: 'memorias/IMG-20230619-WA00082.jpg', alt: 'Memória 15' },
+	{ src: 'memorias/IMG-20240606-WA0064.jpg', alt: 'Memória 16' },
+	{ src: 'memorias/IMG-20240903-WA0010.jpg', alt: 'Memória 17' },
+	{ src: 'memorias/IMG-20240905-WA0001.jpg', alt: 'Memória 18' },
+	{ src: 'memorias/IMG-20241013-WA0006.jpg', alt: 'Memória 19' },
+	{ src: 'memorias/IMG-20241013-WA0014.jpg', alt: 'Memória 20' },
+	{ src: 'memorias/IMG-20241110-WA0001.jpg', alt: 'Memória 21' },
+	{ src: 'memorias/IMG-20241112-WA0012.jpg', alt: 'Memória 22' },
+	{ src: 'memorias/IMG-20241112-WA0013.jpg', alt: 'Memória 23' },
+	{ src: 'memorias/IMG-20241112-WA0014.jpg', alt: 'Memória 24' },
+	{ src: 'memorias/IMG-20241112-WA0016.jpg', alt: 'Memória 25' },
+	{ src: 'memorias/IMG-20241112-WA0017.jpg', alt: 'Memória 26' },
+	{ src: 'memorias/IMG-20241112-WA0018.jpg', alt: 'Memória 27' },
+	{ src: 'memorias/IMG-20241117-WA0004.jpg', alt: 'Memória 28' },
+	{ src: 'memorias/IMG-20241229-WA0130.jpg', alt: 'Memória 29' },
+	{ src: 'memorias/IMG-20250818-WA0050.jpg', alt: 'Memória 30' },
+	{ src: 'memorias/IMG-20250921-WA0020.jpg', alt: 'Memória 31' },
+	{ src: 'memorias/IMG20251225152036.jpg', alt: 'Memória 32' },
+	{ src: 'memorias/IMG20260314134006.jpg', alt: 'Memória 33' },
+	{ src: 'memorias/IMG20260317152708.jpg', alt: 'Memória 34' },
+	{ src: 'memorias/IMG20260627182931.jpg', alt: 'Memória 35' },
+	{ src: 'memorias/received_313562693332709.jpeg', alt: 'Memória 36' },
+	{ src: 'memorias/received_568906853777986.jpeg', alt: 'Memória 37' },
+	{ src: 'memorias/received_669196577003162.jpeg', alt: 'Memória 38' },
 ];
+
+const previewImages = images.slice(0, 6);
+const remainingCount = images.length - 6;
 ---
 
 <section id="gallery" class="wedding-section" style="background-image: url('/casamento_taniaemiguel/images/sand-texture.jpg'); background-size: cover; background-position: center;">
@@ -21,11 +56,12 @@ const images = [
 			</div>
 		</div>
 
-		<!-- Compact grid -->
-		<div class="grid grid-cols-3 md:grid-cols-4 gap-2 md:gap-3">
-			{images.map((img, i) => (
+		<!-- Preview grid: 6 photos, last one has overlay -->
+		<div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+			{previewImages.map((img, i) => (
 				<div 
 					class="gallery-item group relative rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-shadow duration-300"
+					data-index={i}
 				>
 					<div class="aspect-[4/3]">
 						<img 
@@ -35,72 +71,121 @@ const images = [
 							loading="lazy"
 						/>
 					</div>
-					<div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+					{i === 5 && (
+						<div class="absolute inset-0 bg-black/40 flex flex-col items-center justify-center transition-colors duration-300 group-hover:bg-black/55">
+							<span class="text-white text-2xl md:text-3xl">📸</span>
+							<span class="text-white text-sm md:text-base font-light mt-1">Ver mais</span>
+						</div>
+					)}
+					{i !== 5 && (
+						<div class="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
+					)}
 				</div>
 			))}
+		</div>
+
+		<!-- "Ver todas" button -->
+		<div class="text-center mt-8">
+			<button 
+				id="open-gallery-btn"
+				class="inline-flex items-center gap-2 px-6 py-3 bg-olive-600 text-white rounded-full hover:bg-olive-700 transition-colors duration-300 shadow-md hover:shadow-lg"
+				style="background-color: #6b7c4e;"
+			>
+				<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+				</svg>
+				Ver todas as fotos
+			</button>
 		</div>
 	</div>
 </section>
 
 <!-- Lightbox -->
-<div id="lightbox" class="fixed inset-0 bg-black/95 hidden z-[100] flex items-center justify-center" role="dialog" aria-modal="true" aria-label="Visualizar foto">
-	<button id="lightbox-close" class="absolute top-6 right-6 text-white/70 hover:text-white transition-colors" aria-label="Fechar">
+<div id="lightbox" class="fixed inset-0 bg-black/95 hidden z-[100] items-center justify-center" role="dialog" aria-modal="true" aria-label="Visualizar foto">
+	<!-- Counter -->
+	<div id="lightbox-counter" class="absolute top-6 left-6 text-white/70 text-sm font-medium"></div>
+	<!-- Close -->
+	<button id="lightbox-close" class="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-10" aria-label="Fechar">
 		<svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"></path>
 		</svg>
 	</button>
-	<button id="lightbox-prev" class="absolute left-4 md:left-8 text-white/70 hover:text-white transition-colors" aria-label="Anterior">
+	<!-- Prev -->
+	<button id="lightbox-prev" class="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors z-10 bg-black/30 rounded-full p-2" aria-label="Anterior">
 		<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"></path>
 		</svg>
 	</button>
-	<button id="lightbox-next" class="absolute right-4 md:right-8 text-white/70 hover:text-white transition-colors" aria-label="Próxima">
+	<!-- Next -->
+	<button id="lightbox-next" class="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors z-10 bg-black/30 rounded-full p-2" aria-label="Próxima">
 		<svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7"></path>
 		</svg>
 	</button>
+	<!-- Image -->
 	<img id="lightbox-img" src="" alt="" class="max-w-[90vw] max-h-[85vh] object-contain rounded-lg" />
 </div>
 
+<!-- Hidden data for JS -->
+<div id="gallery-data" class="hidden" data-images={JSON.stringify(images.map(img => `${import.meta.env.BASE_URL}/images/${img.src}`))}></div>
+
 <script>
 	document.addEventListener('DOMContentLoaded', () => {
-		const items = document.querySelectorAll('.gallery-item');
 		const lightbox = document.getElementById('lightbox');
 		const lightboxImg = document.getElementById('lightbox-img') as HTMLImageElement;
+		const lightboxCounter = document.getElementById('lightbox-counter');
 		const closeBtn = document.getElementById('lightbox-close');
 		const prevBtn = document.getElementById('lightbox-prev');
 		const nextBtn = document.getElementById('lightbox-next');
+		const openBtn = document.getElementById('open-gallery-btn');
+		const galleryData = document.getElementById('gallery-data');
+		const items = document.querySelectorAll('.gallery-item');
 
-		const images: string[] = [];
-		items.forEach(item => {
-			const img = item.querySelector('img');
-			if (img) images.push(img.src);
-		});
-
+		// All image URLs from hidden data
+		const allImages: string[] = JSON.parse(galleryData?.dataset.images || '[]');
 		let currentIndex = 0;
+
+		function updateCounter() {
+			if (lightboxCounter) {
+				lightboxCounter.textContent = `${currentIndex + 1} / ${allImages.length}`;
+			}
+		}
 
 		function openLightbox(index: number) {
 			currentIndex = index;
-			if (lightboxImg) lightboxImg.src = images[currentIndex];
+			if (lightboxImg) lightboxImg.src = allImages[currentIndex];
+			updateCounter();
 			lightbox?.classList.remove('hidden');
+			lightbox?.classList.add('flex');
 			document.body.style.overflow = 'hidden';
 		}
 
 		function closeLightbox() {
 			lightbox?.classList.add('hidden');
+			lightbox?.classList.remove('flex');
 			document.body.style.overflow = '';
 		}
 
 		function navigate(dir: number) {
-			currentIndex = (currentIndex + dir + images.length) % images.length;
-			if (lightboxImg) lightboxImg.src = images[currentIndex];
+			currentIndex = (currentIndex + dir + allImages.length) % allImages.length;
+			if (lightboxImg) lightboxImg.src = allImages[currentIndex];
+			updateCounter();
 		}
 
-		items.forEach((item, i) => item.addEventListener('click', () => openLightbox(i)));
+		// Click on preview photos opens lightbox at that index
+		items.forEach((item) => {
+			const index = parseInt((item as HTMLElement).dataset.index || '0');
+			item.addEventListener('click', () => openLightbox(index));
+		});
+
+		// "Ver todas" button opens lightbox at photo 0
+		openBtn?.addEventListener('click', () => openLightbox(0));
+
 		closeBtn?.addEventListener('click', closeLightbox);
 		prevBtn?.addEventListener('click', () => navigate(-1));
 		nextBtn?.addEventListener('click', () => navigate(1));
 		lightbox?.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+		
 		document.addEventListener('keydown', (e) => {
 			if (lightbox?.classList.contains('hidden')) return;
 			if (e.key === 'Escape') closeLightbox();

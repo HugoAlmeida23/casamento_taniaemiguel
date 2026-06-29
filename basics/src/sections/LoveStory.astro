@@ -12,33 +12,52 @@
 			</div>
 		</div>
 
-		<div class="grid md:grid-cols-2 gap-10 items-center">
+		<!-- Row 1: Text left, Photo right -->
+		<div class="grid md:grid-cols-2 gap-6 md:gap-10 items-center">
+			<!-- Text Part 1 -->
+			<div class="space-y-4 md:space-y-5 text-gray-600 leading-relaxed text-sm md:text-base">
+				<p>
+					Era uma vez um tempo em que os nossos caminhos se cruzavam de forma tímida: uma miúda que ia ao café pagar as contas da avó e um rapaz demasiado distraído com os seus jogos de computador. A vida, na sua sabedoria, soube esperar pelo momento certo e voltou a sentar-nos lado a lado na mesma turma do secundário.
+				</p>
+				<p>
+					Foi aí, entre os sussurros do corredor e a cumplicidade partilhada, que o nosso destino se selou. Há instantes em que o universo se alinha, e o nosso tem uma data e uma hora que nunca vamos esquecer: dia 7 de outubro de 2014, às 13h40, na sala A23, instantes antes de uma aula de Português. Aquele primeiro beijo, que nasceu com a bonita inocência da juventude, tornou-se o prólogo da nossa maior aventura.
+				</p>
+				
+			</div>
+
 			<!-- Image -->
-			<div class="rounded-3xl overflow-hidden shadow-lg">
+			<div class="rounded-2xl md:rounded-3xl overflow-hidden shadow-lg">
 				<img 
-					src={`${import.meta.env.BASE_URL}/images/historia.jpg`}
+					src={`${import.meta.env.BASE_URL}/images/39.jpg`}
 					alt="Nossa história de amor" 
-					class="w-full h-80 md:h-[450px] object-cover"
+					class="w-full h-64 md:h-[450px] object-cover"
+					loading="lazy"
+				/>
+			</div>
+		</div>
+
+		<!-- Row 2: Photo left (on desktop), Text first on mobile -->
+		<div class="grid md:grid-cols-2 gap-6 md:gap-10 items-center mt-10 md:mt-16">
+			<!-- Image — appears second on mobile, first on desktop -->
+			<div class="rounded-2xl md:rounded-3xl overflow-hidden shadow-lg order-2 md:order-1">
+				<img 
+					src={`${import.meta.env.BASE_URL}/images/historia2.jpg`}
+					alt="O nosso pedido" 
+					class="w-full h-64 md:h-[450px] object-cover"
 					loading="lazy"
 				/>
 			</div>
 
-			<!-- Text -->
-			<div class="space-y-5 text-gray-600 leading-relaxed">
+			<!-- Text Part 2 — appears first on mobile, second on desktop -->
+			<div class="space-y-4 md:space-y-5 text-gray-600 leading-relaxed text-sm md:text-base order-1 md:order-2">
 				<p>
-					Era uma vez dois corações que se encontraram no momento perfeito. 
-					A nossa história começou de forma simples, mas com a certeza de que 
-					havia algo especial entre nós.
+					Ao longo de uma década, crescemos juntos. Descobrimos o mundo em viagens, abrimos as portas das nossas famílias e entrelaçámos os nossos sonhos, construindo, dia após dia, um amor maduro e inabalável.
 				</p>
 				<p>
-					Desde o primeiro olhar, soubemos que éramos feitos um para o outro. 
-					Crescemos juntos, partilhámos sonhos, enfrentámos desafios e construímos 
-					uma base sólida de amor, respeito e cumplicidade.
+					Exatamente dez anos depois, o relógio quis poetizar a nossa história. Sob o céu de Sevilha, na imensidão da Plaza de España e ao som apaixonado do flamenco, o Miguel fez a grande pergunta. O relógio marcava, uma vez mais, 13h40.
 				</p>
 				<p>
-					Hoje, queremos oficializar este amor perante as pessoas que mais amamos, 
-					celebrando não só o que fomos até aqui, mas principalmente tudo o que 
-					ainda vamos viver juntos.
+					O "Sim" que ali dissemos estende-se agora até ao altar. Estamos a preparar o dia mais feliz das nossas vidas e mal podemos esperar por celebrar este novo capítulo com as pessoas que mais amamos!
 				</p>
 				<p class="text-olive-600 italic pt-4" style="font-family: 'Playfair Display', serif; font-size: 1.1rem;">
 					Com amor, Tânia & Miguel 🌿
