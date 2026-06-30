@@ -1,0 +1,637 @@
+---
+// Realistic animated envelope — sage-green textured paper with a real copper wax seal.
+// MOBILE-OPTIMIZED VERSION: tighter sizing, no zoom/scroll glitches, safe-area aware,
+// touch-friendly hit areas, lighter perspective so nothing clips on small screens.
+const base = import.meta.env.BASE_URL;
+const paper = `${base}/images/envelope-background.jpg`;
+const seal = `${base}/images/wax-seal-prata.png`;
+---
+
+<div
+	id="intro-screen"
+	class="fixed inset-0 z-[200] flex items-center justify-center overflow-hidden select-none"
+	style={`--paper:url('${paper}'); --seal:url('${seal}');`}
+>
+	<div class="env-stage">
+		<div
+			id="envelope-wrapper"
+			class="envelope"
+			role="button"
+			aria-label="Abrir convite"
+			tabindex="0"
+		>
+			<!-- Back of the envelope (holds everything) -->
+			<div class="env-back"></div>
+
+			<!-- The letter / card that rises out -->
+			<div class="env-letter" id="envelope-card">
+				<div class="letter-content">
+					<p class="letter-eyebrow">Estão convidados para o casamento de</p>
+					<h2 class="letter-names">Tânia &amp; Miguel</h2>
+					<div class="letter-rule"><span></span>✦<span></span></div>
+					<p class="letter-date">28 de Maio de 2027</p>
+				</div>
+			</div>
+
+			<!-- Front pocket -->
+			<div class="env-pocket"></div>
+
+			<!-- Top flap that opens / closes (sealed) -->
+			<div class="env-flap" id="envelope-flap">
+				<div class="flap-face"></div>
+				<div class="flap-shadow"></div>
+			</div>
+
+			<!-- Real copper wax seal (TM already embossed in the image) -->
+			<div class="wax-seal" id="wax-seal"></div>
+
+			<!-- Gold sparkle burst on open -->
+			<div class="sparkles" id="sparkles" aria-hidden="true">
+				<span></span><span></span><span></span><span></span>
+				<span></span><span></span><span></span><span></span>
+				<span></span><span></span>
+			</div>
+		</div>
+
+		<p id="tap-hint" class="tap-hint">Toque para abrir</p>
+	</div>
+
+	<!-- Fog / mist transition layer -->
+	<div id="fog" class="fog" aria-hidden="true">
+		<span class="fog-layer fog-1"></span>
+		<span class="fog-layer fog-2"></span>
+		<span class="fog-layer fog-3"></span>
+	</div>
+</div>
+
+<style>
+	/* ---------- Background ---------- */
+	#intro-screen {
+		background:
+			radial-gradient(ellipse at 50% 38%, #6f8f7c 0%, #56735f 45%, #3f5a4a 100%);
+		transition: opacity 0.8s ease, transform 1s cubic-bezier(0.4, 0, 0.2, 1), filter 0.9s ease;
+		height: 100vh;
+		height: 100dvh; /* dynamic viewport height, fixes iOS Safari chrome jump */
+		width: 100vw;
+		/* Avoid notches / home-indicator overlap on phones */
+		padding: env(safe-area-inset-top) env(safe-area-inset-right)
+			env(safe-area-inset-bottom) env(safe-area-inset-left);
+		box-sizing: border-box;
+		/* Stop iOS rubber-band scroll & pinch-zoom inside the overlay */
+		touch-action: none;
+		overscroll-behavior: none;
+	}
+
+	#intro-screen::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: radial-gradient(ellipse at center, transparent 45%, rgba(25, 42, 33, 0.55) 100%);
+		pointer-events: none;
+	}
+
+	.env-stage {
+		position: relative;
+		perspective: 1200px; /* reduced from 1600px: keeps 3D tilt subtle, avoids edge clipping on narrow viewports */
+		perspective-origin: 50% 38%;
+		transition: transform 1.3s cubic-bezier(0.66, 0, 0.34, 1);
+		transform-origin: 50% 38%;
+		display: inline-flex;
+		flex-direction: column;
+		align-items: center;
+		flex-shrink: 0;
+		max-width: 100vw;
+		padding: 0 1rem;
+		box-sizing: border-box;
+	}
+
+	.env-stage.zooming {
+		transform: scale(7);
+	}
+
+	/* ---------- Envelope shell ---------- */
+	.envelope {
+		/* Mobile-first sizing: smaller viewport %, capped lower than desktop (380px) */
+		--w: min(78vw, 320px);
+		--h: calc(var(--w) * 0.66);
+		position: relative;
+		width: var(--w);
+		height: var(--h);
+		transform-style: preserve-3d;
+		cursor: pointer;
+		touch-action: manipulation; /* removes 300ms tap delay, blocks double-tap-zoom */
+		-webkit-tap-highlight-color: transparent;
+		animation: floatIdle 6s ease-in-out infinite;
+		transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+		filter: drop-shadow(0 20px 30px rgba(0, 0, 0, 0.4));
+		flex-shrink: 0;
+	}
+
+	.envelope.opened {
+		animation: none;
+	}
+
+	.envelope.content-fading .letter-content {
+		opacity: 0 !important;
+		transition: opacity 0.2s ease !important;
+		transition-delay: 0s !important;
+	}
+
+	.envelope.opened .letter-content {
+		opacity: 1;
+		transform: translateY(0);
+		transition: opacity 0.5s ease 0.5s, transform 0.5s ease 0.5s;
+	}
+
+	/* Shared paper texture for every facet */
+	.env-back,
+	.env-pocket,
+	.flap-face,
+	.env-letter {
+		background-image: var(--paper);
+		background-size: 140% 140%;
+		background-position: center;
+		background-blend-mode: soft-light;
+		filter: contrast(1.08) saturate(0.95);
+	}
+
+	/* ---------- Back ---------- */
+	.env-back {
+		position: absolute;
+		inset: 0;
+		border-radius: 8px;
+		background-color: #93a88c;
+		box-shadow: inset 0 0 40px rgba(60, 84, 66, 0.4);
+	}
+
+	/* ---------- Letter / card ---------- */
+	.env-letter {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		width: 88%;
+		height: 86%;
+		background-color: #f7f5ec;
+		background-blend-mode: overlay;
+		background-size: 200% 200%;
+		border-radius: 4px;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 2;
+		transform: translate(-50%, -50%) translateY(0) scale(0.98);
+		transition: transform 1.4s cubic-bezier(0.22, 1, 0.36, 1), width 1.4s cubic-bezier(0.22, 1, 0.36, 1), height 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.envelope.opened .env-letter {
+		transform: translate(-50%, -50%) translateY(-18%) translateZ(60px) scale(1.04);
+		z-index: 20;
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+		width: 150%;
+		height: 150%;
+		margin-top: 20%;
+	}
+
+	.letter-content {
+		text-align: center;
+		padding: 1rem;
+		opacity: 0;
+		transform: translateY(8px);
+		transition: opacity 0.7s ease, transform 0.7s ease;
+	}
+
+	.letter-eyebrow {
+		font-family: 'Montserrat', sans-serif;
+		font-size: clamp(0.46rem, 3.2vw, 0.6rem);
+		text-transform: uppercase;
+		letter-spacing: 0.22em;
+		color: #7a9379;
+		margin-bottom: 0.6rem;
+	}
+
+	.letter-names {
+		font-family: 'Playfair Display', Georgia, serif;
+		font-size: clamp(1.3rem, 8vw, 2rem);
+		font-weight: 400;
+		color: #2f3d33;
+		line-height: 1.1;
+	}
+
+	.letter-rule {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		margin: 0.5rem 0;
+		color: #b07f43;
+		font-size: 0.65rem;
+	}
+
+	.letter-rule span {
+		display: block;
+		width: clamp(22px, 9vw, 40px);
+		height: 1px;
+		background: linear-gradient(90deg, transparent, #c79a5e);
+	}
+
+	.letter-rule span:last-child {
+		background: linear-gradient(90deg, #c79a5e, transparent);
+	}
+
+	.letter-date {
+		font-family: 'Montserrat', sans-serif;
+		font-size: clamp(0.58rem, 3vw, 0.72rem);
+		letter-spacing: 0.14em;
+		color: #5f6b5f;
+	}
+
+	/* ---------- Front pocket ---------- */
+	.env-pocket {
+		position: absolute;
+		inset: 0;
+		border-radius: 8px;
+		background-color: #8fa890;
+		z-index: 3;
+		box-shadow: inset 0 -10px 22px rgba(60, 84, 66, 0.18);
+		overflow: hidden;
+	}
+
+	.env-pocket::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(115deg, transparent calc(52% - 1px), rgba(255, 255, 255, 0.28) 52%, transparent calc(52% + 1px)) 0 0 / 50% 100% no-repeat,
+			linear-gradient(245deg, transparent calc(48% - 1px), rgba(255, 255, 255, 0.28) 48%, transparent calc(48% + 1px)) 100% 0 / 50% 100% no-repeat,
+			linear-gradient(0deg, rgba(1, 32, 8, 0.15), transparent 70%);
+		mix-blend-mode: multiply;
+		pointer-events: none;
+	}
+
+	/* ---------- Top flap (opens) ---------- */
+	.env-flap {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 58%;
+		transform-origin: top center;
+		transform: rotateX(0deg);
+		transform-style: preserve-3d;
+		z-index: 6;
+		transition: transform 1.1s cubic-bezier(0.6, 0.02, 0.3, 1), z-index 0s linear 0.55s;
+	}
+
+	.envelope.opened .env-flap {
+		transform: rotateX(178deg);
+		z-index: 1;
+	}
+
+	.flap-shadow {
+		position: absolute;
+		inset: 0;
+		clip-path: polygon(0 0, 100% 0, 50% 100%);
+		background: rgba(0, 0, 0, 0.22);
+		opacity: 0;
+		transition: opacity 0.5s ease;
+	}
+
+	.envelope.opened .flap-shadow {
+		opacity: 1;
+		transition-delay: 0.15s;
+	}
+
+	/* ---------- Wax seal ---------- */
+	.wax-seal {
+		position: absolute;
+		top: 80%;
+		left: 52%;
+		width: clamp(82px, 24%, 110px); /* scaled down for smaller mobile envelope */
+		aspect-ratio: 1;
+		transform: translate(-50%, -50%);
+		z-index: 7;
+		background-image: var(--seal);
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center;
+		filter: drop-shadow(0 5px 8px rgba(0,0,0,0.5)) drop-shadow(0 2px 2px rgba(0,0,0,0.35)) contrast(1.1) saturate(1.1);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		animation: sealShimmer 3.5s ease-in-out infinite;
+	}
+
+	.envelope.opened .wax-seal {
+		animation: sealBreak 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+	}
+
+	/* ---------- Sparkles ---------- */
+	.sparkles {
+		position: absolute;
+		top: 58%;
+		left: 50%;
+		width: 1px;
+		height: 1px;
+		z-index: 9;
+		pointer-events: none;
+	}
+
+	.sparkles span {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 6px;
+		height: 6px;
+		margin: -3px;
+		border-radius: 50%;
+		background: radial-gradient(circle, #ffe9b8 0%, #d6a44f 55%, transparent 75%);
+		opacity: 0;
+	}
+
+	.envelope.opened .sparkles span {
+		animation: sparkle 0.9s ease-out forwards;
+	}
+
+	/* Tighter travel distances so sparkles stay on-screen on narrow phones */
+	.sparkles span:nth-child(1)  { animation-delay: 0.05s; --tx: -50px; --ty: -36px; }
+	.sparkles span:nth-child(2)  { animation-delay: 0.10s; --tx: 46px;  --ty: -42px; }
+	.sparkles span:nth-child(3)  { animation-delay: 0.00s; --tx: -26px; --ty: -58px; }
+	.sparkles span:nth-child(4)  { animation-delay: 0.14s; --tx: 30px;  --ty: -54px; }
+	.sparkles span:nth-child(5)  { animation-delay: 0.08s; --tx: -64px; --ty: -8px; }
+	.sparkles span:nth-child(6)  { animation-delay: 0.12s; --tx: 66px;  --ty: -14px; }
+	.sparkles span:nth-child(7)  { animation-delay: 0.18s; --tx: -14px; --ty: -70px; }
+	.sparkles span:nth-child(8)  { animation-delay: 0.06s; --tx: 12px;  --ty: -68px; }
+	.sparkles span:nth-child(9)  { animation-delay: 0.16s; --tx: -38px; --ty: -48px; }
+	.sparkles span:nth-child(10) { animation-delay: 0.10s; --tx: 40px;  --ty: -30px; }
+
+	/* ---------- Tap hint ---------- */
+	.tap-hint {
+		position: relative;
+		margin-top: 1.2rem;
+		margin-left: 1rem;
+		font-family: 'Montserrat', sans-serif;
+		font-size: 0.58rem;
+		text-transform: uppercase;
+		letter-spacing: 0.26em;
+		color: rgba(255, 255, 255, 0.7);
+		white-space: nowrap;
+		text-align: center;
+		animation: hintPulse 2.4s ease-in-out infinite;
+	}
+
+	.envelope.opened ~ .tap-hint {
+		opacity: 0;
+		transition: opacity 0.3s ease;
+	}
+
+	/* ---------- Fog / mist transition ---------- */
+	.fog {
+		position: absolute;
+		inset: 0;
+		z-index: 50;
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.6s ease;
+	}
+
+	.fog.active {
+		opacity: 1;
+	}
+
+	.fog-layer {
+		position: absolute;
+		top: -50%;
+		left: -50%;
+		width: 200%;
+		height: 200%;
+		background-repeat: repeat;
+		will-change: transform, opacity;
+	}
+
+	.fog-1 {
+		background:
+			radial-gradient(ellipse 40% 30% at 20% 40%, rgba(245, 248, 244, 0.9), transparent 60%),
+			radial-gradient(ellipse 50% 35% at 70% 55%, rgba(232, 240, 233, 0.85), transparent 60%),
+			radial-gradient(ellipse 45% 30% at 45% 75%, rgba(240, 245, 240, 0.8), transparent 60%);
+		animation: fogDrift1 9s linear infinite;
+	}
+
+	.fog-2 {
+		background:
+			radial-gradient(ellipse 55% 40% at 60% 30%, rgba(238, 244, 238, 0.8), transparent 60%),
+			radial-gradient(ellipse 40% 30% at 25% 65%, rgba(245, 248, 244, 0.85), transparent 60%),
+			radial-gradient(ellipse 50% 35% at 80% 80%, rgba(232, 240, 233, 0.75), transparent 60%);
+		animation: fogDrift2 13s linear infinite;
+	}
+
+	.fog-3 {
+		background:
+			radial-gradient(ellipse 60% 45% at 50% 50%, rgba(248, 250, 247, 0.7), transparent 65%);
+		animation: fogDrift3 7s ease-in-out infinite;
+	}
+
+	@keyframes fogDrift1 {
+		0%   { transform: translate(0, 0) scale(1); }
+		100% { transform: translate(8%, -4%) scale(1.1); }
+	}
+
+	@keyframes fogDrift2 {
+		0%   { transform: translate(0, 0) scale(1.05); }
+		100% { transform: translate(-10%, 5%) scale(1); }
+	}
+
+	@keyframes fogDrift3 {
+		0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+		50%      { transform: translate(4%, -3%) scale(1.15); opacity: 0.95; }
+	}
+
+	/* ---------- Dismiss transitions ---------- */
+	#intro-screen.vanishing .letter-content {
+		opacity: 0 !important;
+		transition: opacity 0.25s ease !important;
+		transition-delay: 0s !important;
+	}
+
+	#intro-screen.dismissed {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	/* ---------- Keyframes ---------- */
+	@keyframes floatIdle {
+		0%, 100% { transform: translateY(0) rotateX(2deg); }
+		50%      { transform: translateY(-8px) rotateX(0deg); }
+	}
+
+	@keyframes sealShimmer {
+		0%, 100% { filter: drop-shadow(0 3px 5px rgba(0,0,0,0.45)) brightness(1); }
+		50%      { filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5)) brightness(1.12); }
+	}
+
+	@keyframes sealBreak {
+		0%   { transform: translate(-50%, -50%)   translateX(0)    scale(1)    rotate(0deg);   opacity: 1; }
+		2%   { transform: translate(-50%, -85%)   translateX(0.3%) scale(1.03) rotate(-1deg);  opacity: 1; }
+		4%   { transform: translate(-50%, -118%)  translateX(0.6%) scale(1.06) rotate(-2deg);  opacity: 1; }
+		6%   { transform: translate(-50%, -148%)  translateX(1%)   scale(1.08) rotate(-3deg);  opacity: 1; }
+		8%   { transform: translate(-50%, -175%)  translateX(1.5%) scale(1.09) rotate(-4deg);  opacity: 1; }
+		10%  { transform: translate(-50%, -198%)  translateX(2%)   scale(1.1)  rotate(-5deg);  opacity: 1; }
+		12%  { transform: translate(-50%, -218%)  translateX(2.6%) scale(1.1)  rotate(-5deg);  opacity: 1; }
+		15%  { transform: translate(-50%, -250%)  translateX(4%)   scale(1.1)  rotate(-5deg);  opacity: 1; }
+		18%  { transform: translate(-50%, -285%)  translateX(6%)   scale(1.07) rotate(-3deg);  opacity: 1; }
+		21%  { transform: translate(-50%, -318%)  translateX(8.5%) scale(1.04) rotate(-1deg);  opacity: 1; }
+		24%  { transform: translate(-50%, -350%)  translateX(11%)  scale(1.01) rotate(1deg);   opacity: 1; }
+		27%  { transform: translate(-50%, -380%)  translateX(14%)  scale(0.99) rotate(2deg);   opacity: 1; }
+		30%  { transform: translate(-50%, -407%)  translateX(17%)  scale(0.97) rotate(3deg);   opacity: 1; }
+		33%  { transform: translate(-50%, -430%)  translateX(20.5%) scale(0.96) rotate(3.5deg); opacity: 1; }
+		36%  { transform: translate(-50%, -448%)  translateX(24%)  scale(0.955) rotate(4deg);  opacity: 1; }
+		38%  { transform: translate(-50%, -457%)  translateX(27%)  scale(0.95) rotate(4.5deg); opacity: 1; }
+		40%  { transform: translate(-50%, -460%)  translateX(30%)  scale(0.95) rotate(5deg);   opacity: 1; }
+		43%  { transform: translate(-50%, -458%)  translateX(35%)  scale(0.92) rotate(7deg);   opacity: 0.98; }
+		46%  { transform: translate(-50%, -452%)  translateX(40%)  scale(0.89) rotate(9deg);   opacity: 0.96; }
+		49%  { transform: translate(-50%, -443%)  translateX(46%)  scale(0.87) rotate(11deg);  opacity: 0.94; }
+		52%  { transform: translate(-50%, -432%)  translateX(52%)  scale(0.84) rotate(13deg);  opacity: 0.91; }
+		55%  { transform: translate(-50%, -420%)  translateX(58%)  scale(0.82) rotate(15deg);  opacity: 0.88; }
+		58%  { transform: translate(-50%, -413%)  translateX(64%)  scale(0.8)  rotate(17deg);  opacity: 0.85; }
+		61%  { transform: translate(-50%, -412%)  translateX(70%)  scale(0.78) rotate(18.5deg); opacity: 0.82; }
+		65%  { transform: translate(-50%, -420%)  translateX(80%)  scale(0.75) rotate(20deg);  opacity: 0.8; }
+		68%  { transform: translate(-50%, -408%)  translateX(88%)  scale(0.72) rotate(22deg);  opacity: 0.75; }
+		71%  { transform: translate(-50%, -390%)  translateX(97%)  scale(0.69) rotate(24deg);  opacity: 0.69; }
+		74%  { transform: translate(-50%, -368%)  translateX(106%) scale(0.66) rotate(26deg);  opacity: 0.63; }
+		77%  { transform: translate(-50%, -342%)  translateX(116%) scale(0.63) rotate(28deg);  opacity: 0.56; }
+		80%  { transform: translate(-50%, -312%)  translateX(126%) scale(0.6)  rotate(30deg);  opacity: 0.49; }
+		83%  { transform: translate(-50%, -280%)  translateX(136%) scale(0.57) rotate(32deg);  opacity: 0.42; }
+		86%  { transform: translate(-50%, -245%)  translateX(146%) scale(0.54) rotate(34deg);  opacity: 0.34; }
+		89%  { transform: translate(-50%, -208%)  translateX(156%) scale(0.51) rotate(35.5deg); opacity: 0.26; }
+		92%  { transform: translate(-50%, -168%)  translateX(165%) scale(0.48) rotate(37deg);  opacity: 0.18; }
+		95%  { transform: translate(-50%, -125%)  translateX(170%) scale(0.45) rotate(38.5deg); opacity: 0.1; }
+		98%  { transform: translate(-50%, -82%)   translateX(170%) scale(0.42) rotate(39.5deg); opacity: 0.04; }
+		100% { transform: translate(-50%, -200%)  translateX(170%) scale(0.4)  rotate(40deg);  opacity: 0; }
+	}
+
+	@keyframes sparkle {
+		0%   { opacity: 0; transform: translate(0, 0) scale(0.3); }
+		30%  { opacity: 1; }
+		100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(1); }
+	}
+
+	@keyframes hintPulse {
+		0%, 100% { opacity: 0.4; transform: translateY(0); }
+		50%      { opacity: 0.85; transform: translateY(-4px); }
+	}
+
+	/* ---------- Extra-small phones (e.g. iPhone SE, 360px and below) ---------- */
+	@media (max-width: 360px) {
+		.envelope {
+			--w: min(82vw, 270px);
+		}
+		.letter-eyebrow { letter-spacing: 0.16em; }
+	}
+
+	/* ---------- Short / landscape phones: keep envelope from overflowing height ---------- */
+	@media (max-height: 480px) {
+		.envelope {
+			--w: min(50vh, 60vw, 300px);
+		}
+		.tap-hint { margin-top: 0.6rem; }
+	}
+
+	/* Respect reduced motion */
+	@media (prefers-reduced-motion: reduce) {
+		.envelope { animation: none; }
+		.wax-seal { animation: none; }
+		.tap-hint { animation: none; }
+	}
+</style>
+
+<script>
+	const intro = document.getElementById('intro-screen');
+	const wrapper = document.getElementById('envelope-wrapper');
+	const stage = document.querySelector('.env-stage');
+	const fog = document.getElementById('fog');
+
+	// Skip intro if the guest already passed the quiz
+	if (localStorage.getItem('wedding_quiz_passed') === 'true') {
+		intro?.remove();
+		document.getElementById('quiz-gate')?.remove();
+		document.getElementById('wtf-reveal')?.remove();
+		const mainContent = document.getElementById('main-content');
+		if (mainContent) {
+			mainContent.style.opacity = '1';
+			mainContent.style.pointerEvents = '';
+		}
+	} else {
+		// Lock scroll while the intro is showing
+		document.body.style.overflow = 'hidden';
+		document.documentElement.style.overflow = 'hidden';
+
+		(window as any).__preventScroll = function (e: Event) {
+			e.preventDefault();
+		};
+		document.addEventListener('wheel', (window as any).__preventScroll, { passive: false });
+		document.addEventListener('touchmove', (window as any).__preventScroll, { passive: false });
+
+		// Mobile fix: iOS Safari sometimes fires a "ghost click" ~300ms after touchend,
+		// which could double-trigger openEnvelope(). touchend is handled explicitly below
+		// and stops propagation so the later synthetic click is harmless either way.
+	}
+
+	let opened = false;
+	let dismissed = false;
+
+	function openEnvelope() {
+		if (opened) return;
+		opened = true;
+		wrapper?.classList.add('opened');
+
+		setTimeout(() => {
+			wrapper?.classList.add('content-fading');
+		}, 2000);
+
+		setTimeout(() => {
+			stage?.classList.add('zooming');
+		}, 2300);
+
+		setTimeout(() => {
+			fog?.classList.add('active');
+		}, 2300);
+
+		setTimeout(dismissIntro, 2500);
+	}
+
+	function dismissIntro() {
+		if (dismissed) return;
+		dismissed = true;
+
+		if (typeof (window as any).showQuizGate === 'function') {
+			(window as any).showQuizGate();
+		}
+
+		intro?.classList.add('vanishing');
+
+		setTimeout(() => {
+			intro?.classList.add('dismissed');
+			setTimeout(() => intro?.remove(), 900);
+		}, 500);
+	}
+
+	// touchend fires faster/more reliably than click on mobile and avoids the
+	// 300ms tap-delay some browsers still apply; click is kept for desktop/keyboard.
+	wrapper?.addEventListener('touchend', (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		openEnvelope();
+	}, { passive: false });
+
+	wrapper?.addEventListener('click', (e) => {
+		e.stopPropagation();
+		openEnvelope();
+	});
+
+	wrapper?.addEventListener('keydown', (e) => {
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			openEnvelope();
+		}
+	});
+</script>
