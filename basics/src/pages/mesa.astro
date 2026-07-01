@@ -283,6 +283,14 @@ import Layout from '../layouts/Layout.astro';
   // === API ===
   async function fetchGuests(): Promise<Guest[]> {
     if (guestsFetched) return allGuests;
+    // Prefer the normalized `attendees` table (one row per person, each with its
+    // own mesa_id). Fall back to `guests` if attendees doesn't exist / is empty.
+    const attRes = await supabase.from('attendees').select('id, name, mesa_id, is_primary');
+    if (!attRes.error && attRes.data && attRes.data.length > 0) {
+      allGuests = attRes.data.map((a: any) => ({ id: a.id, nome: a.name, mesa_id: a.mesa_id ?? null }));
+      guestsFetched = true;
+      return allGuests;
+    }
     const { data, error } = await supabase.from('guests').select('*').order('created_at', { ascending: false });
     if (error) throw new Error(error.message);
     allGuests = data || [];

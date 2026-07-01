@@ -87,12 +87,34 @@ export function computeScaledDimensions(
 // --- URL Generation ---
 
 /**
- * Returns the thumbnail URL for a photo using Supabase Storage transforms.
- * Uses width=400 for grid display.
+ * Storage prefix under which small pre-generated thumbnails are stored.
+ * A photo saved as `wedding-photos/{path}` has its thumbnail at
+ * `wedding-photos/thumbs/{path}`.
+ */
+export const THUMBNAIL_PREFIX = 'thumbs/';
+
+/**
+ * Returns the thumbnail URL for a photo.
+ *
+ * Thumbnails are generated client-side at upload time and stored as plain
+ * objects under the `thumbs/` prefix. This avoids depending on Supabase's
+ * paid image-transformation feature (which silently fails on the free tier),
+ * works regardless of plan, and keeps grid payloads tiny.
+ *
+ * If a given photo has no thumbnail (e.g. legacy uploads), callers should
+ * fall back to `getFullResUrl` via the image `error` event.
  */
 export function getThumbnailUrl(path: string): string {
   const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
-  return `${supabaseUrl}/storage/v1/render/image/public/wedding-photos/${path}?width=400`;
+  return `${supabaseUrl}/storage/v1/object/public/wedding-photos/${THUMBNAIL_PREFIX}${path}`;
+}
+
+/**
+ * Returns the storage path (relative to the bucket) where a photo's
+ * thumbnail should be uploaded.
+ */
+export function getThumbnailPath(path: string): string {
+  return `${THUMBNAIL_PREFIX}${path}`;
 }
 
 /**
@@ -158,7 +180,7 @@ const MAX_FALLBACK_SIZE = 10_485_760; // 10 MB
  * otherwise throws an error.
  */
 export async function compressImage(
-  file: File,
+  file: File | Blob,
   maxDimension: number,
   quality: number
 ): Promise<Blob> {
@@ -218,7 +240,7 @@ export async function compressImage(
  * Loads a File into an HTMLImageElement via object URL.
  * Rejects if the image cannot be decoded (e.g., unsupported format).
  */
-function loadImage(file: File): Promise<HTMLImageElement> {
+function loadImage(file: File | Blob): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
     const img = new Image();

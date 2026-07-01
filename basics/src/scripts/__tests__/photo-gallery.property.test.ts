@@ -246,7 +246,7 @@ describe('Property 6: Image dimension scaling preserves aspect ratio and enforce
 // **Validates: Requirements 4.2, 4.3**
 
 describe('Property 7: Storage URL generation produces correct thumbnail and full-res URLs', () => {
-  it('getThumbnailUrl contains "width=400" for any non-empty path', () => {
+  it('getThumbnailUrl points at the thumbs/ prefix for any non-empty path', () => {
     const pathArb = fc.string({ minLength: 1, maxLength: 100 }).filter(
       (s) => s.trim().length > 0
     );
@@ -254,14 +254,14 @@ describe('Property 7: Storage URL generation produces correct thumbnail and full
     fc.assert(
       fc.property(pathArb, (path) => {
         const url = getThumbnailUrl(path);
-        expect(url).toContain('width=400');
+        expect(url).toContain('thumbs/');
         expect(url).toContain(path);
       }),
       { numRuns: 100 }
     );
   });
 
-  it('getFullResUrl contains the path without resize params', () => {
+  it('getFullResUrl contains the path without the thumbs/ prefix', () => {
     const pathArb = fc.string({ minLength: 1, maxLength: 100 }).filter(
       (s) => s.trim().length > 0
     );
@@ -270,7 +270,7 @@ describe('Property 7: Storage URL generation produces correct thumbnail and full
       fc.property(pathArb, (path) => {
         const url = getFullResUrl(path);
         expect(url).toContain(path);
-        expect(url).not.toContain('width=');
+        expect(url).not.toContain('thumbs/');
       }),
       { numRuns: 100 }
     );

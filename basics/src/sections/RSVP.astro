@@ -329,7 +329,7 @@
 			const supabaseKey = (import.meta as any).env.PUBLIC_SUPABASE_ANON_KEY;
 			const supabase = createClient(supabaseUrl, supabaseKey);
 
-			const { error } = await supabase
+			const { data: insertedGuest, error } = await supabase
 				.from('guests')
 				.insert({
 					nome: payload.nome,
@@ -338,9 +338,35 @@
 					restricoes: payload.restricoes || null,
 					companions: payload.companions,
 					mensagem: payload.mensagem || null,
-				});
+				})
+				.select('id')
+				.single();
 
 			if (error) throw new Error(error.message);
+
+			// Normalized model: create one `attendees` row per physical person
+			// (main contact + each companion). Non-fatal if it fails, so a guest
+			// is never blocked from confirming — the admin backfill SQL can repair.
+			if (insertedGuest?.id) {
+				const attendeeRows = [
+					{
+						guest_id: insertedGuest.id,
+						name: payload.nome,
+						type: 'adult',
+						is_primary: true,
+						allergy: payload.restricoes || null,
+					},
+					...payload.companions.map((c) => ({
+						guest_id: insertedGuest.id,
+						name: c.name,
+						type: c.type || 'adult',
+						is_primary: false,
+						allergy: c.allergy || null,
+					})),
+				];
+				const { error: attErr } = await supabase.from('attendees').insert(attendeeRows);
+				if (attErr) console.warn('attendees insert failed (non-fatal):', attErr.message);
+			}
 
 			form.reset();
 			companionsList.innerHTML = '';

@@ -1,49 +1,83 @@
 ---
 // Photo gallery with lightbox — olive/beige palette
 // Show 6 preview photos + "Ver todas" button to open full gallery lightbox
-const images = [
-	{ src: 'memorias/18.JPG', alt: 'Memória 1' },
-	{ src: 'memorias/2021_10.jpg', alt: 'Memória 2' },
-	{ src: 'memorias/2022_02.jpg', alt: 'Memória 3' },
-	{ src: 'memorias/2023_05_3.jpg', alt: 'Memória 4' },
-	{ src: 'memorias/26.jpg', alt: 'Memória 5' },
-	{ src: 'memorias/33.jpg', alt: 'Memória 6' },
-	{ src: 'memorias/36.jpg', alt: 'Memória 7' },
-	{ src: 'memorias/39.jpg', alt: 'Memória 8' },
-	{ src: 'memorias/IMG_20201011_130444.jpg', alt: 'Memória 9' },
-	{ src: 'memorias/IMG_20210918_151723.jpg', alt: 'Memória 10' },
-	{ src: 'memorias/IMG_20231006_162301.jpg', alt: 'Memória 11' },
-	{ src: 'memorias/IMG_20260628_165114.jpg', alt: 'Memória 12' },
-	{ src: 'memorias/IMG-20210705-WA0021.jpg', alt: 'Memória 13' },
-	{ src: 'memorias/IMG-20230530-WA0029.jpg', alt: 'Memória 14' },
-	{ src: 'memorias/IMG-20230619-WA00082.jpg', alt: 'Memória 15' },
-	{ src: 'memorias/IMG-20240606-WA0064.jpg', alt: 'Memória 16' },
-	{ src: 'memorias/IMG-20240903-WA0010.jpg', alt: 'Memória 17' },
-	{ src: 'memorias/IMG-20240905-WA0001.jpg', alt: 'Memória 18' },
-	{ src: 'memorias/IMG-20241013-WA0006.jpg', alt: 'Memória 19' },
-	{ src: 'memorias/IMG-20241013-WA0014.jpg', alt: 'Memória 20' },
-	{ src: 'memorias/IMG-20241110-WA0001.jpg', alt: 'Memória 21' },
-	{ src: 'memorias/IMG-20241112-WA0012.jpg', alt: 'Memória 22' },
-	{ src: 'memorias/IMG-20241112-WA0013.jpg', alt: 'Memória 23' },
-	{ src: 'memorias/IMG-20241112-WA0014.jpg', alt: 'Memória 24' },
-	{ src: 'memorias/IMG-20241112-WA0016.jpg', alt: 'Memória 25' },
-	{ src: 'memorias/IMG-20241112-WA0017.jpg', alt: 'Memória 26' },
-	{ src: 'memorias/IMG-20241112-WA0018.jpg', alt: 'Memória 27' },
-	{ src: 'memorias/IMG-20241117-WA0004.jpg', alt: 'Memória 28' },
-	{ src: 'memorias/IMG-20241229-WA0130.jpg', alt: 'Memória 29' },
-	{ src: 'memorias/IMG-20250818-WA0050.jpg', alt: 'Memória 30' },
-	{ src: 'memorias/IMG-20250921-WA0020.jpg', alt: 'Memória 31' },
-	{ src: 'memorias/IMG20251225152036.jpg', alt: 'Memória 32' },
-	{ src: 'memorias/IMG20260314134006.jpg', alt: 'Memória 33' },
-	{ src: 'memorias/IMG20260317152708.jpg', alt: 'Memória 34' },
-	{ src: 'memorias/IMG20260627182931.jpg', alt: 'Memória 35' },
-	{ src: 'memorias/received_313562693332709.jpeg', alt: 'Memória 36' },
-	{ src: 'memorias/received_568906853777986.jpeg', alt: 'Memória 37' },
-	{ src: 'memorias/received_669196577003162.jpeg', alt: 'Memória 38' },
+//
+// Images live in src/assets/memorias and are optimized at build time by Astro:
+//  - grid thumbnails: small WebP (~600px)
+//  - lightbox: larger WebP (~1600px)
+// This turns multi-MB originals into tens of KB, fixing slow/broken loads on mobile.
+import { Image, getImage } from 'astro:assets';
+
+// Eagerly import every image in the folder as processed ImageMetadata.
+const imageModules = import.meta.glob<{ default: ImageMetadata }>(
+	'../assets/memorias/*.{jpg,JPG,jpeg,JPEG,png,PNG}',
+	{ eager: true }
+);
+
+// Preserve the original display order (Memória 1..38) by filename.
+const orderedFilenames = [
+	'18.JPG',
+	'2021_10.jpg',
+	'2022_02.jpg',
+	'2023_05_3.jpg',
+	'26.jpg',
+	'33.jpg',
+	'36.jpg',
+	'39.jpg',
+	'IMG_20201011_130444.jpg',
+	'IMG_20210918_151723.jpg',
+	'IMG_20231006_162301.jpg',
+	'IMG_20260628_165114.jpg',
+	'IMG-20210705-WA0021.jpg',
+	'IMG-20230530-WA0029.jpg',
+	'IMG-20230619-WA00082.jpg',
+	'IMG-20240606-WA0064.jpg',
+	'IMG-20240903-WA0010.jpg',
+	'IMG-20240905-WA0001.jpg',
+	'IMG-20241013-WA0006.jpg',
+	'IMG-20241013-WA0014.jpg',
+	'IMG-20241110-WA0001.jpg',
+	'IMG-20241112-WA0012.jpg',
+	'IMG-20241112-WA0013.jpg',
+	'IMG-20241112-WA0014.jpg',
+	'IMG-20241112-WA0016.jpg',
+	'IMG-20241112-WA0017.jpg',
+	'IMG-20241112-WA0018.jpg',
+	'IMG-20241117-WA0004.jpg',
+	'IMG-20241229-WA0130.jpg',
+	'IMG-20250818-WA0050.jpg',
+	'IMG-20250921-WA0020.jpg',
+	'IMG20251225152036.jpg',
+	'IMG20260314134006.jpg',
+	'IMG20260317152708.jpg',
+	'IMG20260627182931.jpg',
+	'received_313562693332709.jpeg',
+	'received_568906853777986.jpeg',
+	'received_669196577003162.jpeg',
 ];
+
+function moduleFor(filename: string) {
+	const key = `../assets/memorias/${filename}`;
+	const mod = imageModules[key];
+	if (!mod) throw new Error(`Gallery image not found: ${filename}`);
+	return mod.default;
+}
+
+const images = orderedFilenames.map((filename, i) => ({
+	image: moduleFor(filename),
+	alt: `Memória ${i + 1}`,
+}));
 
 const previewImages = images.slice(0, 6);
 const remainingCount = images.length - 6;
+
+// Pre-generate optimized full-size WebP URLs for the lightbox (used by JS).
+const lightboxUrls = await Promise.all(
+	images.map(async ({ image }) => {
+		const optimized = await getImage({ src: image, width: 1600, format: 'webp' });
+		return optimized.src;
+	})
+);
 ---
 
 <section id="gallery" class="wedding-section" style="background-image: url('/casamento_taniaemiguel/images/sand-texture.jpg'); background-size: cover; background-position: center;">
@@ -64,11 +98,15 @@ const remainingCount = images.length - 6;
 					data-index={i}
 				>
 					<div class="aspect-[4/3]">
-						<img 
-							src={`${import.meta.env.BASE_URL}/images/${img.src}`}
+						<Image
+							src={img.image}
 							alt={img.alt}
+							width={600}
+							height={450}
+							format="webp"
+							quality={72}
 							class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-							loading="lazy"
+							loading={i < 3 ? 'eager' : 'lazy'}
 						/>
 					</div>
 					{i === 5 && (
@@ -127,7 +165,7 @@ const remainingCount = images.length - 6;
 </div>
 
 <!-- Hidden data for JS -->
-<div id="gallery-data" class="hidden" data-images={JSON.stringify(images.map(img => `${import.meta.env.BASE_URL}/images/${img.src}`))}></div>
+<div id="gallery-data" class="hidden" data-images={JSON.stringify(lightboxUrls)}></div>
 
 <script>
 	document.addEventListener('DOMContentLoaded', () => {
