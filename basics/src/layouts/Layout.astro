@@ -14,14 +14,14 @@ const description = 'Junta-te a nós para celebrar o casamento da Tânia e do Mi
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" type="image/svg+xml" href={`${import.meta.env.BASE_URL}/favicon.svg`} />
+		<link rel="icon" type="image/svg+xml" href={`/favicon.svg`} />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="base-url" content={import.meta.env.BASE_URL} />
 		<meta name="description" content={description} />
 		<meta property="og:title" content={title} />
 		<meta property="og:description" content={description} />
 		<meta property="og:type" content="website" />
-		<meta property="og:image" content={`${import.meta.env.BASE_URL}/images/couple-background.jpg`} />
+		<meta property="og:image" content={`/images/couple-background.jpg`} />
 		<title>{title}</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -29,14 +29,14 @@ const description = 'Junta-te a nós para celebrar o casamento da Tânia e do Mi
 		<style>
 			@font-face {
 				font-family: 'Whispering Signature';
-				src: url('/casamento_taniaemiguel/fonts/WhisperingSignature.ttf') format('truetype');
+				src: url('/fonts/WhisperingSignature.ttf') format('truetype');
 				font-weight: normal;
 				font-style: normal;
 				font-display: swap;
 			}
 		</style>
 	</head>
-	<body class="min-h-screen overflow-x-hidden bg-sand" style={`background-image: url('${import.meta.env.BASE_URL}/images/sand-texture.jpg');`}>
+	<body class="min-h-screen overflow-x-hidden bg-sand" style={`background-image: url('/images/sand-texture.jpg');`}>
 		<slot />
 		<Footer />
 
