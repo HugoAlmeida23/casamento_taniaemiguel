@@ -1,21 +1,31 @@
 ---
-// Intro: Video_inicial.mp4 paused → tap anywhere to play → on end → quiz gate.
+// Intro: imagem_inicial.png shown → tap → Video_inicial.mp4 plays → on end → quiz gate.
 const base = import.meta.env.BASE_URL;
 const videoSrc = `${base}images/Video_inicial.mp4`;
+const imageSrc = `${base}images/imagem_inicial.png`;
 ---
 
 <div
 	id="intro-screen"
-	class="fixed inset-0 z-[200] overflow-hidden select-none bg-black cursor-pointer"
+	class="fixed inset-0 z-[200] overflow-hidden select-none cursor-pointer"
+	style="background:#6e8e7a;"
 >
+	<!-- Static image (shown while video is paused) -->
+	<img
+		id="intro-image"
+		src={imageSrc}
+		alt="Convite"
+		class="absolute inset-0 w-full h-full object-cover"
+	/>
+
+	<!-- Video (hidden behind image, plays on tap) -->
 	<video
 		id="intro-video"
-		class="absolute inset-0 w-full h-full object-cover"
-		style="object-position: 48% center; margin:0; padding:0;"
+		class="absolute inset-0 w-full h-full opacity-0"
+		style="object-fit: cover; object-position: 48% center; transform: scale(1.15);"
 		muted
 		playsinline
 		preload="auto"
-		style="margin:0; padding:0;"
 	>
 		<source src={videoSrc} type="video/mp4" />
 	</video>
@@ -40,11 +50,31 @@ const videoSrc = `${base}images/Video_inicial.mp4`;
 		opacity: 0;
 		pointer-events: none;
 	}
+
+	#intro-image {
+		z-index: 2;
+		transition: opacity 0.3s ease;
+	}
+
+	#intro-image.hidden {
+		opacity: 0;
+		pointer-events: none;
+	}
+
+	#intro-video {
+		z-index: 1;
+		transition: opacity 0.3s ease;
+	}
+
+	#intro-video.visible {
+		opacity: 1;
+	}
 </style>
 
 <script>
 	const intro = document.getElementById('intro-screen');
 	const video = document.getElementById('intro-video') as HTMLVideoElement | null;
+	const image = document.getElementById('intro-image');
 
 	// Skip intro if the guest already passed the quiz
 	if (localStorage.getItem('wedding_quiz_passed') === 'true') {
@@ -75,6 +105,10 @@ const videoSrc = `${base}images/Video_inicial.mp4`;
 	function startVideo() {
 		if (videoStarted) return;
 		videoStarted = true;
+
+		// Hide image, show video
+		image?.classList.add('hidden');
+		video?.classList.add('visible');
 		video?.play().catch(() => {});
 	}
 
